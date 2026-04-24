@@ -308,7 +308,8 @@ fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_code:
 		"ZSecuritySystemCameraConfiguration_SHitmanVisibleEscalationRule",
 		"AI_SFirePattern02",
 		"ZSecuritySystemCameraConfiguration_SDeadBodyVisibleEscalationRule",
-		"ZOverlayControllerEntity_SInputData"
+		"ZOverlayControllerEntity_SInputData",
+		"ZEntityReference"
 	];
 
 	for ty in to_generate.concat() {
