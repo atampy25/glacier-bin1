@@ -644,11 +644,11 @@ value.try_into().map_err(|_| DeserializeError::InvalidEnumValue(value as i64))"
 	}
 
 	scope.raw(format!(
-		"pub static ENUMS: [&facet::Shape; {}] = [{}];",
+		"pub static ENUMS: [(&str, &facet::Shape); {}] = [{}];",
 		enums.len(),
 		enums
 			.into_iter()
-			.map(|x| format!("{x}::SHAPE"))
+			.map(|x| format!(r#"({x}::TYPE_ID, &{x}::SHAPE)"#))
 			.collect::<Vec<_>>()
 			.join(", ")
 	));
