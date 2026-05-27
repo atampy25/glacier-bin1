@@ -394,7 +394,7 @@ impl<'de> Deserialize<'de> for ZVariant {
 			where
 				V: serde::de::SeqAccess<'de>
 			{
-				let type_id: &'de str = seq
+				let type_id: std::borrow::Cow<'de, str> = seq
 					.next_element()?
 					.ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
 
@@ -402,7 +402,7 @@ impl<'de> Deserialize<'de> for ZVariant {
 					.next_element()?
 					.ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
 
-				if let Some(deserializer) = DESERIALIZERS.get(&type_id) {
+				if let Some(deserializer) = DESERIALIZERS.get(&*type_id) {
 					let value = BorrowedValueWrapper { value };
 
 					if let Some(variant) = VARIANT_POOL.pin().get(&value)
@@ -412,7 +412,7 @@ impl<'de> Deserialize<'de> for ZVariant {
 					}
 
 					let variant = deserializer
-						.deserialize_serde(type_id, value.value.to_owned().into())
+						.deserialize_serde(&type_id, value.value.to_owned().into())
 						.map_err(serde::de::Error::custom)?;
 
 					VARIANT_POOL.pin().insert(
@@ -432,7 +432,7 @@ impl<'de> Deserialize<'de> for ZVariant {
 			where
 				V: serde::de::MapAccess<'de>
 			{
-				let mut type_id = None::<&'de str>;
+				let mut type_id = None::<std::borrow::Cow<'de, str>>;
 				let mut value = None;
 
 				while let Some(key) = map.next_key()? {
@@ -456,7 +456,7 @@ impl<'de> Deserialize<'de> for ZVariant {
 				let type_id = type_id.ok_or_else(|| serde::de::Error::missing_field("$type"))?;
 				let value = value.ok_or_else(|| serde::de::Error::missing_field("$val"))?;
 
-				if let Some(deserializer) = DESERIALIZERS.get(&type_id) {
+				if let Some(deserializer) = DESERIALIZERS.get(&*type_id) {
 					let value = BorrowedValueWrapper { value };
 
 					if let Some(variant) = VARIANT_POOL.pin().get(&value)
@@ -466,7 +466,7 @@ impl<'de> Deserialize<'de> for ZVariant {
 					}
 
 					let variant = deserializer
-						.deserialize_serde(type_id, value.value.to_owned().into())
+						.deserialize_serde(&type_id, value.value.to_owned().into())
 						.map_err(serde::de::Error::custom)?;
 
 					VARIANT_POOL.pin().insert(
