@@ -24,7 +24,7 @@ static PROPERTIES: BiMap<&'static str, u32> = include_str!("../../properties.txt
 	.collect();
 
 #[static_init::dynamic]
-static CUSTOM_PROPERTIES: papaya::HashMap<u32, EcoString> = papaya::HashMap::new();
+static CUSTOM_PROPERTIES: papaya::HashMap<u32, EcoString, rapidhash::fast::RandomState> = Default::default();
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Facet)]
 pub struct PropertyID(pub u32);

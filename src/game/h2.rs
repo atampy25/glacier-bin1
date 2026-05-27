@@ -4,7 +4,11 @@
 static VARIANT_TYPES_H2: [(std::any::TypeId, &'static str, Option<&'static facet::Shape>)];
 
 #[static_init::dynamic]
-pub static VARIANT_TYPES: HashMap<std::any::TypeId, (&'static str, Option<&'static facet::Shape>)> = VARIANT_TYPES_H2
+pub static VARIANT_TYPES: HashMap<
+	std::any::TypeId,
+	(&'static str, Option<&'static facet::Shape>),
+	rapidhash::fast::RandomState
+> = VARIANT_TYPES_H2
 	.into_iter()
 	.map(|&(ty, name, shape)| (ty, (name, shape)))
 	.collect();
@@ -13,7 +17,7 @@ pub static VARIANT_TYPES: HashMap<std::any::TypeId, (&'static str, Option<&'stat
 static VARIANT_DESERIALIZERS_H2: [&'static dyn DeserializeVariant];
 
 #[static_init::dynamic]
-pub static DESERIALIZERS: HashMap<&'static str, &'static dyn DeserializeVariant> =
+pub static DESERIALIZERS: HashMap<&'static str, &'static dyn DeserializeVariant, rapidhash::fast::RandomState> =
 	VARIANT_DESERIALIZERS_H2.iter().map(|&x| (x.type_id(), x)).collect();
 
 macro_rules! submit_nofacet {

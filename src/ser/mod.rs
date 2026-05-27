@@ -45,7 +45,7 @@ pub struct Bin1Serializer {
 	buffer: Vec<u8>,
 
 	/// Map of pointer IDs to where their data has been written.
-	offsets: HashMap<u64, u64>,
+	offsets: HashMap<u64, u64, rapidhash::fast::RandomState>,
 
 	/// Offsets to pointers that need to be patched.
 	pointers: Vec<u32>,
@@ -67,7 +67,7 @@ impl Default for Bin1Serializer {
 	fn default() -> Self {
 		Self {
 			buffer: vec![],
-			offsets: HashMap::new(),
+			offsets: Default::default(),
 			pointers: vec![],
 			runtime_resource_ids: vec![],
 			resource_ptrs: vec![],

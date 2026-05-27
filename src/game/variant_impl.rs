@@ -61,7 +61,8 @@ impl<T: StaticVariant + Variant + Bin1Deserialize + DeserializeOwned + 'static +
 
 /// Pool of serde-deserialised variants to deduplicate identical values.
 #[static_init::dynamic]
-static VARIANT_POOL: papaya::HashMap<ValueWrapper, std::sync::Weak<dyn Variant>> = papaya::HashMap::new();
+static VARIANT_POOL: papaya::HashMap<ValueWrapper, std::sync::Weak<dyn Variant>, rapidhash::fast::RandomState> =
+	Default::default();
 
 struct ValueWrapper {
 	value: serde_json::Value
@@ -275,50 +276,108 @@ impl<'de> Deserialize<'de> for ZVariant {
 	where
 		D: serde::Deserializer<'de>
 	{
-		let mut type_id = None;
-		let mut value = None;
-
-		let map = serde_json::Map::<String, serde_json::Value>::deserialize(deserializer)?;
-		for (key, val) in map {
-			match key.as_str() {
-				"$type" => {
-					type_id = Some(
-						val.as_str()
-							.ok_or_else(|| serde::de::Error::custom("$type must be string"))?
-							.to_owned()
-					);
-				}
-
-				"$val" => {
-					value = Some(val);
-				}
-
-				_ => return Err(serde::de::Error::unknown_field(&key, &["$type", "$val"]))
-			}
+		#[derive(Deserialize)]
+		#[serde(field_identifier)]
+		enum Field {
+			#[serde(rename = "$type")]
+			Ty,
+			#[serde(rename = "$val")]
+			Val
 		}
 
-		let type_id = type_id.ok_or_else(|| serde::de::Error::missing_field("$type"))?;
-		let value = value.ok_or_else(|| serde::de::Error::missing_field("$val"))?;
+		struct VariantVisitor;
 
-		if let Some(deserializer) = DESERIALIZERS.get(type_id.as_str()) {
-			if let Some(variant) = VARIANT_POOL.pin().get(&BorrowedValueWrapper { value: &value })
-				&& let Some(variant) = variant.upgrade()
+		impl<'de> serde::de::Visitor<'de> for VariantVisitor {
+			type Value = ZVariant;
+
+			fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+				formatter.write_str("struct ZVariant")
+			}
+
+			fn visit_seq<V>(self, mut seq: V) -> Result<ZVariant, V::Error>
+			where
+				V: serde::de::SeqAccess<'de>
 			{
-				return Ok(variant.into());
+				let type_id: &'de str = seq
+					.next_element()?
+					.ok_or_else(|| serde::de::Error::invalid_length(0, &self))?;
+
+				let value = seq
+					.next_element()?
+					.ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
+
+				if let Some(deserializer) = DESERIALIZERS.get(&type_id) {
+					if let Some(variant) = VARIANT_POOL.pin().get(&BorrowedValueWrapper { value: &value })
+						&& let Some(variant) = variant.upgrade()
+					{
+						return Ok(variant.into());
+					}
+
+					let variant = deserializer
+						.deserialize_serde(&type_id, value.to_owned())
+						.map_err(serde::de::Error::custom)?;
+
+					VARIANT_POOL
+						.pin()
+						.insert(ValueWrapper { value }, Arc::downgrade(&variant));
+
+					Ok(variant.into())
+				} else {
+					Err(serde::de::Error::custom(format!("unknown type ID: {}", type_id)))
+				}
 			}
 
-			let variant = deserializer
-				.deserialize_serde(&type_id, value.to_owned())
-				.map_err(serde::de::Error::custom)?;
+			fn visit_map<V>(self, mut map: V) -> Result<ZVariant, V::Error>
+			where
+				V: serde::de::MapAccess<'de>
+			{
+				let mut type_id = None::<&'de str>;
+				let mut value = None;
 
-			VARIANT_POOL
-				.pin()
-				.insert(ValueWrapper { value }, Arc::downgrade(&variant));
+				while let Some(key) = map.next_key()? {
+					match key {
+						Field::Ty => {
+							if type_id.is_some() {
+								return Err(serde::de::Error::duplicate_field("$type"));
+							}
+							type_id = Some(map.next_value()?);
+						}
 
-			Ok(variant.into())
-		} else {
-			Err(serde::de::Error::custom(format!("unknown type ID: {}", type_id)))
+						Field::Val => {
+							if value.is_some() {
+								return Err(serde::de::Error::duplicate_field("$val"));
+							}
+							value = Some(map.next_value()?);
+						}
+					}
+				}
+
+				let type_id = type_id.ok_or_else(|| serde::de::Error::missing_field("$type"))?;
+				let value = value.ok_or_else(|| serde::de::Error::missing_field("$val"))?;
+
+				if let Some(deserializer) = DESERIALIZERS.get(&type_id) {
+					if let Some(variant) = VARIANT_POOL.pin().get(&BorrowedValueWrapper { value: &value })
+						&& let Some(variant) = variant.upgrade()
+					{
+						return Ok(variant.into());
+					}
+
+					let variant = deserializer
+						.deserialize_serde(&type_id, value.to_owned())
+						.map_err(serde::de::Error::custom)?;
+
+					VARIANT_POOL
+						.pin()
+						.insert(ValueWrapper { value }, Arc::downgrade(&variant));
+
+					Ok(variant.into())
+				} else {
+					Err(serde::de::Error::custom(format!("unknown type ID: {}", type_id)))
+				}
+			}
 		}
+
+		deserializer.deserialize_struct("ZVariant", &["$type", "$val"], VariantVisitor)
 	}
 }
 

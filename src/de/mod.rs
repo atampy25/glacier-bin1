@@ -49,11 +49,11 @@ pub enum DeserializeError {
 pub struct Bin1Deserializer<'a> {
 	buffer: Cursor<&'a [u8]>,
 
-	parsed_strings: HashMap<u64, EcoString>,
-	parsed_pointers: HashMap<u64, Box<dyn Any>>,
-	parsed_variants: HashMap<u64, Arc<dyn Variant>>,
+	parsed_strings: HashMap<u64, EcoString, rapidhash::fast::RandomState>,
+	parsed_pointers: HashMap<u64, Box<dyn Any>, rapidhash::fast::RandomState>,
+	parsed_variants: HashMap<u64, Arc<dyn Variant>, rapidhash::fast::RandomState>,
 
-	type_names: HashMap<u32, EcoString>
+	type_names: HashMap<u32, EcoString, rapidhash::fast::RandomState>
 }
 
 pub trait Bin1Deserialize: Sized + Aligned {
@@ -66,10 +66,10 @@ impl<'a> Bin1Deserializer<'a> {
 	pub fn new(data: &'a [u8]) -> Self {
 		Self {
 			buffer: Cursor::new(data),
-			parsed_strings: HashMap::new(),
-			parsed_pointers: HashMap::new(),
-			parsed_variants: HashMap::new(),
-			type_names: HashMap::new()
+			parsed_strings: Default::default(),
+			parsed_pointers: Default::default(),
+			parsed_variants: Default::default(),
+			type_names: Default::default()
 		}
 	}
 
