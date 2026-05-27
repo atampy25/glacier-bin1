@@ -6,6 +6,7 @@ use std::{
 
 use const_format::concatcp;
 use ecow::{EcoString, eco_format};
+use facet::Facet;
 use serde::{Deserialize, Serialize};
 use tryvial::try_fn;
 
@@ -211,8 +212,8 @@ impl Variant for EcoString {
 }
 
 /// An arbitrary string, serialised and deserialised as a BIN1 type ID.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct TypeID(pub EcoString);
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Facet)]
+pub struct TypeID(#[facet(opaque, proxy = String)] pub EcoString);
 
 impl Deref for TypeID {
 	type Target = EcoString;

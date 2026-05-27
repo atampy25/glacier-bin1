@@ -76,7 +76,7 @@ impl Bin1Deserialize for ZRuntimeResourceID {
 	}
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Facet)]
 pub struct TResourcePtr {
 	#[serde(rename = "m_IDHigh")]
 	pub id_high: u32,
