@@ -39,7 +39,7 @@ impl<T: StaticVariant + Variant + Bin1Deserialize + DeserializeOwned + 'static +
 
 	fn deserialize_serde(&self, type_id: &str, value: serde_json::Value) -> Result<Arc<dyn Variant>, String> {
 		if type_id != T::TYPE_ID {
-			return Err(format!("Cannot deserialize {} into {}", type_id, T::TYPE_ID));
+			return Err(format!("cannot deserialize {} into {}", type_id, T::TYPE_ID));
 		}
 
 		serde_json::from_value::<T>(value)
@@ -412,7 +412,7 @@ impl<'de> Deserialize<'de> for ZVariant {
 					}
 
 					let variant = deserializer
-						.deserialize_serde(&type_id, value.value.to_owned().into())
+						.deserialize_serde(type_id, value.value.to_owned().into())
 						.map_err(serde::de::Error::custom)?;
 
 					VARIANT_POOL.pin().insert(
@@ -466,7 +466,7 @@ impl<'de> Deserialize<'de> for ZVariant {
 					}
 
 					let variant = deserializer
-						.deserialize_serde(&type_id, value.value.to_owned().into())
+						.deserialize_serde(type_id, value.value.to_owned().into())
 						.map_err(serde::de::Error::custom)?;
 
 					VARIANT_POOL.pin().insert(

@@ -37,7 +37,7 @@ impl Bin1Deserialize for bool {
 	}
 }
 
-impl<T: Bin1Deserialize + 'static> Bin1Deserialize for Arc<T> {
+impl<T: Bin1Deserialize + 'static + Send + Sync> Bin1Deserialize for Arc<T> {
 	const SIZE: usize = 8;
 
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
@@ -48,7 +48,7 @@ impl<T: Bin1Deserialize + 'static> Bin1Deserialize for Arc<T> {
 	}
 }
 
-impl<T: Bin1Deserialize + 'static> Bin1Deserialize for Option<Arc<T>> {
+impl<T: Bin1Deserialize + 'static + Send + Sync> Bin1Deserialize for Option<Arc<T>> {
 	const SIZE: usize = 8;
 
 	#[try_fn]

@@ -139,7 +139,7 @@ pub mod WithZeroNull {
 		const ALIGNMENT: usize = 8;
 	}
 
-	impl<T: Bin1Deserialize + 'static> Bin1Deserialize for De<T> {
+	impl<T: Bin1Deserialize + 'static + Send + Sync> Bin1Deserialize for De<T> {
 		const SIZE: usize = 8;
 
 		#[tryvial::try_fn]

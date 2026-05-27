@@ -50,7 +50,7 @@ pub struct Bin1Deserializer<'a> {
 	buffer: Cursor<&'a [u8]>,
 
 	parsed_strings: HashMap<u64, EcoString, rapidhash::fast::RandomState>,
-	parsed_pointers: HashMap<u64, Box<dyn Any>, rapidhash::fast::RandomState>,
+	parsed_pointers: HashMap<u64, Arc<dyn Any + Send + Sync>, rapidhash::fast::RandomState>,
 	parsed_variants: HashMap<u64, Arc<dyn Variant>, rapidhash::fast::RandomState>,
 
 	type_names: HashMap<u32, EcoString, rapidhash::fast::RandomState>
@@ -232,7 +232,7 @@ impl<'a> Bin1Deserializer<'a> {
 	}
 
 	#[try_fn]
-	pub fn read_pointer<T: 'static>(
+	pub fn read_pointer<T: Any + Send + Sync>(
 		&mut self,
 		parser: impl Fn(&mut Bin1Deserializer) -> Result<T, DeserializeError>
 	) -> Result<Arc<T>, DeserializeError> {
@@ -241,7 +241,7 @@ impl<'a> Bin1Deserializer<'a> {
 		let ptr = self.buffer.read_u64::<LittleEndian>()?;
 
 		if let Some(parsed) = self.parsed_pointers.get(&ptr) {
-			parsed.downcast_ref::<Arc<T>>().unwrap().clone()
+			parsed.clone().downcast::<T>().unwrap()
 		} else {
 			let pos = self.buffer.position();
 
@@ -250,8 +250,7 @@ impl<'a> Bin1Deserializer<'a> {
 			self.buffer.seek(SeekFrom::Start(pos))?;
 
 			let result = Arc::new(result);
-			self.parsed_pointers
-				.insert(ptr, Box::new(result.clone()) as Box<dyn Any>);
+			self.parsed_pointers.insert(ptr, result.clone());
 
 			result
 		}
