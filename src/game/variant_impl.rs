@@ -68,21 +68,14 @@ struct ValueWrapper {
 	value: serde_json::Value
 }
 
+#[derive(PartialEq, Eq)]
 struct BorrowedValueWrapper<'a> {
-	value: &'a serde_json::Value
+	value: serde_json_borrow::Value<'a>
 }
-
-impl<'a> PartialEq for BorrowedValueWrapper<'a> {
-	fn eq(&self, other: &Self) -> bool {
-		*self.value == *other.value
-	}
-}
-
-impl<'a> Eq for BorrowedValueWrapper<'a> {}
 
 impl PartialEq for ValueWrapper {
 	fn eq(&self, other: &Self) -> bool {
-		BorrowedValueWrapper { value: &self.value } == BorrowedValueWrapper { value: &other.value }
+		self.value == other.value
 	}
 }
 
@@ -90,56 +83,159 @@ impl Eq for ValueWrapper {}
 
 impl<'a> equivalent::Equivalent<ValueWrapper> for BorrowedValueWrapper<'a> {
 	fn equivalent(&self, other: &ValueWrapper) -> bool {
-		*self.value == other.value
-	}
-}
+		fn equiv(a: &serde_json_borrow::Value<'_>, b: &serde_json::Value) -> bool {
+			match (a, b) {
+				(serde_json_borrow::Value::Null, serde_json::Value::Null) => true,
+				(serde_json_borrow::Value::Bool(ab), serde_json::Value::Bool(bb)) => ab == bb,
+				(serde_json_borrow::Value::Number(an), serde_json::Value::Number(bn)) => {
+					if let Some(av) = an.as_i64()
+						&& let Some(bv) = bn.as_i64()
+					{
+						av == bv
+					} else if let Some(av) = an.as_u64()
+						&& let Some(bv) = bn.as_u64()
+					{
+						av == bv
+					} else if let Some(av) = an.as_f64()
+						&& let Some(bv) = bn.as_f64()
+					{
+						av == bv
+					} else {
+						false
+					}
+				}
+				(serde_json_borrow::Value::Str(as_), serde_json::Value::String(bs)) => as_ == bs,
+				(serde_json_borrow::Value::Array(aa), serde_json::Value::Array(bb)) => {
+					if aa.len() != bb.len() {
+						return false;
+					}
 
-impl<'a> std::hash::Hash for BorrowedValueWrapper<'a> {
-	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-		match self.value {
-			serde_json::Value::Null => {
-				0u8.hash(state);
-			}
-			serde_json::Value::Bool(b) => {
-				1u8.hash(state);
-				b.hash(state);
-			}
-			serde_json::Value::Number(n) => {
-				2u8.hash(state);
-				if let Some(i) = n.as_i64() {
-					i.hash(state);
-				} else if let Some(u) = n.as_u64() {
-					u.hash(state);
-				} else if let Some(f) = n.as_f64() {
-					f.to_bits().hash(state);
+					for (ae, be) in aa.iter().zip(bb.iter()) {
+						if !equiv(ae, be) {
+							return false;
+						}
+					}
+
+					true
 				}
-			}
-			serde_json::Value::String(s) => {
-				3u8.hash(state);
-				s.hash(state);
-			}
-			serde_json::Value::Array(arr) => {
-				4u8.hash(state);
-				for item in arr {
-					BorrowedValueWrapper { value: item }.hash(state);
+				(serde_json_borrow::Value::Object(am), serde_json::Value::Object(bm)) => {
+					if am.len() != bm.len() {
+						return false;
+					}
+
+					for (ak, av) in am.iter() {
+						if let Some(bv) = bm.get(ak) {
+							if !equiv(av, bv) {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					}
+
+					// Technically we should check that bm doesn't have extra keys not in am, but it doesn't really matter
+
+					true
 				}
-			}
-			serde_json::Value::Object(obj) => {
-				5u8.hash(state);
-				let mut entries = obj.iter().collect::<Vec<_>>();
-				entries.sort_by_key(|&(k, _)| k);
-				for (k, v) in entries {
-					k.hash(state);
-					BorrowedValueWrapper { value: v }.hash(state);
-				}
+				_ => false
 			}
 		}
+
+		equiv(&self.value, &other.value)
 	}
 }
 
 impl std::hash::Hash for ValueWrapper {
 	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-		BorrowedValueWrapper { value: &self.value }.hash(state);
+		fn hash_value<H: std::hash::Hasher>(value: &serde_json::Value, state: &mut H) {
+			match value {
+				serde_json::Value::Null => {
+					0u8.hash(state);
+				}
+				serde_json::Value::Bool(b) => {
+					1u8.hash(state);
+					b.hash(state);
+				}
+				serde_json::Value::Number(n) => {
+					2u8.hash(state);
+					if let Some(i) = n.as_i64() {
+						i.hash(state);
+					} else if let Some(u) = n.as_u64() {
+						u.hash(state);
+					} else if let Some(f) = n.as_f64() {
+						f.to_bits().hash(state);
+					}
+				}
+				serde_json::Value::String(s) => {
+					3u8.hash(state);
+					s.hash(state);
+				}
+				serde_json::Value::Array(arr) => {
+					4u8.hash(state);
+					for item in arr {
+						hash_value(item, state);
+					}
+				}
+				serde_json::Value::Object(obj) => {
+					5u8.hash(state);
+					let mut entries = obj.iter().collect::<Vec<_>>();
+					entries.sort_by_key(|&(k, _)| k);
+					for (k, v) in entries {
+						k.hash(state);
+						hash_value(v, state);
+					}
+				}
+			}
+		}
+
+		hash_value(&self.value, state);
+	}
+}
+
+impl<'a> std::hash::Hash for BorrowedValueWrapper<'a> {
+	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+		fn hash_value<H: std::hash::Hasher>(value: &serde_json_borrow::Value<'_>, state: &mut H) {
+			match value {
+				serde_json_borrow::Value::Null => {
+					0u8.hash(state);
+				}
+				serde_json_borrow::Value::Bool(b) => {
+					1u8.hash(state);
+					b.hash(state);
+				}
+				serde_json_borrow::Value::Number(n) => {
+					2u8.hash(state);
+					if let Some(i) = n.as_i64() {
+						i.hash(state);
+					} else if let Some(u) = n.as_u64() {
+						u.hash(state);
+					} else if let Some(f) = n.as_f64() {
+						f.to_bits().hash(state);
+					}
+				}
+				serde_json_borrow::Value::Str(s) => {
+					3u8.hash(state);
+					s.hash(state);
+				}
+				serde_json_borrow::Value::Array(arr) => {
+					4u8.hash(state);
+					for item in arr {
+						hash_value(item, state);
+					}
+				}
+				serde_json_borrow::Value::Object(obj) => {
+					5u8.hash(state);
+					let mut entries = obj.iter().collect::<Vec<_>>();
+					entries.sort_by_key(|&(k, _)| k);
+					for (k, v) in entries {
+						k.hash(state);
+						hash_value(v, state);
+					}
+				}
+			}
+		}
+
+		hash_value(&self.value, state);
 	}
 }
 
@@ -307,19 +403,24 @@ impl<'de> Deserialize<'de> for ZVariant {
 					.ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
 
 				if let Some(deserializer) = DESERIALIZERS.get(&type_id) {
-					if let Some(variant) = VARIANT_POOL.pin().get(&BorrowedValueWrapper { value: &value })
+					let value = BorrowedValueWrapper { value };
+
+					if let Some(variant) = VARIANT_POOL.pin().get(&value)
 						&& let Some(variant) = variant.upgrade()
 					{
 						return Ok(variant.into());
 					}
 
 					let variant = deserializer
-						.deserialize_serde(&type_id, value.to_owned())
+						.deserialize_serde(&type_id, value.value.to_owned().into())
 						.map_err(serde::de::Error::custom)?;
 
-					VARIANT_POOL
-						.pin()
-						.insert(ValueWrapper { value }, Arc::downgrade(&variant));
+					VARIANT_POOL.pin().insert(
+						ValueWrapper {
+							value: value.value.into()
+						},
+						Arc::downgrade(&variant)
+					);
 
 					Ok(variant.into())
 				} else {
@@ -356,19 +457,24 @@ impl<'de> Deserialize<'de> for ZVariant {
 				let value = value.ok_or_else(|| serde::de::Error::missing_field("$val"))?;
 
 				if let Some(deserializer) = DESERIALIZERS.get(&type_id) {
-					if let Some(variant) = VARIANT_POOL.pin().get(&BorrowedValueWrapper { value: &value })
+					let value = BorrowedValueWrapper { value };
+
+					if let Some(variant) = VARIANT_POOL.pin().get(&value)
 						&& let Some(variant) = variant.upgrade()
 					{
 						return Ok(variant.into());
 					}
 
 					let variant = deserializer
-						.deserialize_serde(&type_id, value.to_owned())
+						.deserialize_serde(&type_id, value.value.to_owned().into())
 						.map_err(serde::de::Error::custom)?;
 
-					VARIANT_POOL
-						.pin()
-						.insert(ValueWrapper { value }, Arc::downgrade(&variant));
+					VARIANT_POOL.pin().insert(
+						ValueWrapper {
+							value: value.value.into()
+						},
+						Arc::downgrade(&variant)
+					);
 
 					Ok(variant.into())
 				} else {

@@ -428,7 +428,7 @@ fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_code:
 		);
 
 		scope
-			.new_impl(&format!("Vec<{name}>"))
+			.new_impl(format!("Vec<{name}>"))
 			.impl_trait("StaticVariant")
 			.associate_const("TYPE_ID", "&str", format!(r#""TArray<{type_id}>""#), "");
 
@@ -618,7 +618,7 @@ value.try_into().map_err(|_| DeserializeError::InvalidEnumValue(value as i64))"
 		);
 
 		scope
-			.new_impl(&format!("Vec<{name}>"))
+			.new_impl(format!("Vec<{name}>"))
 			.impl_trait("StaticVariant")
 			.associate_const("TYPE_ID", "&str", format!(r#""TArray<{type_id}>""#), "");
 
