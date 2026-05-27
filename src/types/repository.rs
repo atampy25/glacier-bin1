@@ -1,7 +1,8 @@
 use std::{fmt::Display, str::FromStr};
 
+use ecow::EcoString;
+use facet::Facet;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use string_interner::{DefaultSymbol, StringInterner, backend::BucketBackend};
 use thiserror::Error;
 
 use crate::{
@@ -13,7 +14,17 @@ use crate::{
 use crate as hitman_bin1;
 
 #[derive(
-	SerializeDisplay, DeserializeFromStr, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Bin1Serialize, Bin1Deserialize,
+	SerializeDisplay,
+	DeserializeFromStr,
+	Debug,
+	Clone,
+	PartialEq,
+	Eq,
+	PartialOrd,
+	Ord,
+	Bin1Serialize,
+	Bin1Deserialize,
+	Facet,
 )]
 pub struct ZRepositoryID {
 	pub data_1: u32,
@@ -96,8 +107,8 @@ impl StaticVariant for Vec<ZRepositoryID> {
 }
 
 impl Variant for ZRepositoryID {
-	fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol {
-		interner.get_or_intern_static(Self::TYPE_ID)
+	fn type_id(&self) -> EcoString {
+		Self::TYPE_ID.into()
 	}
 
 	fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error> {

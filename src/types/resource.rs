@@ -1,5 +1,6 @@
+use ecow::EcoString;
+use facet::Facet;
 use serde::{Deserialize, Serialize};
-use string_interner::{DefaultSymbol, StringInterner, backend::BucketBackend};
 use tryvial::try_fn;
 
 use crate::{
@@ -8,7 +9,7 @@ use crate::{
 	types::variant::{StaticVariant, Variant}
 };
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Facet)]
 pub struct ZRuntimeResourceID {
 	#[serde(rename = "m_IDHigh")]
 	pub id_high: u32,
@@ -39,8 +40,8 @@ impl StaticVariant for Vec<ZRuntimeResourceID> {
 }
 
 impl Variant for ZRuntimeResourceID {
-	fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol {
-		interner.get_or_intern_static(Self::TYPE_ID)
+	fn type_id(&self) -> EcoString {
+		Self::TYPE_ID.into()
 	}
 
 	fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error> {
@@ -110,8 +111,8 @@ impl StaticVariant for Vec<Vec<TResourcePtr>> {
 }
 
 impl Variant for TResourcePtr {
-	fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol {
-		interner.get_or_intern_static(Self::TYPE_ID)
+	fn type_id(&self) -> EcoString {
+		Self::TYPE_ID.into()
 	}
 
 	fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error> {

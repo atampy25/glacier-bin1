@@ -221,7 +221,6 @@ fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_code:
 	scope.import("crate::types::variant", "StaticVariant");
 	scope.import("crate::types::variant", "Variant");
 	scope.import("std::str", "FromStr");
-	scope.import("facet", "Facet");
 	scope.raw("use crate as hitman_bin1;");
 
 	let mut classes = parse_classes(
@@ -336,7 +335,7 @@ fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_code:
 				}
 
 				for ty in tys {
-					if ty == "ZVariant" {
+					if ty == "ZVariant" || ty == "SEntityTemplateProperty" {
 						for ty in KNOWN_VARIANTS {
 							if let Some(pos) = classes.iter().position(|x| x.0 == *ty) {
 								class_queue.push_back(classes.remove(pos));
@@ -357,6 +356,7 @@ fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_code:
 
 		let cls = scope
 			.new_struct(&name)
+			.derive("Facet")
 			.derive("Debug")
 			.derive("Clone")
 			.derive("PartialEq")
@@ -398,6 +398,12 @@ fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_code:
 							));
 						}
 
+						if type_name == "EcoString" {
+							field.annotation(r#"#[facet(opaque, proxy = String)]"#);
+						} else if type_name.contains("EcoString") {
+							field.annotation(r#"#[facet(opaque)]"#);
+						}
+
 						if padding != 0 {
 							field.annotation(format!("#[bin1(pad = {padding})]"));
 						}
@@ -431,12 +437,8 @@ fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_code:
 		variant_impl
 			.new_fn("type_id")
 			.arg_ref_self()
-			.arg(
-				"interner",
-				"&mut string_interner::StringInterner<string_interner::backend::BucketBackend>"
-			)
-			.ret("string_interner::DefaultSymbol")
-			.line(format!(r#"interner.get_or_intern_static("{type_id}")"#));
+			.ret("EcoString")
+			.line(format!(r#""{type_id}".into()"#));
 
 		variant_impl
 			.new_fn("to_serde")
@@ -625,12 +627,8 @@ value.try_into().map_err(|_| DeserializeError::InvalidEnumValue(value as i64))"
 		variant_impl
 			.new_fn("type_id")
 			.arg_ref_self()
-			.arg(
-				"interner",
-				"&mut string_interner::StringInterner<string_interner::backend::BucketBackend>"
-			)
-			.ret("string_interner::DefaultSymbol")
-			.line(format!(r#"interner.get_or_intern_static("{type_id}")"#));
+			.ret("EcoString")
+			.line(format!(r#""{type_id}".into()"#));
 
 		variant_impl
 			.new_fn("to_serde")
@@ -642,16 +640,6 @@ value.try_into().map_err(|_| DeserializeError::InvalidEnumValue(value as i64))"
 
 		enums.push(name);
 	}
-
-	scope.raw(format!(
-		"pub static ENUMS: [(&str, &facet::Shape); {}] = [{}];",
-		enums.len(),
-		enums
-			.into_iter()
-			.map(|x| format!(r#"({x}::TYPE_ID, &{x}::SHAPE)"#))
-			.collect::<Vec<_>>()
-			.join(", ")
-	));
 }
 
 pub fn main() -> Result<()> {

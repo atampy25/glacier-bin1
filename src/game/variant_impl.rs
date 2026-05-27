@@ -6,9 +6,9 @@ use std::{
 };
 
 use ecow::EcoString;
+use facet::Facet;
 use polonius_the_crab::{polonius, polonius_return};
 use serde::{Deserialize, Serialize, de::DeserializeOwned, ser::SerializeStruct};
-use string_interner::{DefaultSymbol, StringInterner, backend::BucketBackend};
 use tryvial::try_fn;
 
 use crate::types::{property::PropertyID, resource::ZRuntimeResourceID};
@@ -59,9 +59,93 @@ impl<T: StaticVariant + Variant + Bin1Deserialize + DeserializeOwned + 'static +
 	}
 }
 
+/// Pool of serde-deserialised variants to deduplicate identical values.
+#[static_init::dynamic]
+static VARIANT_POOL: papaya::HashMap<ValueWrapper, std::sync::Weak<dyn Variant>> = papaya::HashMap::new();
+
+struct ValueWrapper {
+	value: serde_json::Value
+}
+
+struct BorrowedValueWrapper<'a> {
+	value: &'a serde_json::Value
+}
+
+impl<'a> PartialEq for BorrowedValueWrapper<'a> {
+	fn eq(&self, other: &Self) -> bool {
+		*self.value == *other.value
+	}
+}
+
+impl<'a> Eq for BorrowedValueWrapper<'a> {}
+
+impl PartialEq for ValueWrapper {
+	fn eq(&self, other: &Self) -> bool {
+		BorrowedValueWrapper { value: &self.value } == BorrowedValueWrapper { value: &other.value }
+	}
+}
+
+impl Eq for ValueWrapper {}
+
+impl<'a> equivalent::Equivalent<ValueWrapper> for BorrowedValueWrapper<'a> {
+	fn equivalent(&self, other: &ValueWrapper) -> bool {
+		*self.value == other.value
+	}
+}
+
+impl<'a> std::hash::Hash for BorrowedValueWrapper<'a> {
+	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+		match self.value {
+			serde_json::Value::Null => {
+				0u8.hash(state);
+			}
+			serde_json::Value::Bool(b) => {
+				1u8.hash(state);
+				b.hash(state);
+			}
+			serde_json::Value::Number(n) => {
+				2u8.hash(state);
+				if let Some(i) = n.as_i64() {
+					i.hash(state);
+				} else if let Some(u) = n.as_u64() {
+					u.hash(state);
+				} else if let Some(f) = n.as_f64() {
+					f.to_bits().hash(state);
+				}
+			}
+			serde_json::Value::String(s) => {
+				3u8.hash(state);
+				s.hash(state);
+			}
+			serde_json::Value::Array(arr) => {
+				4u8.hash(state);
+				for item in arr {
+					BorrowedValueWrapper { value: item }.hash(state);
+				}
+			}
+			serde_json::Value::Object(obj) => {
+				5u8.hash(state);
+				let mut entries = obj.iter().collect::<Vec<_>>();
+				entries.sort_by_key(|&(k, _)| k);
+				for (k, v) in entries {
+					k.hash(state);
+					BorrowedValueWrapper { value: v }.hash(state);
+				}
+			}
+		}
+	}
+}
+
+impl std::hash::Hash for ValueWrapper {
+	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+		BorrowedValueWrapper { value: &self.value }.hash(state);
+	}
+}
+
 /// Reference-counted copy-on-write container for any Variant-implementing value.
-#[derive(Clone, dynex::PartialEqFix)]
+#[derive(Facet, Clone, dynex::PartialEqFix)]
 pub struct ZVariant {
+	#[facet(opaque)]
 	value: Arc<dyn Variant>
 }
 
@@ -98,11 +182,9 @@ impl ZVariant {
 		Self { value: Arc::new(value) }
 	}
 
-	/// Determine whether the stored Variant value is valid for this game version.
+	/// Determine whether the stored Variant value is a valid type for this game version.
 	pub fn is_valid(&self) -> bool {
-		let mut interner = StringInterner::new();
-		let type_id = Variant::type_id(self.value.deref(), &mut interner);
-		DESERIALIZERS.contains_key(interner.resolve(type_id).unwrap())
+		VARIANT_TYPES.contains_key(&self.any_type())
 	}
 
 	pub fn into_inner(self) -> Arc<dyn Variant> {
@@ -126,12 +208,13 @@ impl Bin1Serialize for ZVariant {
 	}
 
 	fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
-		let type_id = Variant::type_id(&*self.value, ser.interner());
-		ser.write_type(type_id);
+		let type_id = self.variant_type();
 
-		if Variant::type_id(&*self.value, ser.interner()) == ser.interner().get_or_intern_static("void") {
+		if type_id == "void" {
+			ser.write_type(type_id);
 			ser.write_pointer(u64::MAX); // void type has no data
 		} else {
+			ser.write_type(type_id);
 			let pointer_id = Arc::as_ptr(&self.value) as *const () as u64 | 0xBEEF000000000000;
 			ser.write_pointer(pointer_id);
 		}
@@ -140,7 +223,7 @@ impl Bin1Serialize for ZVariant {
 	}
 
 	fn resolve(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
-		if Variant::type_id(&*self.value, ser.interner()) != ser.interner().get_or_intern_static("void") {
+		if self.variant_type() != "void" {
 			let pointer_id = Arc::as_ptr(&self.value) as *const () as u64 | 0xBEEF000000000000;
 			ser.write_pointee(pointer_id, None, &*self.value)?;
 		}
@@ -178,9 +261,7 @@ impl Serialize for ZVariant {
 		S::Error: serde::ser::Error
 	{
 		let mut ser = serializer.serialize_struct("ZVariant", 2)?;
-		let mut interner = StringInterner::new();
-		let type_id = Variant::type_id(&*self.value, &mut interner);
-		ser.serialize_field("$type", interner.resolve(type_id).unwrap())?;
+		ser.serialize_field("$type", &self.variant_type())?;
 		ser.serialize_field(
 			"$val",
 			&self.value.to_serde().map_err(<S::Error as serde::ser::Error>::custom)?
@@ -220,10 +301,21 @@ impl<'de> Deserialize<'de> for ZVariant {
 		let value = value.ok_or_else(|| serde::de::Error::missing_field("$val"))?;
 
 		if let Some(deserializer) = DESERIALIZERS.get(type_id.as_str()) {
-			Ok(deserializer
-				.deserialize_serde(&type_id, value)
-				.map_err(serde::de::Error::custom)?
-				.into())
+			if let Some(variant) = VARIANT_POOL.pin().get(&BorrowedValueWrapper { value: &value })
+				&& let Some(variant) = variant.upgrade()
+			{
+				return Ok(variant.into());
+			}
+
+			let variant = deserializer
+				.deserialize_serde(&type_id, value.to_owned())
+				.map_err(serde::de::Error::custom)?;
+
+			VARIANT_POOL
+				.pin()
+				.insert(ValueWrapper { value }, Arc::downgrade(&variant));
+
+			Ok(variant.into())
 		} else {
 			Err(serde::de::Error::custom(format!("unknown type ID: {}", type_id)))
 		}
@@ -235,8 +327,8 @@ impl StaticVariant for ZVariant {
 }
 
 impl Variant for ZVariant {
-	fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol {
-		interner.get_or_intern_static(Self::TYPE_ID)
+	fn type_id(&self) -> EcoString {
+		Self::TYPE_ID.into()
 	}
 
 	fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error> {
@@ -262,10 +354,10 @@ submit!(f32);
 submit!(f64);
 submit!(bool);
 submit!(());
-submit!(EcoString);
+submit_nofacet!(EcoString);
 submit!(ZRuntimeResourceID);
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Bin1Serialize, Bin1Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Bin1Serialize, Bin1Deserialize, Facet)]
 pub struct SEntityTemplateProperty {
 	#[serde(rename = "nPropertyID")]
 	pub property_id: PropertyID,
@@ -284,8 +376,8 @@ impl StaticVariant for Vec<SEntityTemplateProperty> {
 }
 
 impl Variant for SEntityTemplateProperty {
-	fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol {
-		interner.get_or_intern_static(Self::TYPE_ID)
+	fn type_id(&self) -> EcoString {
+		Self::TYPE_ID.into()
 	}
 
 	fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error> {
@@ -303,4 +395,4 @@ impl StaticVariant for Vec<(EcoString, ZVariant)> {
 	const TYPE_ID: &'static str = "TArray<TPair<ZString,ZVariant>>";
 }
 
-submit!((EcoString, ZVariant));
+submit_nofacet!((EcoString, ZVariant));

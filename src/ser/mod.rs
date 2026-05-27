@@ -5,7 +5,7 @@ use std::{
 };
 
 use byteorder::{LittleEndian, ReadBytesExt};
-use string_interner::{DefaultSymbol, StringInterner, backend::BucketBackend};
+use ecow::EcoString;
 use thiserror::Error;
 use tryvial::try_fn;
 
@@ -58,9 +58,7 @@ pub struct Bin1Serializer {
 
 	/// Offsets to STypeIDs
 	type_ids: Vec<u32>,
-	type_names: Vec<DefaultSymbol>,
-
-	interner: StringInterner<BucketBackend>,
+	type_names: Vec<EcoString>,
 
 	rrids_segment: bool
 }
@@ -75,7 +73,6 @@ impl Default for Bin1Serializer {
 			resource_ptrs: vec![],
 			type_ids: vec![],
 			type_names: vec![],
-			interner: StringInterner::new(),
 			rrids_segment: true
 		}
 	}
@@ -89,10 +86,6 @@ impl Bin1Serializer {
 	pub fn with_rrids_segment(mut self, enabled: bool) -> Self {
 		self.rrids_segment = enabled;
 		self
-	}
-
-	pub fn interner(&mut self) -> &mut StringInterner<BucketBackend> {
-		&mut self.interner
 	}
 
 	pub fn align_to(&mut self, alignment: usize) {
@@ -149,11 +142,11 @@ impl Bin1Serializer {
 		self.offsets.insert(pointer_id, self.buffer.len() as u64);
 	}
 
-	pub fn write_type(&mut self, type_name: DefaultSymbol) {
+	pub fn write_type(&mut self, type_name: EcoString) {
 		self.align_to(8);
 		self.type_ids.push(self.buffer.len() as u32);
 
-		if let Some(existing) = self.type_names.iter().position(|&name| name == type_name) {
+		if let Some(existing) = self.type_names.iter().position(|name| *name == type_name) {
 			self.buffer.extend_from_slice(&(existing as u64).to_le_bytes());
 		} else {
 			self.buffer
@@ -213,7 +206,6 @@ impl Bin1Serializer {
 				segment.extend_from_slice(&(idx as u32).to_le_bytes());
 				segment.extend_from_slice(&u32::MAX.to_le_bytes());
 
-				let name = self.interner.resolve(name).unwrap();
 				segment.extend_from_slice(&(name.len() as u32 + 1).to_le_bytes());
 				segment.extend_from_slice(name.as_bytes());
 				segment.push(0);

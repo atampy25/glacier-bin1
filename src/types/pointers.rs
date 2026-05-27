@@ -1,7 +1,5 @@
 use std::ops::{Deref, DerefMut};
 
-use rand::Rng;
-
 use crate::{
 	de::Bin1Deserialize,
 	ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
@@ -16,7 +14,7 @@ impl<T> Owned<T> {
 	pub fn new(value: T) -> Self {
 		Self {
 			value,
-			identity: rand::rng().random()
+			identity: rand::random()
 		}
 	}
 }
@@ -25,7 +23,7 @@ impl<T> From<T> for Owned<T> {
 	fn from(value: T) -> Self {
 		Self {
 			value,
-			identity: rand::rng().random()
+			identity: rand::random()
 		}
 	}
 }
@@ -78,7 +76,7 @@ impl<T: Bin1Deserialize> Bin1Deserialize for Owned<T> {
 
 		Self {
 			value,
-			identity: rand::rng().random()
+			identity: rand::random()
 		}
 	}
 }

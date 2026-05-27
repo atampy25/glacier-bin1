@@ -5,9 +5,8 @@ use std::{
 };
 
 use const_format::concatcp;
-use ecow::EcoString;
+use ecow::{EcoString, eco_format};
 use serde::{Deserialize, Serialize};
-use string_interner::{DefaultSymbol, StringInterner, backend::BucketBackend};
 use tryvial::try_fn;
 
 use crate::{
@@ -21,7 +20,7 @@ pub trait StaticVariant {
 
 #[dynex::dyn_trait]
 pub trait Variant: VariantArc + Bin1Serialize + Send + Sync + Debug + Clone + PartialEq {
-	fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol;
+	fn type_id(&self) -> EcoString;
 
 	/// Serialise this variant value into a serde_json Value. Does not include type information.
 	fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error>;
@@ -54,11 +53,13 @@ impl<T: Variant + Clone> VariantArc for T {
 }
 
 impl dyn Variant {
-	/// Get the type ID of this variant as a string. Inefficient; for repeated use it is better to reuse your own StringInterner with the [Variant::type_id] trait method directly.
-	pub fn variant_type(&self) -> String {
-		let mut interner = StringInterner::new();
-		let type_id = Variant::type_id(self, &mut interner);
-		interner.resolve(type_id).unwrap().to_owned()
+	pub fn variant_type(&self) -> EcoString {
+		Variant::type_id(self)
+	}
+
+	/// Get the std::any::TypeId of the underlying type.
+	pub fn any_type(&self) -> std::any::TypeId {
+		std::any::Any::type_id(self)
 	}
 
 	pub fn is<T: Variant>(&self) -> bool {
@@ -112,8 +113,8 @@ macro_rules! impl_primitive {
 		}
 
 		impl Variant for $ty {
-			fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol {
-				interner.get_or_intern_static(Self::TYPE_ID)
+			fn type_id(&self) -> EcoString {
+				Self::TYPE_ID.into()
 			}
 
 			fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error> {
@@ -151,8 +152,8 @@ impl StaticVariant for Vec<()> {
 }
 
 impl Variant for () {
-	fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol {
-		interner.get_or_intern_static(Self::TYPE_ID)
+	fn type_id(&self) -> EcoString {
+		Self::TYPE_ID.into()
 	}
 
 	fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error> {
@@ -165,8 +166,8 @@ impl<
 	U: Bin1Serialize + Aligned + Serialize + StaticVariant + Send + Sync + Clone + Debug + PartialEq + 'static
 > Variant for (T, U)
 {
-	fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol {
-		interner.get_or_intern(format!("TPair<{},{}>", T::TYPE_ID, U::TYPE_ID))
+	fn type_id(&self) -> EcoString {
+		eco_format!("TPair<{},{}>", T::TYPE_ID, U::TYPE_ID)
 	}
 
 	fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error> {
@@ -178,8 +179,8 @@ impl<
 	T: Bin1Serialize + Aligned + Serialize + StaticVariant + Variant + Send + Sync + Clone + Debug + PartialEq + 'static
 > Variant for Vec<T>
 {
-	fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol {
-		interner.get_or_intern(format!("TArray<{}>", T::TYPE_ID))
+	fn type_id(&self) -> EcoString {
+		eco_format!("TArray<{}>", T::TYPE_ID)
 	}
 
 	fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error> {
@@ -200,8 +201,8 @@ impl StaticVariant for Vec<EcoString> {
 }
 
 impl Variant for EcoString {
-	fn type_id(&self, interner: &mut StringInterner<BucketBackend>) -> DefaultSymbol {
-		interner.get_or_intern_static(Self::TYPE_ID)
+	fn type_id(&self) -> EcoString {
+		Self::TYPE_ID.into()
 	}
 
 	fn to_serde(&self) -> Result<serde_json::Value, serde_json::Error> {
@@ -238,8 +239,7 @@ impl Bin1Serialize for TypeID {
 
 	#[try_fn]
 	fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
-		let type_id = ser.interner().get_or_intern(self.as_str());
-		ser.write_type(type_id);
+		ser.write_type(self.0.to_owned());
 	}
 }
 
