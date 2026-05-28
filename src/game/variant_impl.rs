@@ -65,17 +65,19 @@ static VARIANT_POOL: papaya::HashMap<ValueWrapper, std::sync::Weak<dyn Variant>,
 	Default::default();
 
 struct ValueWrapper {
+	type_id: String,
 	value: serde_json::Value
 }
 
 #[derive(PartialEq, Eq)]
 struct BorrowedValueWrapper<'a> {
+	type_id: std::borrow::Cow<'a, str>,
 	value: serde_json_borrow::Value<'a>
 }
 
 impl PartialEq for ValueWrapper {
 	fn eq(&self, other: &Self) -> bool {
-		self.value == other.value
+		self.type_id == other.type_id && self.value == other.value
 	}
 }
 
@@ -141,7 +143,7 @@ impl<'a> equivalent::Equivalent<ValueWrapper> for BorrowedValueWrapper<'a> {
 			}
 		}
 
-		equiv(&self.value, &other.value)
+		self.type_id == other.type_id && equiv(&self.value, &other.value)
 	}
 }
 
@@ -188,6 +190,7 @@ impl std::hash::Hash for ValueWrapper {
 			}
 		}
 
+		self.type_id.hash(state);
 		hash_value(&self.value, state);
 	}
 }
@@ -235,6 +238,7 @@ impl<'a> std::hash::Hash for BorrowedValueWrapper<'a> {
 			}
 		}
 
+		self.type_id.hash(state);
 		hash_value(&self.value, state);
 	}
 }
@@ -403,7 +407,7 @@ impl<'de> Deserialize<'de> for ZVariant {
 					.ok_or_else(|| serde::de::Error::invalid_length(1, &self))?;
 
 				if let Some(deserializer) = DESERIALIZERS.get(&*type_id) {
-					let value = BorrowedValueWrapper { value };
+					let value = BorrowedValueWrapper { type_id, value };
 
 					if let Some(variant) = VARIANT_POOL.pin().get(&value)
 						&& let Some(variant) = variant.upgrade()
@@ -412,11 +416,12 @@ impl<'de> Deserialize<'de> for ZVariant {
 					}
 
 					let variant = deserializer
-						.deserialize_serde(&type_id, value.value.to_owned().into())
+						.deserialize_serde(&value.type_id, value.value.to_owned().into())
 						.map_err(serde::de::Error::custom)?;
 
 					VARIANT_POOL.pin().insert(
 						ValueWrapper {
+							type_id: value.type_id.into_owned(),
 							value: value.value.into()
 						},
 						Arc::downgrade(&variant)
@@ -457,7 +462,7 @@ impl<'de> Deserialize<'de> for ZVariant {
 				let value = value.ok_or_else(|| serde::de::Error::missing_field("$val"))?;
 
 				if let Some(deserializer) = DESERIALIZERS.get(&*type_id) {
-					let value = BorrowedValueWrapper { value };
+					let value = BorrowedValueWrapper { type_id, value };
 
 					if let Some(variant) = VARIANT_POOL.pin().get(&value)
 						&& let Some(variant) = variant.upgrade()
@@ -466,11 +471,12 @@ impl<'de> Deserialize<'de> for ZVariant {
 					}
 
 					let variant = deserializer
-						.deserialize_serde(&type_id, value.value.to_owned().into())
+						.deserialize_serde(&value.type_id, value.value.to_owned().into())
 						.map_err(serde::de::Error::custom)?;
 
 					VARIANT_POOL.pin().insert(
 						ValueWrapper {
+							type_id: value.type_id.into_owned(),
 							value: value.value.into()
 						},
 						Arc::downgrade(&variant)

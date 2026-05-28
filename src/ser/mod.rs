@@ -44,19 +44,19 @@ pub trait Bin1Serialize {
 pub struct Bin1Serializer {
 	buffer: Vec<u8>,
 
-	/// Map of pointer IDs to where their data has been written.
+	/// Map of pointer IDs to where their data has been written (relative to the data section).
 	offsets: HashMap<u64, u64, rapidhash::fast::RandomState>,
 
-	/// Offsets to pointers that need to be patched.
-	pointers: Vec<u32>,
+	/// Offsets to pointers that need to be patched (relative to the buffer).
+	pointers: Vec<usize>,
 
-	/// Offsets to ZRuntimeResourceIDs
+	/// Offsets to ZRuntimeResourceIDs (relative to the buffer)
 	runtime_resource_ids: Vec<u32>,
 
-	/// Offsets to TResourcePtrs
+	/// Offsets to TResourcePtrs (relative to the buffer)
 	resource_ptrs: Vec<u32>,
 
-	/// Offsets to STypeIDs
+	/// Offsets to STypeIDs (relative to the buffer)
 	type_ids: Vec<u32>,
 	type_names: Vec<EcoString>,
 
@@ -66,7 +66,17 @@ pub struct Bin1Serializer {
 impl Default for Bin1Serializer {
 	fn default() -> Self {
 		Self {
-			buffer: vec![],
+			buffer: {
+				let mut buffer = vec![];
+				buffer.extend_from_slice(b"BIN1");
+				buffer.push(0); // padding
+				buffer.push(8); // alignment
+				buffer.push(0); // number of segments, to be filled in later
+				buffer.push(0);
+				buffer.extend_from_slice(&0u32.to_be_bytes()); // data size, to be filled in later
+				buffer.extend_from_slice(&0u32.to_le_bytes());
+				buffer
+			},
 			offsets: Default::default(),
 			pointers: vec![],
 			runtime_resource_ids: vec![],
@@ -89,8 +99,7 @@ impl Bin1Serializer {
 	}
 
 	pub fn align_to(&mut self, alignment: usize) {
-		let current_len = self.buffer.len();
-		let padding = alignment - (current_len % alignment);
+		let padding = alignment - (self.buffer.len() % alignment);
 		if padding < alignment {
 			self.buffer.extend(vec![0; padding]);
 		}
@@ -108,7 +117,7 @@ impl Bin1Serializer {
 
 	pub fn write_pointer(&mut self, pointer_id: u64) {
 		self.align_to(8);
-		self.pointers.push(self.buffer.len() as u32);
+		self.pointers.push(self.buffer.len());
 		self.buffer.extend_from_slice(&pointer_id.to_le_bytes());
 	}
 
@@ -139,7 +148,7 @@ impl Bin1Serializer {
 
 	/// Register a pointer as referring to the current location in the serialisation buffer.
 	pub fn register_pointee(&mut self, pointer_id: u64) {
-		self.offsets.insert(pointer_id, self.buffer.len() as u64);
+		self.offsets.insert(pointer_id, self.buffer.len() as u64 - 16);
 	}
 
 	pub fn write_type(&mut self, type_name: EcoString) {
@@ -181,7 +190,7 @@ impl Bin1Serializer {
 			let mut segment = (self.pointers.len() as u32).to_le_bytes().to_vec();
 
 			for offset in &self.pointers {
-				segment.extend_from_slice(&offset.to_le_bytes());
+				segment.extend_from_slice(&(offset - 16).to_le_bytes());
 			}
 
 			segments.push((0x12EBA5ED, segment));
@@ -192,7 +201,7 @@ impl Bin1Serializer {
 			let mut segment = (self.type_ids.len() as u32).to_le_bytes().to_vec();
 
 			for offset in self.type_ids {
-				segment.extend_from_slice(&offset.to_le_bytes());
+				segment.extend_from_slice(&(offset - 16).to_le_bytes());
 			}
 
 			segment.extend_from_slice(&(self.type_names.len() as u32).to_le_bytes());
@@ -219,7 +228,7 @@ impl Bin1Serializer {
 			let mut segment = (self.runtime_resource_ids.len() as u32).to_le_bytes().to_vec();
 
 			for offset in self.runtime_resource_ids {
-				segment.extend_from_slice(&offset.to_le_bytes());
+				segment.extend_from_slice(&(offset - 16).to_le_bytes());
 			}
 
 			segments.push((0x578FBCEE, segment));
@@ -230,33 +239,26 @@ impl Bin1Serializer {
 			let mut segment = (self.resource_ptrs.len() as u32).to_le_bytes().to_vec();
 
 			for offset in self.resource_ptrs {
-				segment.extend_from_slice(&offset.to_le_bytes());
+				segment.extend_from_slice(&(offset - 16).to_le_bytes());
 			}
 
 			segments.push((0x64603664, segment));
 		}
 
-		for offset in self.pointers.drain(..) {
+		for offset in self.pointers {
 			cursor.seek(SeekFrom::Start(offset as u64))?;
 			let pointer_id = cursor.read_u64::<LittleEndian>()?;
 			if pointer_id != u64::MAX {
-				cursor.get_mut()[offset as usize..offset as usize + 8]
-					.copy_from_slice(&self.offsets[&pointer_id].to_le_bytes());
+				cursor.get_mut()[offset..offset + 8].copy_from_slice(&self.offsets[&pointer_id].to_le_bytes());
 			}
 		}
 
-		let buffer = cursor.into_inner();
+		let mut data = cursor.into_inner();
 
-		let mut data = vec![];
-		data.extend_from_slice(b"BIN1");
-		data.push(0); // padding
-		data.push(8); // alignment
-		data.push(segments.len() as u8);
-		data.push(0);
-		data.extend_from_slice(&(buffer.len() as u32).to_be_bytes());
-		data.extend_from_slice(&0u32.to_le_bytes());
+		data[6] = segments.len() as u8;
 
-		data.extend_from_slice(&buffer);
+		let data_size = data.len() as u32 - 16;
+		data[8..12].copy_from_slice(&data_size.to_be_bytes());
 
 		for segment in segments {
 			data.extend_from_slice(&segment.0.to_le_bytes());
