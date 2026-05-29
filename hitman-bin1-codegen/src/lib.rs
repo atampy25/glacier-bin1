@@ -453,12 +453,30 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 				let rust_name = if let Some(common_prefix) = &common_prefix {
 					let name = variant_name.trim_start_matches(common_prefix).trim_start_matches('_');
 					if name.starts_with(|c: char| c.is_ascii_digit()) {
-						format!("_{}", name.to_pascal_case())
+						format!(
+							"_{}",
+							if name.chars().all(|c| c.is_uppercase() || !c.is_ascii_alphabetic()) {
+								name.to_pascal_case()
+							} else {
+								name.into()
+							}
+						)
 					} else {
-						name.to_pascal_case()
+						if name.chars().all(|c| c.is_uppercase() || !c.is_ascii_alphabetic()) {
+							name.to_pascal_case()
+						} else {
+							name.into()
+						}
 					}
 				} else {
-					variant_name.to_pascal_case()
+					if variant_name
+						.chars()
+						.all(|c| c.is_uppercase() || !c.is_ascii_alphabetic())
+					{
+						variant_name.to_pascal_case()
+					} else {
+						variant_name.to_owned()
+					}
 				};
 
 				(variant_name, rust_name, value)
