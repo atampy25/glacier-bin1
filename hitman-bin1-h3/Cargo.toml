@@ -52,6 +52,7 @@ UICB = []
 VIDB = []
 WSGB = []
 WSWB = []
+enums = []
 all-types = [
     "AIBB",
     "AIRG",
@@ -72,4 +73,5 @@ all-types = [
     "VIDB",
     "WSGB",
     "WSWB",
+    "enums",
 ]

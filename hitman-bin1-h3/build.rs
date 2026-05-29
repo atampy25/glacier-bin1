@@ -57,7 +57,9 @@ pub fn main() -> Result<()> {
 				"SEnvironmentConfigResource"
 			],
 			#[cfg(feature = "AIBB")]
-			&["SBehaviorTreeInfo"]
+			&["SBehaviorTreeInfo"],
+			#[cfg(feature = "enums")]
+			&["enums"]
 		]
 	);
 

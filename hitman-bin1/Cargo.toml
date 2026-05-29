@@ -52,6 +52,11 @@ UICB = ["hitman-bin1-h1?/UICB", "hitman-bin1-h2?/UICB", "hitman-bin1-h3?/UICB"]
 VIDB = ["hitman-bin1-h1?/VIDB", "hitman-bin1-h2?/VIDB", "hitman-bin1-h3?/VIDB"]
 WSGB = ["hitman-bin1-h1?/WSGB", "hitman-bin1-h2?/WSGB", "hitman-bin1-h3?/WSGB"]
 WSWB = ["hitman-bin1-h1?/WSWB", "hitman-bin1-h2?/WSWB", "hitman-bin1-h3?/WSWB"]
+enums = [
+    "hitman-bin1-h1?/enums",
+    "hitman-bin1-h2?/enums",
+    "hitman-bin1-h3?/enums",
+]
 all-types = [
     "AIBB",
     "AIRG",
@@ -72,6 +77,7 @@ all-types = [
     "VIDB",
     "WSGB",
     "WSWB",
+    "enums",
 ]
 
 # Crate features

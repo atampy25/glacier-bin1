@@ -234,11 +234,14 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 		types_code
 	);
 
+	let mut enums = parse_enums(classes_code, enums_code);
+
 	// Special cased
 	classes.remove(classes.iter().position(|x| x.0 == "ZRuntimeResourceID").unwrap());
 	classes.remove(classes.iter().position(|x| x.0 == "SEntityTemplateProperty").unwrap());
 
 	let mut class_queue = VecDeque::new();
+	let mut enum_queue = vec![];
 
 	// Types known to be used as ZVariant
 	const KNOWN_VARIANTS: &[&str] = &[
@@ -277,10 +280,12 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 		if let Some(pos) = classes.iter().position(|x| x.0 == ty) {
 			class_queue.push_back(classes.remove(pos));
 		}
-	}
 
-	let mut enums = parse_enums(classes_code, enums_code);
-	let mut enum_queue = vec![];
+		if ty == "enums" {
+			scope.import("std::str", "FromStr");
+			enum_queue.append(&mut enums);
+		}
+	}
 
 	while let Some((name, type_id, members)) = class_queue.pop_front() {
 		for member in &members {
