@@ -71,8 +71,7 @@ public:
 class SGFxMovieResource
 {
 public:
-	ZHMPtr<uint8_t> gfxData;
-	size_t gfxDataLength;
+	ZHMPtrLen<uint8_t> gfxData;
 	TArray<ZString> imagesFilename;
 	TArray<TArray<uint8_t>> imagesData;
 };

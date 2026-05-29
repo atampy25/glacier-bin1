@@ -1,0 +1,78 @@
+[package]
+name = "hitman-bin1"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+hitman-bin1-core.workspace = true
+hitman-bin1-h1 = { workspace = true, optional = true }
+hitman-bin1-h2 = { workspace = true, optional = true }
+hitman-bin1-h3 = { workspace = true, optional = true }
+
+ecow = { version = "0.3.0", features = ["serde"] }
+thiserror = "2.0.15"
+tryvial = "0.2.0"
+serde_json = { version = "1.0.150", features = ["preserve_order"] }
+
+tracing = { version = "0.1.41", optional = true }
+
+[build-dependencies]
+anyhow = "1.0.100"
+codegen = "0.3.0"
+Inflector = "0.11.4"
+lazy-regex = "3.4.1"
+crc32fast = "1.5.0"
+edit-distance = "2.1.3"
+rayon = "1.11.0"
+
+[features]
+# Games
+h1 = ["dep:hitman-bin1-h1"]
+h2 = ["dep:hitman-bin1-h2"]
+h3 = ["dep:hitman-bin1-h3"]
+all-games = ["h1", "h2", "h3"]
+
+# Resource types
+AIBB = ["hitman-bin1-h1?/AIBB", "hitman-bin1-h2?/AIBB", "hitman-bin1-h3?/AIBB"]
+AIRG = ["hitman-bin1-h1?/AIRG", "hitman-bin1-h2?/AIRG", "hitman-bin1-h3?/AIRG"]
+ASVA = ["hitman-bin1-h1?/ASVA", "hitman-bin1-h2?/ASVA", "hitman-bin1-h3?/ASVA"]
+ATMD = ["hitman-bin1-h1?/ATMD", "hitman-bin1-h2?/ATMD", "hitman-bin1-h3?/ATMD"]
+BMSK = ["hitman-bin1-h1?/BMSK", "hitman-bin1-h2?/BMSK", "hitman-bin1-h3?/BMSK"]
+CBLU = ["hitman-bin1-h1?/CBLU", "hitman-bin1-h2?/CBLU", "hitman-bin1-h3?/CBLU"]
+CPPT = ["hitman-bin1-h1?/CPPT", "hitman-bin1-h2?/CPPT", "hitman-bin1-h3?/CPPT"]
+CRMD = ["hitman-bin1-h1?/CRMD", "hitman-bin1-h2?/CRMD", "hitman-bin1-h3?/CRMD"]
+ECPB = ["hitman-bin1-h2?/ECPB", "hitman-bin1-h3?/ECPB"]
+ENUM = ["hitman-bin1-h1?/ENUM", "hitman-bin1-h2?/ENUM", "hitman-bin1-h3?/ENUM"]
+GFXF = ["hitman-bin1-h1?/GFXF", "hitman-bin1-h2?/GFXF", "hitman-bin1-h3?/GFXF"]
+GIDX = ["hitman-bin1-h1?/GIDX", "hitman-bin1-h2?/GIDX", "hitman-bin1-h3?/GIDX"]
+ORES = ["hitman-bin1-h1?/ORES", "hitman-bin1-h2?/ORES", "hitman-bin1-h3?/ORES"]
+TBLU = ["hitman-bin1-h1?/TBLU", "hitman-bin1-h2?/TBLU", "hitman-bin1-h3?/TBLU"]
+TEMP = ["hitman-bin1-h1?/TEMP", "hitman-bin1-h2?/TEMP", "hitman-bin1-h3?/TEMP"]
+UICB = ["hitman-bin1-h1?/UICB", "hitman-bin1-h2?/UICB", "hitman-bin1-h3?/UICB"]
+VIDB = ["hitman-bin1-h1?/VIDB", "hitman-bin1-h2?/VIDB", "hitman-bin1-h3?/VIDB"]
+WSGB = ["hitman-bin1-h1?/WSGB", "hitman-bin1-h2?/WSGB", "hitman-bin1-h3?/WSGB"]
+WSWB = ["hitman-bin1-h1?/WSWB", "hitman-bin1-h2?/WSWB", "hitman-bin1-h3?/WSWB"]
+all-types = [
+    "AIBB",
+    "AIRG",
+    "ASVA",
+    "ATMD",
+    "BMSK",
+    "CBLU",
+    "CPPT",
+    "CRMD",
+    "ECPB",
+    "ENUM",
+    "GFXF",
+    "GIDX",
+    "ORES",
+    "TBLU",
+    "TEMP",
+    "UICB",
+    "VIDB",
+    "WSGB",
+    "WSWB",
+]
+
+# Crate features
+tracing = ["dep:tracing"]

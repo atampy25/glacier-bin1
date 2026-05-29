@@ -1,94 +1,19 @@
-[package]
-name = "hitman-bin1"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-byteorder = "1.5.0"
-ecow = { version = "0.3.0", features = ["serde"] }
-rand = "0.10.1"
-thiserror = "2.0.15"
-tryvial = "0.2.0"
-hitman-bin1-derive = { path = "derive" }
-serde_json = { version = "1.0.150", features = ["preserve_order"] }
-serde = { version = "1.0.219", features = ["derive"] }
-const_format = "0.2.34"
-dynex = "0.1.1"
-dynex_core = "0.1.1"
-static_init = "1.0.4"
-bimap = "0.6.3"
-polonius-the-crab = "0.5.0"
-crc32fast = "1.5.0"
-papaya = "0.2.3"
-tracing = { version = "0.1.41", optional = true }
-linkme = "0.3.33"
-mident = "0.0.1"
-serde_with = "3.20.0"
-facet = "0.46.5"
-equivalent = "1.0.2"
-rapidhash = { version = "4.4.1", features = ["unsafe", "rand"] }
-serde_json_borrow = "0.9.0"
-
-[build-dependencies]
-anyhow = "1.0.100"
-codegen = "0.3.0"
-Inflector = "0.11.4"
-lazy-regex = "3.4.1"
-crc32fast = "1.5.0"
-edit-distance = "2.1.3"
-rayon = "1.11.0"
-
-[features]
-# Games
-h1 = []
-h2 = []
-h3 = []
-all-games = ["h1", "h2", "h3"]
-
-# Resource types
-AIBB = []
-AIRG = []
-ASVA = []
-ATMD = []
-BMSK = []
-CBLU = []
-CPPT = []
-CRMD = []
-ECPB = []
-ENUM = []
-GFXF = []
-GIDX = []
-ORES = []
-TBLU = []
-TEMP = []
-UICB = []
-VIDB = []
-WSGB = []
-WSWB = []
-all-types = [
-    "AIBB",
-    "AIRG",
-    "ASVA",
-    "ATMD",
-    "BMSK",
-    "CBLU",
-    "CPPT",
-    "CRMD",
-    "ECPB",
-    "ENUM",
-    "GFXF",
-    "GIDX",
-    "ORES",
-    "TBLU",
-    "TEMP",
-    "UICB",
-    "VIDB",
-    "WSGB",
-    "WSWB",
+[workspace]
+members = [
+    "hitman-bin1",
+    "hitman-bin1-core",
+    "hitman-bin1-derive",
+    "hitman-bin1-codegen",
+    "hitman-bin1-h1",
+    "hitman-bin1-h2",
+    "hitman-bin1-h3",
 ]
+resolver = "3"
 
-# Crate features
-tracing = ["dep:tracing"]
-
-[profile.dev]
-debug = false
+[workspace.dependencies]
+hitman-bin1-core = { path = "hitman-bin1-core" }
+hitman-bin1-derive = { path = "hitman-bin1-derive" }
+hitman-bin1-codegen = { path = "hitman-bin1-codegen" }
+hitman-bin1-h1 = { path = "hitman-bin1-h1" }
+hitman-bin1-h2 = { path = "hitman-bin1-h2" }
+hitman-bin1-h3 = { path = "hitman-bin1-h3" }
