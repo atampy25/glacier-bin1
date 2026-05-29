@@ -10,9 +10,11 @@ use crate::{
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Facet)]
 pub struct ZRuntimeResourceID {
 	#[serde(rename = "m_IDHigh")]
+	#[facet(rename = "m_IDHigh")]
 	pub id_high: u32,
 
 	#[serde(rename = "m_IDLow")]
+	#[facet(rename = "m_IDLow")]
 	pub id_low: u32
 }
 
@@ -59,9 +61,11 @@ impl Bin1Deserialize for ZRuntimeResourceID {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Facet)]
 pub struct TResourcePtr {
 	#[serde(rename = "m_IDHigh")]
+	#[facet(rename = "m_IDHigh")]
 	pub id_high: u32,
 
 	#[serde(rename = "m_IDLow")]
+	#[facet(rename = "m_IDLow")]
 	pub id_low: u32
 }
 

@@ -373,7 +373,8 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 						let field = cls
 							.new_field(field_name, &type_name)
 							.vis("pub")
-							.annotation(format!(r#"#[serde(rename = "{orig_name}")]"#));
+							.annotation(format!(r#"#[serde(rename = "{orig_name}")]"#))
+							.annotation(format!(r#"#[facet(rename = "{orig_name}")]"#));
 
 						if type_name.starts_with('[') {
 							field.annotation(format!(
@@ -485,11 +486,14 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 
 		if members.is_empty() {
 			// ZST
-			item.new_variant("Value").annotation(r#"#[serde(rename = "")]"#);
+			item.new_variant("Value")
+				.annotation(r#"#[serde(rename = "")]"#)
+				.annotation(r#"#[facet(rename = "")]"#);
 		} else {
 			for (game_name, rust_name, _) in &members {
 				item.new_variant(rust_name)
-					.annotation(format!(r#"#[serde(rename = "{game_name}")]"#));
+					.annotation(format!(r#"#[serde(rename = "{game_name}")]"#))
+					.annotation(format!(r#"#[facet(rename = "{game_name}")]"#));
 			}
 		}
 

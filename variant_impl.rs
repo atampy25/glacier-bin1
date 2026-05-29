@@ -519,9 +519,11 @@ submit!(ZRuntimeResourceID);
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Bin1Serialize, Bin1Deserialize, Facet)]
 pub struct SEntityTemplateProperty {
 	#[serde(rename = "nPropertyID")]
+	#[facet(rename = "nPropertyID")]
 	pub property_id: PropertyID,
 
 	#[serde(rename = "value")]
+	#[facet(rename = "value")]
 	#[bin1(pad = 4)]
 	pub value: ZVariant
 }
