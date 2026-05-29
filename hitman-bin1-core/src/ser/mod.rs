@@ -99,6 +99,10 @@ impl Bin1Serializer {
 		}
 	}
 
+	pub fn position(&self) -> usize {
+		self.buffer.len()
+	}
+
 	pub fn write_unaligned(&mut self, data: &[u8]) {
 		self.buffer.extend_from_slice(data);
 	}

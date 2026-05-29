@@ -73,7 +73,7 @@ impl<T> Aligned for Vec<T> {
 }
 
 /// Serialisation of Vec<T> in TArray format, with pointers and length.
-impl<T: Bin1Serialize + Aligned> Bin1Serialize for Vec<T> {
+impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
 	fn alignment(&self) -> usize {
 		Self::ALIGNMENT
 	}
@@ -84,18 +84,28 @@ impl<T: Bin1Serialize + Aligned> Bin1Serialize for Vec<T> {
 			ser.write_pointer(u64::MAX);
 			ser.write_pointer(u64::MAX);
 		} else {
-			let start_id = self.as_ptr() as u64 | 0xABCD000000000000; // fake pointers to avoid colliding with actual data
-			let end_id = start_id | 0xCAFE000000000000;
-			ser.write_pointer(start_id);
-			ser.write_pointer(end_id);
-			ser.write_pointer(end_id); // allocation end, which in serialisation/deserialisation is the same as the end
+			if self.len() * T::SIZE <= 16 {
+				// Inline optimisation
+				let pos = ser.position();
+				self.as_slice().write(ser)?;
+				ser.write_unaligned(&vec![0; 16 - (ser.position() - pos)]);
+
+				// inline flag, count, capacity
+				((1u64 << 62) | (self.len() as u8 as u64) | ((self.len() as u8 as u64) << 8)).write(ser)?;
+			} else {
+				let start_id = self.as_ptr() as u64 | 0xABCD000000000000; // fake pointers to avoid colliding with actual data
+				let end_id = start_id | 0xCAFE000000000000;
+				ser.write_pointer(start_id);
+				ser.write_pointer(end_id);
+				ser.write_pointer(end_id); // allocation end, which in serialisation/deserialisation is the same as the end
+			}
 		}
 
 		Ok(())
 	}
 
 	fn resolve(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
-		if !self.is_empty() {
+		if !self.is_empty() && self.len() * T::SIZE > 16 {
 			let start_id = self.as_ptr() as u64 | 0xABCD000000000000;
 			let end_id = start_id | 0xCAFE000000000000;
 			ser.write_pointee(start_id, Some(end_id), self.as_slice())?;
@@ -111,27 +121,42 @@ impl<T: Bin1Deserialize> Bin1Deserialize for Vec<T> {
 	#[try_fn]
 	fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
 		de.align_to(8)?;
-		let start = de.read_u64()?;
-		let end = de.read_u64()?;
+		de.seek_relative(8 * 2)?;
+		let allocation_end_or_flags = de.read_u64()?;
+		let end_pos = de.position();
+		de.seek_relative(-8 * 3)?;
 
-		if start == u64::MAX || end == u64::MAX {
+		if allocation_end_or_flags == u64::MAX {
 			de.seek_relative(8)?;
 			return Ok(Vec::new());
 		}
 
-		let pos = de.position();
+		if (allocation_end_or_flags >> 62) & 1 == 1 {
+			// Inline data
+			let len = (allocation_end_or_flags & 0xFF) as usize;
+			let mut result = Vec::with_capacity(len);
+			for _ in 0..len {
+				de.align_to(T::ALIGNMENT)?;
+				result.push(T::read(de)?);
+			}
 
-		de.seek_from_start(start + 0x10)?;
-		let mut result = Vec::with_capacity((end as usize - start as usize).checked_div(T::SIZE).unwrap_or(0));
-		while de.position() != end + 0x10 {
-			de.align_to(T::ALIGNMENT)?;
-			result.push(T::read(de)?);
+			de.seek_from_start(end_pos)?;
+			result
+		} else {
+			let start = de.read_u64()?;
+			let end = de.read_u64()?;
+
+			de.seek_from_start(start + 0x10)?;
+			let mut result = Vec::with_capacity((end as usize - start as usize).checked_div(T::SIZE).unwrap_or(0));
+			while de.position() != end + 0x10 {
+				de.align_to(T::ALIGNMENT)?;
+				result.push(T::read(de)?);
+			}
+
+			// Seek past the allocation end pointer
+			de.seek_from_start(end_pos)?;
+			result
 		}
-
-		// Seek past the allocation end pointer
-		de.seek_from_start(pos + 8)?;
-
-		result
 	}
 }
 

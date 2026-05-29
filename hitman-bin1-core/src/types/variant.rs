@@ -200,7 +200,7 @@ impl<T: StaticVariant> StaticVariant for Vec<T> {
 		};
 }
 
-impl<T: Variant + StaticVariant + Serialize + Aligned + PartialEq + Clone> Variant for Vec<T> {
+impl<T: Variant + StaticVariant + Serialize + Aligned + PartialEq + Clone + Bin1Deserialize> Variant for Vec<T> {
 	fn type_id(&self) -> &'static str {
 		Self::TYPE_ID
 	}
