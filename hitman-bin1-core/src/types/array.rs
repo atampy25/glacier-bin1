@@ -105,7 +105,15 @@ impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
 	}
 
 	fn resolve(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
-		if !self.is_empty() && self.len() * T::SIZE > 16 {
+		if self.is_empty() {
+			return Ok(());
+		}
+
+		if self.len() * T::SIZE <= 16 {
+			for item in self {
+				item.resolve(ser)?;
+			}
+		} else {
 			let start_id = self.as_ptr() as u64 | 0xABCD000000000000;
 			let end_id = start_id | 0xCAFE000000000000;
 			ser.write_pointee(start_id, Some(end_id), self.as_slice())?;
@@ -279,7 +287,6 @@ pub mod ZHMPtrLen {
 
 		fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
 			if self.0.is_empty() {
-				ser.write_pointer(u64::MAX);
 				ser.write_pointer(u64::MAX);
 				ser.write_pointer(u64::MAX);
 			} else {

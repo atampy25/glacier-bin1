@@ -81,4 +81,4 @@ all-types = [
 ]
 
 # Crate features
-tracing = ["dep:tracing"]
+tracing = ["dep:tracing", "hitman-bin1-core/tracing"]
