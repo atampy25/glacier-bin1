@@ -25,9 +25,6 @@ pub enum DeserializeError {
 	Io(#[from] std::io::Error),
 
 	#[error("invalid string: {0}")]
-	FromUtf8Error(#[from] std::string::FromUtf8Error),
-
-	#[error("invalid string: {0}")]
 	Utf8Error(#[from] std::str::Utf8Error),
 
 	#[error("string length exceeded remaining file")]

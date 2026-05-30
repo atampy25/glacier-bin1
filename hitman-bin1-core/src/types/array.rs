@@ -151,8 +151,8 @@ impl<T: Bin1Deserialize> Bin1Deserialize for Vec<T> {
 			de.seek_from_start(start + 0x10)?;
 			let mut result = Vec::with_capacity((end as usize - start as usize).checked_div(T::SIZE).unwrap_or(0));
 			while de.position() != end + 0x10 {
-				de.align_to(T::ALIGNMENT)?;
 				result.push(T::read(de)?);
+				de.align_to(T::ALIGNMENT)?;
 			}
 
 			// Seek past the allocation end pointer
@@ -241,8 +241,8 @@ pub mod TArrayRef {
 			de.seek_from_start(start + 0x10)?;
 			let mut result = Vec::with_capacity((end as usize - start as usize).checked_div(T::SIZE).unwrap_or(0));
 			while de.position() != end + 0x10 {
-				de.align_to(T::ALIGNMENT)?;
 				result.push(T::read(de)?);
+				de.align_to(T::ALIGNMENT)?;
 			}
 
 			de.seek_from_start(pos)?;
