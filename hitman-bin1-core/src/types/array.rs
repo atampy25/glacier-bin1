@@ -121,15 +121,17 @@ impl<T: Bin1Deserialize> Bin1Deserialize for Vec<T> {
 	#[try_fn]
 	fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
 		de.align_to(8)?;
-		de.seek_relative(8 * 2)?;
-		let allocation_end_or_flags = de.read_u64()?;
-		let end_pos = de.position();
-		de.seek_relative(-8 * 3)?;
 
+		// Skip to allocation end pointer/flags value
+		de.seek_relative(8 * 2)?;
+
+		let allocation_end_or_flags = de.read_u64()?;
 		if allocation_end_or_flags == u64::MAX {
-			de.seek_relative(8)?;
 			return Ok(Vec::new());
 		}
+
+		let end_pos = de.position();
+		de.seek_relative(-8 * 3)?;
 
 		if (allocation_end_or_flags >> 62) & 1 == 1 {
 			// Inline data
