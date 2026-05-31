@@ -13,9 +13,8 @@ pub fn main() -> Result<()> {
 
 	generate(
 		&mut h2,
-		&fs::read_to_string("h2.txt")?,
-		&fs::read_to_string("h2-enums.txt")?,
-		&fs::read_to_string("h2-types.txt")?,
+		&fs::read_to_string("ZHMTypes.json")?,
+		&fs::read_to_string("../CustomTypes.json")?,
 		&[
 			#[cfg(feature = "TEMP")]
 			&["STemplateEntity", "STemplateEntityFactory"],
@@ -65,11 +64,8 @@ pub fn main() -> Result<()> {
 
 	fs::write(out_dir.join("h2.rs"), h2.to_string())?;
 
-	println!("cargo::rerun-if-changed=h2.txt");
-	println!("cargo::rerun-if-changed=h2-enums.txt");
-	println!("cargo::rerun-if-changed=h2-types.txt");
-
-	println!("cargo::rerun-if-changed=../custom.txt");
+	println!("cargo::rerun-if-changed=ZHMTypes.json");
+	println!("cargo::rerun-if-changed=../CustomTypes.json");
 
 	Ok(())
 }

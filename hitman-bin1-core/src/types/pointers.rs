@@ -70,7 +70,6 @@ impl<T: Bin1Deserialize> Bin1Deserialize for Owned<T> {
 		let pos = de.position();
 
 		de.seek_from_start(ptr + 0x10)?;
-		de.align_to(T::ALIGNMENT)?;
 		let value = T::read(de)?;
 		de.seek_from_start(pos)?;
 
@@ -144,17 +143,13 @@ pub mod WithZeroNull {
 
 		#[tryvial::try_fn]
 		fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
-			de.align_to(8)?;
 			let ptr = de.read_u64()?;
 
 			if ptr == 0 {
 				De(None)
 			} else {
 				de.seek_relative(-8)?;
-				De(Some(de.read_pointer(|de| {
-					de.align_to(T::ALIGNMENT)?;
-					T::read(de)
-				})?))
+				De(Some(de.read_pointer(T::read)?))
 			}
 		}
 	}

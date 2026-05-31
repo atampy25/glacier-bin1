@@ -7,13 +7,16 @@ use syn::{PathArguments, Type};
 #[darling(default, derive_syn_parse)]
 struct Bin1RootAttrs {
 	#[darling(rename = "crate", default = || syn::parse_str("::hitman_bin1_core").unwrap())]
-	crate_path: syn::Path
+	crate_path: syn::Path,
+
+	alignment: Option<usize>
 }
 
 impl Default for Bin1RootAttrs {
 	fn default() -> Self {
 		Self {
-			crate_path: syn::parse_str("::hitman_bin1_core").unwrap()
+			crate_path: syn::parse_str("::hitman_bin1_core").unwrap(),
+			alignment: None
 		}
 	}
 }
@@ -103,23 +106,28 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 		.collect::<Vec<_>>();
 
 	// Align struct to maximum of members (repeated ifs so it's a valid const expression)
-	let alignment = {
-		let mut iter = field_types.iter().map(|ty| {
-			quote! { <#ty as #crate_path::ser::Aligned>::ALIGNMENT }
-		});
+	let alignment = root_attrs.alignment.map_or_else(
+		|| {
+			let mut iter = field_types.iter().map(|ty| {
+				quote! { <#ty as #crate_path::ser::Aligned>::ALIGNMENT }
+			});
 
-		let first = match iter.next() {
-			Some(t) => quote! { let x = #t; },
-			None => quote! { let x = 1usize; }
-		};
+			let first = match iter.next() {
+				Some(t) => quote! { let x = #t; },
+				None => quote! { let x = 1usize; }
+			};
 
-		iter.fold(first, |acc, next| {
-			quote! {
-				#acc
-				let x = if #next > x { #next } else { x };
-			}
-		})
-	};
+			iter.fold(first, |acc, next| {
+				quote! {
+					#acc
+					let x = if #next > x { #next } else { x };
+				}
+			})
+		},
+		|alignment| {
+			quote! { let x = #alignment; }
+		}
+	);
 
 	let write_fields = data.fields.iter().enumerate().fold(quote! {}, |acc, (idx, f)| {
 		let field = f.ident.to_owned().unwrap();
@@ -148,10 +156,20 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 			})
 			.unwrap_or_default();
 
+		let log = cfg_select! {
+			feature = "debug-log" => {
+				quote! {
+					eprintln!("0x{:6X}: writing field {}::{}", ser.position(), stringify!(#name), stringify!(#field));
+				}
+			},
+			_ => quote! {}
+		};
+
 		if options.as_type.is_some() {
 			let as_type = &field_types[idx];
 			quote! {
 				#acc
+				#log
 				#padding
 				#as_type::from(self.#field.as_ref()).write_aligned(ser)?;
 				#padding_end
@@ -159,6 +177,7 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 		} else {
 			quote! {
 				#acc
+				#log
 				#padding
 				self.#field.write_aligned(ser)?;
 				#padding_end
@@ -175,19 +194,48 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 			.find_map(|attr| attr.meta.path().is_ident("bin1").then(|| attr.parse_args().unwrap()))
 			.unwrap_or_default();
 
+		let log = cfg_select! {
+			feature = "debug-log" => {
+				quote! {
+					eprintln!("0x{:6X}: resolving field {}::{}", ser.position(), stringify!(#name), stringify!(#field));
+				}
+			},
+			_ => quote! {}
+		};
+
 		if options.as_type.is_some() {
 			let as_type = &field_types[idx];
 			quote! {
 				#acc
+				#log
 				#as_type::from(self.#field.as_ref()).resolve(ser)?;
 			}
 		} else {
 			quote! {
 				#acc
+				#log
 				self.#field.resolve(ser)?;
 			}
 		}
 	});
+
+	let log_write = cfg_select! {
+		feature = "debug-log" => {
+			quote! {
+				eprintln!("0x{:6X}: writing {}", ser.position(), stringify!(#name));
+			}
+		},
+		_ => quote! {}
+	};
+
+	let log_resolve = cfg_select! {
+		feature = "debug-log" => {
+			quote! {
+				eprintln!("0x{:6X}: resolving {}", ser.position(), stringify!(#name));
+			}
+		},
+		_ => quote! {}
+	};
 
 	let expanded = quote! {
 		impl #crate_path::ser::Aligned for #name {
@@ -202,13 +250,16 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 			fn write(&self, ser: &mut #crate_path::ser::Bin1Serializer)
 				-> Result<(), #crate_path::ser::SerializeError>
 			{
+				#log_write
 				#write_fields
+				ser.align_to(<Self as #crate_path::ser::Aligned>::ALIGNMENT);
 				Ok(())
 			}
 
 			fn resolve(&self, ser: &mut #crate_path::ser::Bin1Serializer)
 				-> Result<(), #crate_path::ser::SerializeError>
 			{
+				#log_resolve
 				#resolve_fields
 				Ok(())
 			}
@@ -292,23 +343,45 @@ pub fn derive_deserialize(input: TokenStream) -> TokenStream {
 		})
 		.collect::<Vec<_>>();
 
-	let size = {
-		let total_padding = data.fields.iter().fold(0, |acc, f| {
+	let mut size = {
+		let mut size = quote! { let mut size = 0; };
+
+		for (f, ty) in data.fields.iter().zip(field_types.iter()) {
 			let options: Bin1Attrs = f
 				.attrs
 				.iter()
 				.find_map(|attr| attr.meta.path().is_ident("bin1").then(|| attr.parse_args().unwrap()))
 				.unwrap_or_default();
 
-			acc + options.pad.unwrap_or(0) + options.pad_end.unwrap_or(0)
-		});
+			let pad = options.pad.map(|x| quote! { + #x }).unwrap_or_default();
+			let pad_end = options.pad_end.map(|x| quote! { + #x }).unwrap_or_default();
 
-		let iter = field_types.iter().map(|ty| {
-			quote! { + <#ty as #crate_path::de::Bin1Deserialize>::SIZE }
-		});
+			let alignment_padding = quote! {
+				(<#ty as #crate_path::ser::Aligned>::ALIGNMENT
+					- (size % <#ty as #crate_path::ser::Aligned>::ALIGNMENT))
+					% <#ty as #crate_path::ser::Aligned>::ALIGNMENT
+			};
 
-		quote! { #total_padding #(#iter)* }
+			size.extend(quote! {
+				size += #alignment_padding #pad + <#ty as #crate_path::de::Bin1Deserialize>::SIZE #pad_end;
+			});
+		}
+
+		size
 	};
+
+	let end_padding = quote! {
+		(<Self as #crate_path::ser::Aligned>::ALIGNMENT
+			- ({ #size size } % <Self as #crate_path::ser::Aligned>::ALIGNMENT))
+			% <Self as #crate_path::ser::Aligned>::ALIGNMENT
+	};
+
+	size.extend(quote! {
+		size += (<Self as #crate_path::ser::Aligned>::ALIGNMENT
+			- (size % <Self as #crate_path::ser::Aligned>::ALIGNMENT))
+			% <Self as #crate_path::ser::Aligned>::ALIGNMENT;
+		size
+	});
 
 	let read_fields = data.fields.iter().enumerate().fold(quote! {}, |acc, (idx, f)| {
 		let field = f.ident.to_owned().unwrap();
@@ -339,10 +412,20 @@ pub fn derive_deserialize(input: TokenStream) -> TokenStream {
 			})
 			.unwrap_or_default();
 
+		let log = cfg_select! {
+			feature = "debug-log" => {
+				quote! {
+					eprintln!("0x{:6X}: reading field {}::{}", de.position(), stringify!(#name), stringify!(#field));
+				}
+			},
+			_ => quote! {}
+		};
+
 		if options.as_type.is_some() {
 			let as_type = &field_types[idx];
 			quote! {
 				#acc
+				#log
 				#padding
 				de.align_to(<#as_type as #crate_path::ser::Aligned>::ALIGNMENT)?;
 				let #field = #as_type::read(de)?.into();
@@ -352,6 +435,7 @@ pub fn derive_deserialize(input: TokenStream) -> TokenStream {
 			let ty = &field_types[idx];
 			quote! {
 				#acc
+				#log
 				#padding
 				de.align_to(<#ty as #crate_path::ser::Aligned>::ALIGNMENT)?;
 				let #field = <#ty>::read(de)?;
@@ -367,15 +451,26 @@ pub fn derive_deserialize(input: TokenStream) -> TokenStream {
 		}
 	});
 
+	let log = cfg_select! {
+		feature = "debug-log" => {
+			quote! {
+				eprintln!("0x{:6X}: deserializing {}", de.position(), stringify!(#name));
+			}
+		},
+		_ => quote! {}
+	};
+
 	let expanded = quote! {
 		impl #crate_path::de::Bin1Deserialize for #name {
-			const SIZE: usize = #size;
+			#[allow(clippy::modulo_one)]
+			const SIZE: usize = { #size };
 
 			fn read(de: &mut #crate_path::de::Bin1Deserializer)
 				-> Result<Self, #crate_path::de::DeserializeError>
 			{
+				#log
 				#read_fields
-
+				de.seek_relative(const { #[allow(clippy::modulo_one)] { (#end_padding) as i64 } })?;
 				Ok(Self { #(#fields),* })
 			}
 		}

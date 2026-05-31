@@ -14,6 +14,9 @@ macro_rules! impl_primitive {
 			}
 
 			fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
+				#[cfg(feature = "debug-log")]
+				eprintln!("0x{:6X}: writing {}", ser.position(), stringify!($ty));
+
 				ser.write_unaligned(&self.to_le_bytes());
 				Ok(())
 			}
@@ -46,6 +49,9 @@ impl Bin1Serialize for bool {
 	}
 
 	fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: writing bool", ser.position());
+
 		ser.write_unaligned(&[*self as u8]);
 		Ok(())
 	}
@@ -130,16 +136,32 @@ impl<T: Aligned, U: Aligned> Aligned for (T, U) {
 
 impl<T: Bin1Serialize, U: Bin1Serialize> Bin1Serialize for (T, U) {
 	fn alignment(&self) -> usize {
-		self.0.alignment()
+		self.0.alignment().max(self.1.alignment())
 	}
 
 	fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
+		#[cfg(feature = "debug-log")]
+		eprintln!(
+			"0x{:6X}: writing pair ({}, {})",
+			ser.position(),
+			std::any::type_name::<T>(),
+			std::any::type_name::<U>()
+		);
+
 		self.0.write(ser)?;
 		self.1.write_aligned(ser)?;
 		Ok(())
 	}
 
 	fn resolve(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
+		#[cfg(feature = "debug-log")]
+		eprintln!(
+			"0x{:6X}: resolving pair ({}, {})",
+			ser.position(),
+			std::any::type_name::<T>(),
+			std::any::type_name::<U>()
+		);
+
 		self.0.resolve(ser)?;
 		self.1.resolve(ser)?;
 		Ok(())

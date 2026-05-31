@@ -16,6 +16,16 @@ serde_json = { version = "1.0.150", features = ["preserve_order"] }
 
 tracing = { version = "0.1.41", optional = true }
 
+[dev-dependencies]
+hitman-commons = { git = "https://github.com/atampy25/hitman-commons", features = [
+    "game_detection",
+    "rpkg-rs",
+] }
+static_init = "1.0.4"
+rpkg-rs = "1.4.0"
+rayon = "1.12.0"
+glacier-ini = "0.1.0"
+
 [build-dependencies]
 anyhow = "1.0.100"
 codegen = "0.3.0"
@@ -82,3 +92,4 @@ all-types = [
 
 # Crate features
 tracing = ["dep:tracing", "hitman-bin1-core/tracing"]
+debug-log = ["hitman-bin1-core/debug-log"]

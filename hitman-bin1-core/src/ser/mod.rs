@@ -25,7 +25,6 @@ pub trait Bin1Serialize {
 	fn write_aligned(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
 		ser.align_to(self.alignment());
 		self.write(ser)?;
-		ser.align_to(self.alignment());
 		Ok(())
 	}
 
@@ -54,7 +53,8 @@ pub struct Bin1Serializer {
 	type_ids: Vec<u32>,
 	type_names: Vec<Cow<'static, str>>,
 
-	rrids_segment: bool
+	rrids_segment: bool,
+	resource_ptrs_segment: bool
 }
 
 impl Default for Bin1Serializer {
@@ -64,7 +64,7 @@ impl Default for Bin1Serializer {
 				let mut buffer = vec![];
 				buffer.extend_from_slice(b"BIN1");
 				buffer.push(0); // padding
-				buffer.push(8); // alignment
+				buffer.push(1); // alignment
 				buffer.push(0); // number of segments, to be filled in later
 				buffer.push(0);
 				buffer.extend_from_slice(&0u32.to_be_bytes()); // data size, to be filled in later
@@ -77,7 +77,8 @@ impl Default for Bin1Serializer {
 			resource_ptrs: vec![],
 			type_ids: vec![],
 			type_names: vec![],
-			rrids_segment: true
+			rrids_segment: true,
+			resource_ptrs_segment: true
 		}
 	}
 }
@@ -92,8 +93,13 @@ impl Bin1Serializer {
 		self
 	}
 
+	pub fn with_resource_ptrs_segment(mut self, enabled: bool) -> Self {
+		self.resource_ptrs_segment = enabled;
+		self
+	}
+
 	pub fn align_to(&mut self, alignment: usize) {
-		let padding = alignment - (self.buffer.len() % alignment);
+		let padding = alignment - ((self.buffer.len() - 0x10) % alignment);
 		if padding < alignment {
 			self.buffer.extend(vec![0; padding]);
 		}
@@ -110,10 +116,12 @@ impl Bin1Serializer {
 	pub fn write_aligned(&mut self, data: &[u8], alignment: usize) {
 		self.align_to(alignment);
 		self.buffer.extend_from_slice(data);
-		self.align_to(alignment);
 	}
 
 	pub fn write_pointer(&mut self, pointer_id: u64) {
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: writing pointer {:X}", self.position(), pointer_id);
+
 		self.align_to(8);
 		self.pointers.push(self.buffer.len() as u32);
 		self.buffer.extend_from_slice(&pointer_id.to_le_bytes());
@@ -129,7 +137,14 @@ impl Bin1Serializer {
 			return Ok(());
 		}
 
-		self.align_to(8); // align to "serializer alignment"
+		#[cfg(feature = "debug-log")]
+		eprintln!(
+			"0x{:6X}: writing pointee for {:X}/{}",
+			self.position(),
+			pointer_id,
+			end_pointer_id.map_or_else(|| "None".into(), |id| format!("{:X}", id))
+		);
+
 		self.align_to(data.alignment());
 		self.register_pointee(pointer_id);
 
@@ -139,6 +154,13 @@ impl Bin1Serializer {
 			self.register_pointee(end_pointer_id);
 		}
 
+		#[cfg(feature = "debug-log")]
+		eprintln!(
+			"0x{:6X}: resolving pointee for {:X}/{}",
+			self.position(),
+			pointer_id,
+			end_pointer_id.map_or_else(|| "None".into(), |id| format!("{:X}", id))
+		);
 		data.resolve(self)?;
 
 		Ok(())
@@ -146,10 +168,13 @@ impl Bin1Serializer {
 
 	/// Register a pointer as referring to the current location in the serialisation buffer.
 	pub fn register_pointee(&mut self, pointer_id: u64) {
-		self.offsets.insert(pointer_id, self.buffer.len() as u64 - 16);
+		self.offsets.insert(pointer_id, self.buffer.len() as u64 - 0x10);
 	}
 
 	pub fn write_type(&mut self, type_name: Cow<'static, str>) {
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: writing type {type_name}", self.position());
+
 		self.align_to(8);
 		self.type_ids.push(self.buffer.len() as u32);
 
@@ -163,12 +188,18 @@ impl Bin1Serializer {
 	}
 
 	pub fn write_runtime_resource_id(&mut self, high: u32, low: u32) {
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: writing runtime resource ID", self.position());
+
 		self.runtime_resource_ids.push(self.buffer.len() as u32);
 		self.write_unaligned(&high.to_le_bytes());
 		self.write_unaligned(&low.to_le_bytes());
 	}
 
 	pub fn write_resource_ptr(&mut self, high: u32, low: u32) {
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: writing resource pointer", self.position());
+
 		self.resource_ptrs.push(self.buffer.len() as u32);
 		self.write_unaligned(&high.to_le_bytes());
 		self.write_unaligned(&low.to_le_bytes());
@@ -177,8 +208,6 @@ impl Bin1Serializer {
 	#[try_fn]
 	#[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
 	pub fn finalise(mut self) -> Result<Vec<u8>, SerializeError> {
-		self.align_to(8);
-
 		for offset in &self.pointers {
 			let offset = *offset as usize;
 			let pointer_id = u64::from_le_bytes(self.buffer[offset..offset + 8].try_into().unwrap());
@@ -187,7 +216,7 @@ impl Bin1Serializer {
 			}
 		}
 
-		let data_size = self.buffer.len() as u32 - 16;
+		let data_size = self.buffer.len() as u32 - 0x10;
 		self.buffer[8..12].copy_from_slice(&data_size.to_be_bytes());
 
 		// Rebased pointers segment
@@ -201,7 +230,7 @@ impl Bin1Serializer {
 				.extend_from_slice(&(self.pointers.len() as u32).to_le_bytes());
 
 			for offset in self.pointers {
-				self.buffer.extend_from_slice(&(offset - 16).to_le_bytes());
+				self.buffer.extend_from_slice(&(offset - 0x10).to_le_bytes());
 			}
 
 			let segment_len = self.buffer.len() - segment_start;
@@ -219,14 +248,14 @@ impl Bin1Serializer {
 				.extend_from_slice(&(self.type_ids.len() as u32).to_le_bytes());
 
 			for offset in self.type_ids {
-				self.buffer.extend_from_slice(&(offset - 16).to_le_bytes());
+				self.buffer.extend_from_slice(&(offset - 0x10).to_le_bytes());
 			}
 
 			self.buffer
 				.extend_from_slice(&(self.type_names.len() as u32).to_le_bytes());
 
 			for (idx, name) in self.type_names.into_iter().enumerate() {
-				let padding = 4 - (self.buffer.len() % 4);
+				let padding = 4 - ((self.buffer.len() - segment_start) % 4);
 				if padding < 4 {
 					self.buffer.extend(vec![0; padding]);
 				}
@@ -254,7 +283,7 @@ impl Bin1Serializer {
 				.extend_from_slice(&(self.runtime_resource_ids.len() as u32).to_le_bytes());
 
 			for offset in self.runtime_resource_ids {
-				self.buffer.extend_from_slice(&(offset - 16).to_le_bytes());
+				self.buffer.extend_from_slice(&(offset - 0x10).to_le_bytes());
 			}
 
 			let segment_len = self.buffer.len() - segment_start;
@@ -262,7 +291,7 @@ impl Bin1Serializer {
 		}
 
 		// ResourcePtrs segment
-		if !self.resource_ptrs.is_empty() {
+		if self.resource_ptrs_segment && !self.resource_ptrs.is_empty() {
 			self.buffer[6] += 1;
 			self.buffer.extend_from_slice(&0x578FBCEEu32.to_le_bytes());
 			self.buffer.extend_from_slice(&0u32.to_le_bytes());
@@ -272,7 +301,7 @@ impl Bin1Serializer {
 				.extend_from_slice(&(self.resource_ptrs.len() as u32).to_le_bytes());
 
 			for offset in self.resource_ptrs {
-				self.buffer.extend_from_slice(&(offset - 16).to_le_bytes());
+				self.buffer.extend_from_slice(&(offset - 0x10).to_le_bytes());
 			}
 
 			let segment_len = self.buffer.len() - segment_start;
@@ -283,6 +312,7 @@ impl Bin1Serializer {
 	}
 
 	pub fn serialize(mut self, value: &impl Bin1Serialize) -> Result<Vec<u8>, SerializeError> {
+		self.buffer[5] = value.alignment().min(8) as u8;
 		value.write(&mut self)?;
 		value.resolve(&mut self)?;
 		self.finalise()

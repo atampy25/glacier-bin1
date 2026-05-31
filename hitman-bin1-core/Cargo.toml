@@ -32,3 +32,4 @@ crc32fast = "1.5.0"
 [features]
 # Crate features
 tracing = ["dep:tracing"]
+debug-log = ["hitman-bin1-derive/debug-log"]

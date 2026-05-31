@@ -73,7 +73,7 @@ impl<'a> Bin1Deserializer<'a> {
 	#[try_fn]
 	pub fn align_to(&mut self, alignment: usize) -> Result<(), DeserializeError> {
 		self.buffer
-			.seek_relative(((alignment - (self.buffer.position() as usize % alignment)) % alignment) as i64)?;
+			.seek_relative(((alignment - ((self.buffer.position() - 0x10) as usize % alignment)) % alignment) as i64)?;
 	}
 
 	#[try_fn]
@@ -203,6 +203,9 @@ impl<'a> Bin1Deserializer<'a> {
 
 	#[try_fn]
 	pub fn read_type(&mut self) -> Result<&str, DeserializeError> {
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: reading type", self.position());
+
 		self.align_to(8)?;
 		let id = self.buffer.read_u64::<LittleEndian>()?;
 
@@ -214,6 +217,9 @@ impl<'a> Bin1Deserializer<'a> {
 
 	#[try_fn]
 	pub fn read_zstring(&mut self) -> Result<EcoString, DeserializeError> {
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: reading ZString", self.position());
+
 		self.align_to(8)?;
 		let len = self.buffer.read_u32::<LittleEndian>()? & 0xBFFFFFFF;
 		self.align_to(8)?;
@@ -239,14 +245,19 @@ impl<'a> Bin1Deserializer<'a> {
 		&mut self,
 		parser: impl FnOnce(&mut Bin1Deserializer) -> Result<T, DeserializeError>
 	) -> Result<Arc<T>, DeserializeError> {
-		self.align_to(8)?;
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: reading pointer", self.position());
 
+		self.align_to(8)?;
 		let ptr = self.buffer.read_u64::<LittleEndian>()?;
 
 		if let Some(parsed) = self.parsed_pointers.get(&ptr) {
 			parsed.clone().downcast::<T>().unwrap()
 		} else {
 			let pos = self.buffer.position();
+
+			#[cfg(feature = "debug-log")]
+			eprintln!("0x{:6X}: traversing pointer to 0x{:X}", pos, ptr + 0x10);
 
 			self.buffer.seek(SeekFrom::Start(ptr + 0x10))?;
 			let result = parser(self)?;
@@ -264,14 +275,19 @@ impl<'a> Bin1Deserializer<'a> {
 		&mut self,
 		parser: impl FnOnce(&mut Bin1Deserializer) -> Result<Arc<dyn Variant>, DeserializeError>
 	) -> Result<Arc<dyn Variant>, DeserializeError> {
-		self.align_to(8)?;
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: reading variant pointer", self.position());
 
+		self.align_to(8)?;
 		let ptr = self.buffer.read_u64::<LittleEndian>()?;
 
 		if let Some(parsed) = self.parsed_variants.get(&ptr) {
 			parsed.clone()
 		} else {
 			let pos = self.buffer.position();
+
+			#[cfg(feature = "debug-log")]
+			eprintln!("0x{:6X}: traversing variant pointer to 0x{:X}", pos, ptr + 0x10);
 
 			self.buffer.seek(SeekFrom::Start(ptr + 0x10))?;
 			let result = parser(self)?;

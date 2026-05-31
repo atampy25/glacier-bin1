@@ -26,6 +26,8 @@ impl<T: Bin1Serialize + Aligned> Bin1Serialize for [T] {
 			item.write_aligned(ser)?;
 		}
 
+		ser.align_to(Self::ALIGNMENT);
+
 		Ok(())
 	}
 
@@ -56,12 +58,19 @@ impl<T: Bin1Deserialize, const N: usize> Bin1Deserialize for [T; N] {
 	const SIZE: usize = T::SIZE * N;
 
 	fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
+		#[cfg(feature = "debug-log")]
+		eprintln!(
+			"0x{:6X}: reading [{}; {}]",
+			de.position(),
+			std::any::type_name::<T>(),
+			N
+		);
+
 		let mut result = [const { MaybeUninit::uninit() }; N];
 
 		for elem in &mut result {
 			de.align_to(T::ALIGNMENT)?;
 			elem.write(T::read(de)?);
-			de.align_to(T::ALIGNMENT)?;
 		}
 
 		Ok(unsafe { std::mem::transmute_copy(&result) })
@@ -80,11 +89,23 @@ impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
 
 	fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
 		if self.is_empty() {
+			#[cfg(feature = "debug-log")]
+			eprintln!(
+				"0x{:6X}: writing empty Vec<{}>",
+				ser.position(),
+				std::any::type_name::<T>()
+			);
 			ser.write_pointer(u64::MAX);
 			ser.write_pointer(u64::MAX);
 			ser.write_pointer(u64::MAX);
 		} else {
 			if self.len() * T::SIZE <= 16 {
+				#[cfg(feature = "debug-log")]
+				eprintln!(
+					"0x{:6X}: writing inline Vec<{}>",
+					ser.position(),
+					std::any::type_name::<T>()
+				);
 				// Inline optimisation
 				let pos = ser.position();
 				self.as_slice().write(ser)?;
@@ -93,6 +114,13 @@ impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
 				// inline flag, count, capacity
 				((1u64 << 62) | (self.len() as u8 as u64) | ((self.len() as u8 as u64) << 8)).write(ser)?;
 			} else {
+				#[cfg(feature = "debug-log")]
+				eprintln!(
+					"0x{:6X}: writing allocated Vec<{}>",
+					ser.position(),
+					std::any::type_name::<T>()
+				);
+
 				let start_id = self.as_ptr() as u64 | 0xABCD000000000000; // fake pointers to avoid colliding with actual data
 				let end_id = start_id | 0xCAFE000000000000;
 				ser.write_pointer(start_id);
@@ -110,10 +138,24 @@ impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
 		}
 
 		if self.len() * T::SIZE <= 16 {
+			#[cfg(feature = "debug-log")]
+			eprintln!(
+				"0x{:6X}: writing inline Vec<{}> items",
+				ser.position(),
+				std::any::type_name::<T>()
+			);
+
 			for item in self {
 				item.resolve(ser)?;
 			}
 		} else {
+			#[cfg(feature = "debug-log")]
+			eprintln!(
+				"0x{:6X}: resolving allocated Vec<{}> items",
+				ser.position(),
+				std::any::type_name::<T>()
+			);
+
 			let start_id = self.as_ptr() as u64 | 0xABCD000000000000;
 			let end_id = start_id | 0xCAFE000000000000;
 			ser.write_pointee(start_id, Some(end_id), self.as_slice())?;
@@ -128,7 +170,8 @@ impl<T: Bin1Deserialize> Bin1Deserialize for Vec<T> {
 
 	#[try_fn]
 	fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
-		de.align_to(8)?;
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: reading Vec<{}>", de.position(), std::any::type_name::<T>());
 
 		// Skip to allocation end pointer/flags value
 		de.seek_relative(8 * 2)?;
@@ -142,6 +185,13 @@ impl<T: Bin1Deserialize> Bin1Deserialize for Vec<T> {
 		de.seek_relative(-8 * 3)?;
 
 		if (allocation_end_or_flags >> 62) & 1 == 1 {
+			#[cfg(feature = "debug-log")]
+			eprintln!(
+				"0x{:6X}: reading Vec<{}> as inline",
+				de.position(),
+				std::any::type_name::<T>()
+			);
+
 			// Inline data
 			let len = (allocation_end_or_flags & 0xFF) as usize;
 			let mut result = Vec::with_capacity(len);
@@ -156,11 +206,25 @@ impl<T: Bin1Deserialize> Bin1Deserialize for Vec<T> {
 			let start = de.read_u64()?;
 			let end = de.read_u64()?;
 
+			#[cfg(feature = "debug-log")]
+			eprintln!(
+				"0x{:6X}: traversing Vec<{}> to 0x{:X} (end: 0x{:X})",
+				de.position(),
+				std::any::type_name::<T>(),
+				start + 0x10,
+				end + 0x10
+			);
+
 			de.seek_from_start(start + 0x10)?;
 			let mut result = Vec::with_capacity((end as usize - start as usize).checked_div(T::SIZE).unwrap_or(0));
 			while de.position() != end + 0x10 {
 				result.push(T::read(de)?);
 				de.align_to(T::ALIGNMENT)?;
+
+				#[cfg(feature = "debug-log")]
+				if de.position() > end + 0x10 {
+					panic!("Read past array end");
+				}
 			}
 
 			// Seek past the allocation end pointer
@@ -236,7 +300,6 @@ pub mod TArrayRef {
 
 		#[tryvial::try_fn]
 		fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
-			de.align_to(8)?;
 			let start = de.read_u64()?;
 			let end = de.read_u64()?;
 
@@ -326,7 +389,6 @@ pub mod ZHMPtrLen {
 
 		#[tryvial::try_fn]
 		fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
-			de.align_to(8)?;
 			let start = de.read_u64()?;
 			let len = de.read_u64()?;
 

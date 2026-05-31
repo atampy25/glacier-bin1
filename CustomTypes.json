@@ -1,0 +1,152 @@
+{
+	"enums": [],
+	"structs": [
+		{
+			"name": "SResourceIndexFolder",
+			"fields": [
+				{
+					"name": "name",
+					"type": "ZString"
+				},
+				{
+					"name": "resourceIndices",
+					"type": "TArray<uint32_t>"
+				}
+			]
+		},
+		{
+			"name": "SResourceIndex",
+			"fields": [
+				{
+					"name": "folders",
+					"type": "TArray<SResourceIndexFolder>"
+				}
+			]
+		},
+		{
+			"name": "SAttributeInfo",
+			"fields": [
+				{
+					"name": "eKind",
+					"type": "uint32_t"
+				},
+				{
+					"name": "eType",
+					"type": "uint32_t"
+				},
+				{
+					"name": "sName",
+					"type": "ZString"
+				}
+			]
+		},
+		{
+			"name": "SControlTypeInfo",
+			"fields": [
+				{
+					"name": "aAttributes",
+					"type": "TArray<SAttributeInfo>"
+				},
+				{
+					"name": "aSpecialMethods",
+					"type": "TArray<bool>"
+				}
+			]
+		},
+		{
+			"name": "SEnumType",
+			"fields": [
+				{
+					"name": "sName",
+					"type": "ZString"
+				},
+				{
+					"name": "aItemLabels",
+					"type": "TArray<ZString>"
+				},
+				{
+					"name": "aItemValues",
+					"type": "TArray<uint32_t>"
+				}
+			]
+		},
+		{
+			"name": "SPackedAnimSetEntry",
+			"fields": [
+				{
+					"name": "m_sName",
+					"type": "ZString"
+				},
+				{
+					"name": "m_pAnimation",
+					"type": "TResourcePtr"
+				},
+				{
+					"name": "m_pBoneMask",
+					"type": "TResourcePtr"
+				}
+			]
+		},
+		{
+			"name": "SAudioSwitchData",
+			"fields": [
+				{
+					"name": "m_sName",
+					"type": "ZString"
+				}
+			]
+		},
+		{
+			"name": "SAudioSwitchGroupData",
+			"fields": [
+				{
+					"name": "m_sName",
+					"type": "ZString"
+				},
+				{
+					"name": "m_aSwitches",
+					"type": "TArray<SAudioSwitchData>"
+				}
+			]
+		},
+		{
+			"name": "SAudioStateData",
+			"fields": [
+				{
+					"name": "m_sName",
+					"type": "ZString"
+				}
+			]
+		},
+		{
+			"name": "SAudioStateGroupData",
+			"fields": [
+				{
+					"name": "m_sName",
+					"type": "ZString"
+				},
+				{
+					"name": "m_aStates",
+					"type": "TArray<SAudioStateData>"
+				}
+			]
+		},
+		{
+			"name": "SGFxMovieResource",
+			"fields": [
+				{
+					"name": "gfxData",
+					"type": "ZHMPtrLen<uint8_t>"
+				},
+				{
+					"name": "imagesFilename",
+					"type": "TArray<ZString>"
+				},
+				{
+					"name": "imagesData",
+					"type": "TArray<TArray<uint8_t>>"
+				}
+			]
+		}
+	]
+}

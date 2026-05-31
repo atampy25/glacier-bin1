@@ -1,246 +1,296 @@
-use std::{
-	collections::{HashMap, VecDeque},
-	fs
-};
+use std::collections::VecDeque;
 
 use codegen::{Block, Scope};
-use edit_distance::edit_distance;
 use inflector::Inflector;
-use lazy_regex::{regex_captures, regex_captures_iter, regex_is_match, regex_replace};
-use rayon::prelude::*;
+use lazy_regex::{regex_captures, regex_is_match, regex_replace};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use serde::{Deserialize, Serialize};
 
-enum Member {
-	Padding(usize),
-	Field(String, String, String)
-}
-
+#[derive(Serialize, Deserialize)]
 struct Enum {
 	name: String,
-	type_id: String,
 	size: usize,
-	members: Vec<(String, i64)>
+	values: Vec<Variant>
 }
 
-fn parse_enums(classes: &str, enums: &str) -> Vec<Enum> {
-	let enums = enums.replace('\r', "");
-	let enums = regex_captures_iter!(
-		r#"\(\*g_Enums\)\["(.*?)"] = \{\n((?:\s+\{ -?\d+, ".*?" \},\n)*)\s+\};"#,
-		&enums
-	)
-	.collect::<Vec<_>>();
-
-	let classes = classes.replace('\r', "");
-	let classes = classes.split_once("#pragma pack(push, 1)\n\n").unwrap().1;
-	classes
-		.split("};\n\n")
-		.filter(|section| section.starts_with("// Size:"))
-		.filter_map(|section| {
-			let size =
-				usize::from_str_radix(regex_captures!(r"// Size: 0x([0-9A-F]+)", section).unwrap().1, 16).unwrap();
-
-			let section = section
-				.split('\n')
-				.filter(|x| !x.is_empty() && !x.trim_start().starts_with("//"))
-				.collect::<Vec<_>>()
-				.join("\n");
-
-			if section.starts_with("enum class") {
-				let (name, _) = section.split_once("\n{").unwrap();
-
-				let name = regex_captures!("enum class (.*?)(?: : .*)?$", &name).unwrap().1;
-
-				let enum_entry = enums.par_iter().min_by_key(|x| edit_distance(name, &x[1])).unwrap();
-
-				let members = enum_entry[2]
-					.lines()
-					.map(|x| regex_captures!(r#"\{\s*(-?\d+),\s*"(.+?)"\s*\}"#, x))
-					.filter_map(|x| x.map(|x| (x.2.to_owned(), x.1.parse::<i64>().unwrap())))
-					.collect::<Vec<_>>();
-
-				Some(Enum {
-					name: name.to_owned(),
-					type_id: enum_entry[1].to_owned(),
-					size,
-					members
-				})
-			} else {
-				None
-			}
-		})
-		.collect()
+#[derive(Serialize, Deserialize)]
+struct Variant {
+	name: String,
+	value: i64
 }
 
-fn parse_classes(classes: &str, types: &str) -> Vec<(String, String, Vec<Member>)> {
-	let types = types
-		.lines()
-		.filter(|x| x.trim().starts_with("ZHMTypeInfo "))
-		.map(|x| regex_captures!(r#" (.*?)::TypeInfo = ZHMTypeInfo\("(.*)?","#, x).unwrap())
-		.map(|(_, x, y)| (x, y))
-		.collect::<HashMap<_, _>>();
+#[derive(Serialize, Deserialize)]
+struct Struct {
+	name: String,
+	alignment: Option<usize>,
+	fields: Vec<Field>
+}
 
-	let classes = classes.replace('\r', "").replace("#pragma pack(pop)", "");
-	let classes = classes.split_once("#pragma pack(push, 1)\n\n").unwrap().1;
-	classes
-		.split("};\n\n")
-		.map(|section| {
-			section
-				.split('\n')
-				.map(|x| x.trim())
-				.filter(|x| !x.is_empty() && !x.starts_with("//"))
-				.collect::<Vec<_>>()
-				.join("\n")
-		})
-		.filter(|section| section.starts_with("class"))
-		.map(|section| {
-			let (name, members) = section.split_once("\n{\npublic:\n").unwrap();
+#[derive(Serialize, Deserialize)]
+struct Field {
+	name: String,
 
-			let name = name.trim_start_matches("class ");
-			let name = regex_replace!(r" */\*.*?\*/ *", name, "").into_owned();
+	#[serde(rename = "type")]
+	ty: String
+}
 
-			let members = members
-				.lines()
-				.filter(|x| !x.starts_with("static") && !x.starts_with("bool operator"))
-				.map(|member| {
-					if let Some((_, amount)) = regex_captures!(r"uint8_t _pad\w+\[(\d+)\] \{\};", member) {
-						Member::Padding(amount.parse().unwrap())
-					} else {
-						let (_, type_name, field_name) = regex_captures!(r"^(.+) (.+);.*$", member).unwrap();
+#[derive(Serialize, Deserialize)]
+struct Types {
+	structs: Vec<Struct>,
+	enums: Vec<Enum>
+}
 
-						let original_field_name = field_name;
+#[derive(Serialize, Deserialize)]
+struct RustEnum {
+	type_id: String,
+	rust_name: String,
+	size: usize,
+	values: Vec<RustVariant>
+}
 
-						let field_name = if (field_name.len() != 2 && !regex_is_match!(r"m\d+", field_name))
-							|| field_name.chars().next().unwrap().is_uppercase()
-						{
-							field_name.to_snake_case()
-						} else {
+#[derive(Serialize, Deserialize)]
+struct RustVariant {
+	variant_name: String,
+	rust_name: String,
+	value: i64
+}
+
+#[derive(Serialize, Deserialize)]
+struct RustStruct {
+	type_id: String,
+	rust_name: String,
+	alignment: Option<usize>,
+	fields: Vec<RustField>
+}
+
+#[derive(Serialize, Deserialize)]
+struct RustField {
+	field_name: String,
+	rust_name: String,
+
+	#[serde(rename = "type")]
+	ty: String
+}
+
+#[derive(Serialize, Deserialize)]
+struct RustTypes {
+	structs: Vec<RustStruct>,
+	enums: Vec<RustEnum>
+}
+
+fn process_types(types: Types) -> RustTypes {
+	RustTypes {
+		structs: types
+			.structs
+			.into_par_iter()
+			.map(|s| RustStruct {
+				rust_name: s.name.replace('.', "_"),
+				type_id: s.name,
+				alignment: s.alignment,
+				fields: s
+					.fields
+					.into_iter()
+					.map(|f| RustField {
+						rust_name: {
+							let field_name = &f.name;
+
+							let field_name = if (field_name.len() != 2 && !regex_is_match!(r"m\d+", field_name))
+								|| field_name.chars().next().unwrap().is_uppercase()
+							{
+								field_name.to_snake_case()
+							} else {
+								field_name.into()
+							};
+
+							let field_name = if let Some((start, rest)) = field_name.split_once('_')
+								&& start.len() == 1 && !["x", "y", "z"].contains(&start)
+								&& !rest.is_empty()
+							{
+								rest.into()
+							} else {
+								field_name
+							};
+
+							let field_name = if let Some((start, rest)) = field_name.split_once('_')
+								&& start.len() == 1 && !["x", "y", "z"].contains(&start)
+								&& !rest.is_empty()
+							{
+								rest.into()
+							} else {
+								field_name
+							};
+
+							let field_name = match field_name.as_str() {
+								"type" => "r#type",
+								"ref" => "reference",
+								"move" => "r#move",
+								x => x
+							};
+
 							field_name.into()
-						};
+						},
+						field_name: f.name,
+						ty: {
+							fn process_type_name(type_name: &str) -> String {
+								match type_name {
+									"int8" | "int8_t" => "i8".into(),
+									"int16" => "i16".into(),
+									"int32" => "i32".into(),
+									"int64" => "i64".into(),
 
-						let field_name = if let Some((start, rest)) = field_name.split_once('_')
-							&& start.len() == 1 && !["x", "y", "z"].contains(&start)
-							&& !rest.is_empty()
-						{
-							rest.into()
-						} else {
-							field_name
-						};
+									"char" | "uint8" | "uint8_t" => "u8".into(),
+									"uint16" => "u16".into(),
+									"uint32" | "uint32_t" => "u32".into(),
+									"size_t" | "uint64" => "u64".into(),
 
-						let field_name = if let Some((start, rest)) = field_name.split_once('_')
-							&& start.len() == 1 && !["x", "y", "z"].contains(&start)
-							&& !rest.is_empty()
-						{
-							rest.into()
-						} else {
-							field_name
-						};
+									"float32" => "f32".into(),
+									"float64" => "f64".into(),
 
-						let field_name = match field_name.as_str() {
-							"type" => "r#type",
-							"ref" => "reference",
-							"move" => "r#move",
-							x => x
-						};
+									"bool" => "bool".into(),
 
-						fn process_type_name(type_name: &str) -> String {
-							match type_name {
-								"int8" | "int8_t" => "i8".into(),
-								"int16" => "i16".into(),
-								"int32" => "i32".into(),
-								"int64" => "i64".into(),
+									"ZString" => "EcoString".into(),
 
-								"char" | "uint8" | "uint8_t" => "u8".into(),
-								"uint16" => "u16".into(),
-								"uint32" | "uint32_t" => "u32".into(),
-								"size_t" | "uint64" => "u64".into(),
+									x if x.starts_with("TArray<") => format!(
+										"Vec<{}>",
+										process_type_name(
+											&x["TArray<".len()..]
+												.chars()
+												.rev()
+												.skip(1)
+												.collect::<Vec<_>>()
+												.into_iter()
+												.rev()
+												.collect::<String>()
+										)
+									),
 
-								"float32" => "f32".into(),
-								"float64" => "f64".into(),
+									x if x.starts_with("TFixedArray<") => format!(
+										"[{}; {}]",
+										process_type_name(regex_captures!(r"TFixedArray<(.*), *(.*)>", x).unwrap().1),
+										regex_captures!(r"TFixedArray<(.*), *(.*)>", x)
+											.unwrap()
+											.2
+											.parse::<usize>()
+											.unwrap()
+									),
 
-								"bool" => "bool".into(),
+									x if x.starts_with("TPair<") => format!(
+										"({}, {})",
+										process_type_name(regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().1),
+										process_type_name(regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().2)
+									),
 
-								"ZString" => "EcoString".into(),
+									x if x.starts_with("ZHMPtrLen<") => format!(
+										"ZHMPtrLen<{}>",
+										process_type_name(
+											&x["ZHMPtrLen<".len()..]
+												.chars()
+												.rev()
+												.skip(1)
+												.collect::<Vec<_>>()
+												.into_iter()
+												.rev()
+												.collect::<String>()
+										)
+									),
 
-								x if x.starts_with("TArray<") => format!(
-									"Vec<{}>",
-									process_type_name(
-										&x["TArray<".len()..]
-											.chars()
-											.rev()
-											.skip(1)
-											.collect::<Vec<_>>()
-											.into_iter()
-											.rev()
-											.collect::<String>()
-									)
-								),
-
-								x if x.starts_with("TFixedArray<") => format!(
-									"[{}; {}]",
-									process_type_name(regex_captures!(r"TFixedArray<(.*), *(.*)>", x).unwrap().1),
-									regex_captures!(r"TFixedArray<(.*), *(.*)>", x)
-										.unwrap()
-										.2
-										.parse::<usize>()
-										.unwrap()
-								),
-
-								x if x.starts_with("TPair<") => format!(
-									"({}, {})",
-									process_type_name(regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().1),
-									process_type_name(regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().2)
-								),
-
-								x if x.starts_with("ZHMPtrLen<") => format!(
-									"ZHMPtrLen<{}>",
-									process_type_name(
-										&x["ZHMPtrLen<".len()..]
-											.chars()
-											.rev()
-											.skip(1)
-											.collect::<Vec<_>>()
-											.into_iter()
-											.rev()
-											.collect::<String>()
-									)
-								),
-
-								x => x.into()
+									x => x.replace('.', "_")
+								}
 							}
+
+							process_type_name(&f.ty)
 						}
+					})
+					.collect()
+			})
+			.collect(),
+		enums: types
+			.enums
+			.into_par_iter()
+			.map(|e| {
+				let common_prefix = e
+					.values
+					.iter()
+					.map(|v| v.name.split_once("_").map(|x| x.0))
+					.collect::<Option<Vec<_>>>()
+					.and_then(|prefixes| {
+						let first = prefixes[0];
+						if prefixes.iter().all(|x| *x == first) {
+							Some(first.to_owned())
+						} else {
+							None
+						}
+					});
 
-						let type_name = process_type_name(type_name);
-
-						Member::Field(
-							original_field_name.to_owned(),
-							field_name.to_owned(),
-							type_name.to_owned()
-						)
-					}
-				})
-				.collect::<Vec<_>>();
-
-			(
-				name.to_owned(),
-				types.get(name.as_str()).map_or(name.as_str(), |v| v).to_owned(),
-				members
-			)
-		})
-		.collect()
+				RustEnum {
+					rust_name: e.name.replace('.', "_"),
+					type_id: e.name,
+					size: e.size,
+					values: e
+						.values
+						.into_iter()
+						.map(|v| RustVariant {
+							rust_name: {
+								if let Some(common_prefix) = &common_prefix {
+									let name = v.name.trim_start_matches(common_prefix).trim_start_matches('_');
+									if name.starts_with(|c: char| c.is_ascii_digit()) {
+										format!(
+											"_{}",
+											if name.chars().all(|c| c.is_uppercase() || !c.is_ascii_alphabetic()) {
+												name.to_pascal_case()
+											} else {
+												name.into()
+											}
+										)
+									} else {
+										if name.chars().all(|c| c.is_uppercase() || !c.is_ascii_alphabetic()) {
+											name.to_pascal_case()
+										} else {
+											name.into()
+										}
+									}
+								} else {
+									if v.name.chars().all(|c| c.is_uppercase() || !c.is_ascii_alphabetic()) {
+										v.name.to_pascal_case()
+									} else {
+										v.name.to_owned()
+									}
+								}
+							},
+							variant_name: v.name,
+							value: v.value
+						})
+						.collect()
+				}
+			})
+			.collect()
+	}
 }
 
-pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_code: &str, to_generate: &[&[&str]]) {
-	let mut classes = parse_classes(
-		&format!("{}\n\n{}", classes_code, fs::read_to_string("../custom.txt").unwrap()),
-		types_code
-	);
-
-	let mut enums = parse_enums(classes_code, enums_code);
+pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to_generate: &[&[&str]]) {
+	let RustTypes { mut structs, mut enums } = process_types(serde_json::from_str(types_json).unwrap());
+	let RustTypes {
+		structs: mut custom_structs,
+		enums: mut custom_enums
+	} = process_types(serde_json::from_str(custom_types_json).unwrap());
+	structs.append(&mut custom_structs);
+	enums.append(&mut custom_enums);
 
 	// Special cased
-	classes.remove(classes.iter().position(|x| x.0 == "ZRuntimeResourceID").unwrap());
-	classes.remove(classes.iter().position(|x| x.0 == "SEntityTemplateProperty").unwrap());
+	structs.remove(
+		structs
+			.iter()
+			.position(|x| x.rust_name == "ZRuntimeResourceID")
+			.unwrap()
+	);
+	structs.remove(
+		structs
+			.iter()
+			.position(|x| x.rust_name == "SEntityTemplateProperty")
+			.unwrap()
+	);
 
-	let mut class_queue = VecDeque::new();
+	let mut struct_queue = VecDeque::new();
 	let mut enum_queue = vec![];
 
 	// Types known to be used as ZVariant
@@ -260,25 +310,31 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 		"SSCCuriousConfiguration",
 		"ZCurve",
 		"SMapMarkerData",
-		"ZHUDOccluderTriggerEntity_SBoneTestSetup",
+		"ZHUDOccluderTriggerEntity.SBoneTestSetup",
 		"SGaitTransitionEntry",
 		"SClothVertex",
-		"ZSharedSensorDef_SVisibilitySetting",
+		"ZSharedSensorDef.SVisibilitySetting",
 		"SFontLibraryDefinition",
 		"SCamBone",
 		"SConversationPart",
-		"AI_SFirePattern01",
+		"AI.SFirePattern01",
 		"STargetableBoneConfiguration",
-		"ZSecuritySystemCameraConfiguration_SHitmanVisibleEscalationRule",
-		"AI_SFirePattern02",
-		"ZSecuritySystemCameraConfiguration_SDeadBodyVisibleEscalationRule",
-		"ZOverlayControllerEntity_SInputData",
-		"ZEntityReference"
+		"ZSecuritySystemCameraConfiguration.SHitmanVisibleEscalationRule",
+		"AI.SFirePattern02",
+		"ZSecuritySystemCameraConfiguration.SDeadBodyVisibleEscalationRule",
+		"ZOverlayControllerEntity.SInputData",
+		"ZEntityReference",
+		"SLayerBehaviorConfiguration",
+		"ZHM5CrowdGenericEventConsumer.SCrowdSoundGenericEventData",
+		"ZHM5FootstepEventConsumer.SFootstepSoundEventData",
+		"ZHM5AudioEventConsumer.SAudioAnimationEventData",
+		"ZHM5HIKEventConsumer.SZHM5HIKEventData",
+		"ZInteractionEventConsumer.SInteractionEventData"
 	];
 
 	for ty in to_generate.concat() {
-		if let Some(pos) = classes.iter().position(|x| x.0 == ty) {
-			class_queue.push_back(classes.remove(pos));
+		if let Some(pos) = structs.iter().position(|x| x.type_id == ty) {
+			struct_queue.push_back(structs.remove(pos));
 		}
 
 		if ty == "enums" {
@@ -287,59 +343,61 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 		}
 	}
 
-	while let Some((name, type_id, members)) = class_queue.pop_front() {
-		for member in &members {
-			if let Member::Field(_, _, ty) = member {
-				let mut tys = vec![ty.trim_start_matches("Vec<").trim_end_matches(">")];
-				for ty in tys.clone() {
-					if ty.starts_with('(') {
-						let (first, second) = ty
-							.trim_start_matches('(')
-							.trim_end_matches(')')
-							.split_once(',')
-							.unwrap();
+	while let Some(RustStruct {
+		rust_name,
+		type_id,
+		fields,
+		alignment,
+		..
+	}) = struct_queue.pop_front()
+	{
+		for RustField { ty, .. } in &fields {
+			let mut tys = vec![ty.trim_start_matches("Vec<").trim_end_matches(">")];
+			for ty in tys.clone() {
+				if ty.starts_with('(') {
+					let (first, second) = ty
+						.trim_start_matches('(')
+						.trim_end_matches(')')
+						.split_once(',')
+						.unwrap();
 
-						tys.push(first.trim());
-						tys.push(second.trim());
-					}
+					tys.push(first.trim());
+					tys.push(second.trim());
 				}
+			}
 
-				for ty in tys {
-					if ty == "ZVariant" || ty == "SEntityTemplateProperty" {
-						for ty in KNOWN_VARIANTS {
-							if let Some(pos) = classes.iter().position(|x| x.0 == *ty) {
-								class_queue.push_back(classes.remove(pos));
-							}
+			for ty in tys {
+				if ty == "ZVariant" || ty == "SEntityTemplateProperty" {
+					for ty in KNOWN_VARIANTS {
+						if let Some(pos) = structs.iter().position(|x| x.type_id == *ty) {
+							struct_queue.push_back(structs.remove(pos));
 						}
-
-						// All enums are valid ZVariants
-						scope.import("std::str", "FromStr");
-						enum_queue.append(&mut enums);
-					} else if ty == "TResourcePtr" {
-						scope.import("hitman_bin1_core::types::resource", "TResourcePtr");
-					} else if ty == "TypeID" {
-						scope.import("hitman_bin1_core::types::variant", "TypeID");
-					} else if ty.starts_with("ZHMPtrLen<") {
-						scope.import("hitman_bin1_core::types::array", "ZHMPtrLen");
-					} else if let Some(pos) = classes.iter().position(|x| x.0 == *ty) {
-						class_queue.push_back(classes.remove(pos));
-					} else if let Some(pos) = enums.iter().position(|x| x.name == *ty) {
-						scope.import("std::str", "FromStr");
-						enum_queue.push(enums.remove(pos));
 					}
+
+					// All enums are valid ZVariants
+					scope.import("std::str", "FromStr");
+					enum_queue.append(&mut enums);
+				} else if ty == "TResourcePtr" {
+					scope.import("hitman_bin1_core::types::resource", "TResourcePtr");
+				} else if ty == "TypeID" {
+					scope.import("hitman_bin1_core::types::variant", "TypeID");
+				} else if ty.starts_with("ZHMPtrLen<") {
+					scope.import("hitman_bin1_core::types::array", "ZHMPtrLen");
+				} else if let Some(pos) = structs.iter().position(|x| x.rust_name == *ty) {
+					struct_queue.push_back(structs.remove(pos));
+				} else if let Some(pos) = enums.iter().position(|x| x.rust_name == *ty) {
+					scope.import("std::str", "FromStr");
+					enum_queue.push(enums.remove(pos));
 				}
 			}
 		}
 
-		if members
-			.iter()
-			.any(|x| matches!(x, Member::Field(_, _, ty) if ty.starts_with('[')))
-		{
+		if fields.iter().any(|x| x.ty.starts_with('[')) {
 			scope.import("serde_with", "serde_as");
 		}
 
 		let cls = scope
-			.new_struct(&name)
+			.new_struct(&rust_name)
 			.derive("Facet")
 			.derive("Debug")
 			.derive("Clone")
@@ -348,76 +406,56 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 			.derive("Bin1Deserialize")
 			.vis("pub");
 
-		if members
-			.iter()
-			.any(|x| matches!(x, Member::Field(_, _, ty) if ty.starts_with('[')))
-		{
+		if let Some(alignment) = alignment {
+			cls.r#macro(format!("#[bin1(alignment = {alignment})]"));
+		}
+
+		if fields.iter().any(|x| x.ty.starts_with('[')) {
 			cls.r#macro("#[serde_as]");
 		}
 
 		// Need to use macro instead of derive to ensure serde derives are under serde_as
 		cls.r#macro("#[derive(serde::Serialize, serde::Deserialize)]");
 
-		let mut padding = 0;
+		for RustField {
+			rust_name,
+			field_name,
+			ty
+		} in fields.iter()
+		{
+			let field = cls
+				.new_field(rust_name, ty)
+				.vis("pub")
+				.annotation(format!(r#"#[serde(rename = "{field_name}")]"#))
+				.annotation(format!(r#"#[facet(rename = "{field_name}")]"#));
 
-		let mut last_field = None;
+			if ty.starts_with('[') {
+				field.annotation(format!(
+					r#"#[serde_as(as = "{}")]"#,
+					regex_replace!(r"\[.*; (\d+)\]", &ty, "[_; $1]")
+				));
+			}
 
-		for member in members {
-			match member {
-				Member::Padding(amount) => {
-					padding = amount;
-				}
+			if ty == "EcoString" {
+				field.annotation(r#"#[facet(opaque, proxy = String)]"#);
+			} else if ty.contains("EcoString") {
+				field.annotation(r#"#[facet(opaque)]"#);
+			}
 
-				Member::Field(orig_name, field_name, type_name) => {
-					last_field = Some({
-						let field = cls
-							.new_field(field_name, &type_name)
-							.vis("pub")
-							.annotation(format!(r#"#[serde(rename = "{orig_name}")]"#))
-							.annotation(format!(r#"#[facet(rename = "{orig_name}")]"#));
-
-						if type_name.starts_with('[') {
-							field.annotation(format!(
-								r#"#[serde_as(as = "{}")]"#,
-								regex_replace!(r"\[.*; (\d+)\]", &type_name, "[_; $1]")
-							));
-						}
-
-						if type_name == "EcoString" {
-							field.annotation(r#"#[facet(opaque, proxy = String)]"#);
-						} else if type_name.contains("EcoString") {
-							field.annotation(r#"#[facet(opaque)]"#);
-						}
-
-						if let Some((_, contained)) = regex_captures!(r"ZHMPtrLen<(.*)>", &type_name) {
-							field.ty = format!("Vec<{contained}>").into();
-							field.annotation(format!(r#"#[bin1(as = "ZHMPtrLen::<{contained}>")]"#));
-						}
-
-						if padding != 0 {
-							field.annotation(format!("#[bin1(pad = {padding})]"));
-						}
-
-						field
-					});
-
-					padding = 0;
-				}
+			if let Some((_, contained)) = regex_captures!(r"ZHMPtrLen<(.*)>", &ty) {
+				field.ty = format!("Vec<{contained}>").into();
+				field.annotation(format!(r#"#[bin1(as = "ZHMPtrLen::<{contained}>")]"#));
 			}
 		}
 
-		if padding != 0 {
-			last_field.unwrap().annotation(format!("#[bin1(pad_end = {padding})]"));
-		}
-
-		scope.raw(format!(r#"submit!({name}, "{type_id}");"#));
+		scope.raw(format!(r#"submit!({rust_name}, "{type_id}");"#));
 	}
 
-	for Enum {
-		name: enum_name,
+	for RustEnum {
+		rust_name: enum_name,
 		type_id,
 		size,
-		members
+		values
 	} in enum_queue
 	{
 		let item = scope
@@ -435,65 +473,21 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 			.derive("serde::Deserialize")
 			.vis("pub");
 
-		let common_prefix = members
-			.iter()
-			.map(|(name, _)| name.split_once("_").map(|x| x.0))
-			.collect::<Option<Vec<_>>>()
-			.and_then(|prefixes| {
-				let first = prefixes[0];
-				if prefixes.iter().all(|x| *x == first) {
-					Some(first.to_owned())
-				} else {
-					None
-				}
-			});
-
-		let members = members
-			.into_iter()
-			.map(|(variant_name, value)| {
-				let rust_name = if let Some(common_prefix) = &common_prefix {
-					let name = variant_name.trim_start_matches(common_prefix).trim_start_matches('_');
-					if name.starts_with(|c: char| c.is_ascii_digit()) {
-						format!(
-							"_{}",
-							if name.chars().all(|c| c.is_uppercase() || !c.is_ascii_alphabetic()) {
-								name.to_pascal_case()
-							} else {
-								name.into()
-							}
-						)
-					} else {
-						if name.chars().all(|c| c.is_uppercase() || !c.is_ascii_alphabetic()) {
-							name.to_pascal_case()
-						} else {
-							name.into()
-						}
-					}
-				} else {
-					if variant_name
-						.chars()
-						.all(|c| c.is_uppercase() || !c.is_ascii_alphabetic())
-					{
-						variant_name.to_pascal_case()
-					} else {
-						variant_name.to_owned()
-					}
-				};
-
-				(variant_name, rust_name, value)
-			})
-			.collect::<Vec<_>>();
-
-		if members.is_empty() {
+		if values.is_empty() {
 			// ZST
 			item.new_variant("Value")
 				.annotation(r#"#[serde(rename = "")]"#)
 				.annotation(r#"#[facet(rename = "")]"#);
 		} else {
-			for (game_name, rust_name, _) in &members {
+			for RustVariant {
+				rust_name,
+				variant_name,
+				..
+			} in &values
+			{
 				item.new_variant(rust_name)
-					.annotation(format!(r#"#[serde(rename = "{game_name}")]"#))
-					.annotation(format!(r#"#[facet(rename = "{game_name}")]"#));
+					.annotation(format!(r#"#[serde(rename = "{variant_name}")]"#))
+					.annotation(format!(r#"#[facet(rename = "{variant_name}")]"#));
 			}
 		}
 
@@ -528,11 +522,16 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 			.ret("&'static str")
 			.push_block({
 				let mut block = Block::new("match value");
-				if members.is_empty() {
+				if values.is_empty() {
 					block.line(format!(r#"{enum_name}::Value => """#));
 				} else {
-					for (game_name, rust_name, _) in &members {
-						block.line(format!(r#"{enum_name}::{rust_name} => "{game_name}","#));
+					for RustVariant {
+						rust_name,
+						variant_name,
+						..
+					} in &values
+					{
+						block.line(format!(r#"{enum_name}::{rust_name} => "{variant_name}","#));
 					}
 				}
 				block
@@ -546,14 +545,19 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 			.arg("value", "&str")
 			.ret("Result<Self, ()>")
 			.push_block({
-				if members.is_empty() {
+				if values.is_empty() {
 					let mut block = Block::new("");
 					block.line(r#"value.is_empty().then_some(Self::Value).ok_or(())"#);
 					block
 				} else {
 					let mut block = Block::new("Ok(match value");
-					for (game_name, rust_name, _) in &members {
-						block.line(format!(r#""{game_name}" => Self::{rust_name},"#));
+					for RustVariant {
+						rust_name,
+						variant_name,
+						..
+					} in &values
+					{
+						block.line(format!(r#""{variant_name}" => Self::{rust_name},"#));
 					}
 					block.line("_ => return Err(())");
 					block.after(")");
@@ -569,11 +573,11 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 			.ret(signed_size_ty)
 			.push_block({
 				let mut block = Block::new("match value");
-				if members.is_empty() {
+				if values.is_empty() {
 					block.line(format!("{enum_name}::Value => 1"));
 				} else {
-					for (_, rust_name, variant_value) in &members {
-						block.line(format!("{enum_name}::{rust_name} => {variant_value},"));
+					for RustVariant { rust_name, value, .. } in &values {
+						block.line(format!("{enum_name}::{rust_name} => {value},"));
 					}
 				}
 				block
@@ -587,7 +591,7 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 			.arg("value", signed_size_ty)
 			.ret("Result<Self, ()>")
 			.push_block({
-				if members.is_empty() {
+				if values.is_empty() {
 					let mut block = Block::new("");
 					block.line(format!(
 						r#"if value != 1 {{ eprintln!("Unexpected value for uninhabited enum {type_id}: {{}}", value); }}"#
@@ -596,8 +600,8 @@ pub fn generate(scope: &mut Scope, classes_code: &str, enums_code: &str, types_c
 					block
 				} else {
 					let mut block = Block::new("Ok(match value");
-					for (_, rust_name, variant_value) in &members {
-						block.line(format!("{variant_value} => Self::{rust_name},"));
+					for RustVariant { rust_name, value, .. } in &values {
+						block.line(format!("{value} => Self::{rust_name},"));
 					}
 					block.line("_ => return Err(())");
 					block.after(")");

@@ -10,3 +10,6 @@ proc-macro = true
 syn = "2.0.105"
 quote = "1.0.40"
 darling = "0.23.0"
+
+[features]
+debug-log = []

@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use std::{env, fs, path::PathBuf};
 
 use hitman_bin1::{deserialize, ser::Bin1Serializer, serialize};
@@ -157,30 +159,86 @@ macro_rules! impl_generate_norrids {
 	};
 }
 
+macro_rules! impl_generate_noresptrs {
+	($resource_type:ident, $feature:literal, $ty:literal, $res:ty) => {
+		#[cfg(feature = $feature)]
+		if $resource_type.as_deref() == Some($ty) {
+			let value: $res = serde_json::from_slice(
+				&fs::read(env::args().nth(4).expect("4th argument must be input path")).unwrap()
+			)
+			.unwrap();
+
+			fs::write(
+				env::args().nth(5).map_or_else(
+					|| {
+						let path = PathBuf::from(env::args().nth(4).unwrap());
+						path.with_file_name(path.file_stem().unwrap_or_else(|| path.file_name().unwrap()))
+					},
+					PathBuf::from
+				),
+				Bin1Serializer::new()
+					.with_resource_ptrs_segment(false)
+					.serialize(&value)
+					.unwrap()
+			)
+			.unwrap();
+
+			return;
+		}
+	};
+
+	($resource_type:ident, $ty:literal, $res:ty) => {
+		#[cfg(feature = $ty)]
+		if $resource_type.as_deref() == Some($ty) {
+			let value: $res = serde_json::from_slice(
+				&fs::read(env::args().nth(4).expect("4th argument must be input path")).unwrap()
+			)
+			.unwrap();
+
+			fs::write(
+				env::args().nth(5).map_or_else(
+					|| {
+						let path = PathBuf::from(env::args().nth(4).unwrap());
+						path.with_file_name(path.file_stem().unwrap_or_else(|| path.file_name().unwrap()))
+					},
+					PathBuf::from
+				),
+				Bin1Serializer::new()
+					.with_resource_ptrs_segment(false)
+					.serialize(&value)
+					.unwrap()
+			)
+			.unwrap();
+
+			return;
+		}
+	};
+}
+
 macro_rules! impl_all {
-	($resource_type:ident, h1, $impl:ident, $impl_ores:ident) => {
-		impl_all!(generic, $resource_type, h1, $impl, $impl_ores);
+	($resource_type:ident, h1, $impl:ident, $impl_norrids:ident, $impl_noresptrs:ident) => {
+		impl_all!(generic, $resource_type, h1, $impl, $impl_norrids, $impl_noresptrs);
 
 		$impl!($resource_type, "TEMP", h1::STemplateEntity);
 	};
 
-	($resource_type:ident, h2, $impl:ident, $impl_ores:ident) => {
-		impl_all!(generic, $resource_type, h2, $impl, $impl_ores);
+	($resource_type:ident, h2, $impl:ident, $impl_norrids:ident, $impl_noresptrs:ident) => {
+		impl_all!(generic, $resource_type, h2, $impl, $impl_norrids, $impl_noresptrs);
 
 		$impl!($resource_type, "TEMP", h2::STemplateEntityFactory);
 		$impl!($resource_type, "ECPB", h2::SExtendedCppEntityBlueprint);
 	};
 
-	($resource_type:ident, h3, $impl:ident, $impl_ores:ident) => {
-		impl_all!(generic, $resource_type, h3, $impl, $impl_ores);
+	($resource_type:ident, h3, $impl:ident, $impl_norrids:ident, $impl_noresptrs:ident) => {
+		impl_all!(generic, $resource_type, h3, $impl, $impl_norrids, $impl_noresptrs);
 
 		$impl!($resource_type, "TEMP", h3::STemplateEntityFactory);
 		$impl!($resource_type, "ECPB", h3::SExtendedCppEntityBlueprint);
 
-		$impl_ores!($resource_type, "ORES", "ORES-activities", h3::SActivities);
+		$impl_norrids!($resource_type, "ORES", "ORES-activities", h3::SActivities);
 	};
 
-	(generic, $resource_type:ident, $game:ident, $impl:ident, $impl_ores:ident) => {
+	(generic, $resource_type:ident, $game:ident, $impl:ident, $impl_norrids:ident, $impl_noresptrs:ident) => {
 		$impl!($resource_type, "AIBB", $game::SBehaviorTreeInfo);
 		$impl!($resource_type, "AIRG", $game::SReasoningGrid);
 		$impl!($resource_type, "ASVA", Vec<$game::SPackedAnimSetEntry>);
@@ -194,24 +252,24 @@ macro_rules! impl_all {
 		$impl!($resource_type, "GIDX", $game::SResourceIndex);
 		$impl!($resource_type, "TBLU", $game::STemplateEntityBlueprint);
 		$impl!($resource_type, "UICB", $game::SControlTypeInfo);
-		$impl!($resource_type, "VIDB", $game::SVideoDatabaseData);
+		$impl_noresptrs!($resource_type, "VIDB", $game::SVideoDatabaseData);
 		$impl!($resource_type, "WSGB", $game::SAudioStateGroupData);
 		$impl!($resource_type, "WSWB", $game::SAudioSwitchGroupData);
 
-		$impl_ores!(
+		$impl_norrids!(
 			$resource_type,
 			"ORES",
 			"ORES-blobs",
 			Vec<$game::SBlobsConfigResourceEntry>
 		);
-		$impl_ores!(
+		$impl_norrids!(
 			$resource_type,
 			"ORES",
 			"ORES-contracts",
 			Vec<$game::SContractConfigResourceEntry>
 		);
-		$impl_ores!($resource_type, "ORES", "ORES-unlockables", ecow::EcoString);
-		$impl_ores!(
+		$impl_norrids!($resource_type, "ORES", "ORES-unlockables", ecow::EcoString);
+		$impl_norrids!(
 			$resource_type,
 			"ORES",
 			"ORES-environment",
@@ -277,7 +335,7 @@ fn main() {
 			Some("convert") => {
 				let resource_type = env::args().nth(3);
 
-				impl_all!(resource_type, h1, impl_convert, impl_convert);
+				impl_all!(resource_type, h1, impl_convert, impl_convert, impl_convert);
 
 				panic!(
 					"3rd argument must be one of the following resource types and supported by the given game \
@@ -289,7 +347,13 @@ fn main() {
 			Some("generate") => {
 				let resource_type = env::args().nth(3);
 
-				impl_all!(resource_type, h1, impl_generate, impl_generate_norrids);
+				impl_all!(
+					resource_type,
+					h1,
+					impl_generate,
+					impl_generate_norrids,
+					impl_generate_noresptrs
+				);
 
 				panic!(
 					"3rd argument must be one of the following resource types and supported by the given game \
@@ -306,7 +370,7 @@ fn main() {
 			Some("convert") => {
 				let resource_type = env::args().nth(3);
 
-				impl_all!(resource_type, h2, impl_convert, impl_convert);
+				impl_all!(resource_type, h2, impl_convert, impl_convert, impl_convert);
 
 				panic!(
 					"3rd argument must be one of the following resource types and supported by the given game \
@@ -318,7 +382,13 @@ fn main() {
 			Some("generate") => {
 				let resource_type = env::args().nth(3);
 
-				impl_all!(resource_type, h2, impl_generate, impl_generate_norrids);
+				impl_all!(
+					resource_type,
+					h2,
+					impl_generate,
+					impl_generate_norrids,
+					impl_generate_noresptrs
+				);
 
 				panic!(
 					"3rd argument must be one of the following resource types and supported by the given game \
@@ -335,7 +405,7 @@ fn main() {
 			Some("convert") => {
 				let resource_type = env::args().nth(3);
 
-				impl_all!(resource_type, h3, impl_convert, impl_convert);
+				impl_all!(resource_type, h3, impl_convert, impl_convert, impl_convert);
 
 				panic!(
 					"3rd argument must be one of the following resource types and supported by the given game \
@@ -347,7 +417,13 @@ fn main() {
 			Some("generate") => {
 				let resource_type = env::args().nth(3);
 
-				impl_all!(resource_type, h3, impl_generate, impl_generate_norrids);
+				impl_all!(
+					resource_type,
+					h3,
+					impl_generate,
+					impl_generate_norrids,
+					impl_generate_noresptrs
+				);
 
 				panic!(
 					"3rd argument must be one of the following resource types and supported by the given game \

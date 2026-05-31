@@ -32,7 +32,7 @@ impl ZRuntimeResourceID {
 }
 
 impl Aligned for ZRuntimeResourceID {
-	const ALIGNMENT: usize = 8;
+	const ALIGNMENT: usize = 4;
 }
 
 impl Bin1Serialize for ZRuntimeResourceID {
@@ -83,7 +83,7 @@ impl TResourcePtr {
 }
 
 impl Aligned for TResourcePtr {
-	const ALIGNMENT: usize = 8;
+	const ALIGNMENT: usize = 4;
 }
 
 impl Bin1Serialize for TResourcePtr {

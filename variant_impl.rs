@@ -524,7 +524,6 @@ pub struct SEntityTemplateProperty {
 
 	#[serde(rename = "value")]
 	#[facet(rename = "value")]
-	#[bin1(pad = 4)]
 	pub value: ZVariant
 }
 

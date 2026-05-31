@@ -15,6 +15,9 @@ impl Bin1Serialize for EcoString {
 	}
 
 	fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: writing ZString", ser.position());
+
 		let length = (self.len() as u32) | 0x40000000;
 		let pointer_id = self.as_ptr() as u64 | 0xDEAD000000000000;
 
@@ -25,6 +28,9 @@ impl Bin1Serialize for EcoString {
 	}
 
 	fn resolve(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
+		#[cfg(feature = "debug-log")]
+		eprintln!("0x{:6X}: resolving ZString", ser.position());
+
 		let pointer_id = self.as_ptr() as u64 | 0xDEAD000000000000;
 		ser.write_pointee(pointer_id, None, self.as_bytes())?;
 		ser.write_unaligned(&[0]); // Null terminator
