@@ -37,6 +37,10 @@
 				{
 					"name": "sName",
 					"type": "ZString"
+				},
+				{
+					"name": "unk",
+					"type": "ZVariant"
 				}
 			]
 		},

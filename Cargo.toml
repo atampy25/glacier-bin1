@@ -1,19 +1,21 @@
 [workspace]
 members = [
-    "hitman-bin1",
-    "hitman-bin1-core",
-    "hitman-bin1-derive",
-    "hitman-bin1-codegen",
-    "hitman-bin1-h1",
-    "hitman-bin1-h2",
-    "hitman-bin1-h3",
+    "glacier-bin1",
+    "glacier-bin1-core",
+    "glacier-bin1-derive",
+    "glacier-bin1-codegen",
+    "glacier-bin1-h1",
+    "glacier-bin1-h2",
+    "glacier-bin1-h3",
+    "glacier-bin1-fl",
 ]
 resolver = "3"
 
 [workspace.dependencies]
-hitman-bin1-core = { path = "hitman-bin1-core" }
-hitman-bin1-derive = { path = "hitman-bin1-derive" }
-hitman-bin1-codegen = { path = "hitman-bin1-codegen" }
-hitman-bin1-h1 = { path = "hitman-bin1-h1" }
-hitman-bin1-h2 = { path = "hitman-bin1-h2" }
-hitman-bin1-h3 = { path = "hitman-bin1-h3" }
+glacier-bin1-core = { path = "glacier-bin1-core" }
+glacier-bin1-derive = { path = "glacier-bin1-derive" }
+glacier-bin1-codegen = { path = "glacier-bin1-codegen" }
+glacier-bin1-h1 = { path = "glacier-bin1-h1" }
+glacier-bin1-h2 = { path = "glacier-bin1-h2" }
+glacier-bin1-h3 = { path = "glacier-bin1-h3" }
+glacier-bin1-fl = { path = "glacier-bin1-fl" }

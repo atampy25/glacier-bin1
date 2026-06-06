@@ -48,12 +48,12 @@ jobs:
               if: matrix.platform == 'ubuntu-latest'
               uses: actions/upload-artifact@v4
               with:
-                  name: hitman-bin1
-                  path: target/release/hitman-bin1
+                  name: glacier-bin1
+                  path: target/release/glacier-bin1
 
             - name: Upload artifact (Windows)
               if: matrix.platform == 'windows-latest'
               uses: actions/upload-artifact@v4
               with:
-                  name: hitman-bin1.exe
-                  path: target/release/hitman-bin1.exe
+                  name: glacier-bin1.exe
+                  path: target/release/glacier-bin1.exe

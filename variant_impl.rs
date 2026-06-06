@@ -11,12 +11,12 @@ use polonius_the_crab::{polonius, polonius_return};
 use serde::{Deserialize, Serialize, de::DeserializeOwned, ser::SerializeStruct};
 use tryvial::try_fn;
 
-use hitman_bin1_core::{
+use glacier_bin1_core::{
 	de::{Bin1Deserialize, Bin1Deserializer, DeserializeError},
 	ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError},
 	types::{
 		property::PropertyID,
-		resource::ZRuntimeResourceID,
+		resource::{ZResourceID, ZRuntimeResourceID},
 		variant::{StaticVariant, Variant, impl_variant}
 	}
 };
@@ -514,6 +514,7 @@ submit!(bool);
 submit!(());
 submit_nofacet!(EcoString);
 submit_nofacet!((EcoString, ZVariant));
+submit!(ZResourceID);
 submit!(ZRuntimeResourceID);
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Bin1Serialize, Bin1Deserialize, Facet)]

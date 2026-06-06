@@ -1,0 +1,76 @@
+[package]
+name = "glacier-bin1-h3"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+glacier-bin1-core.workspace = true
+glacier-bin1-derive.workspace = true
+
+ecow = { version = "0.3.0", features = ["serde"] }
+tryvial = "0.2.0"
+serde_json = { version = "1.0.150", features = ["preserve_order"] }
+serde = { version = "1.0.219", features = ["derive"] }
+dynex = "0.1.1"
+dynex_core = "0.1.1"
+static_init = "1.0.4"
+polonius-the-crab = "0.5.0"
+papaya = "0.2.3"
+linkme = "0.3.33"
+mident = "0.0.1"
+serde_with = "3.20.0"
+facet = "0.46.5"
+equivalent = "1.0.2"
+rapidhash = { version = "4.4.1", features = ["unsafe", "rand"] }
+serde_json_borrow = "0.9.0"
+
+[build-dependencies]
+glacier-bin1-codegen.workspace = true
+
+anyhow = "1.0.100"
+codegen = "0.3.0"
+
+[features]
+# Resource types
+AIBB = []
+AIRG = []
+ASVA = []
+ATMD = []
+BMSK = []
+CBLU = []
+CPPT = []
+CRMD = []
+ECPB = []
+ENUM = []
+GFXF = []
+GIDX = []
+ORES = []
+TBLU = []
+TEMP = []
+UICB = []
+VIDB = []
+WSGB = []
+WSWB = []
+enums = []
+all-types = [
+    "AIBB",
+    "AIRG",
+    "ASVA",
+    "ATMD",
+    "BMSK",
+    "CBLU",
+    "CPPT",
+    "CRMD",
+    "ECPB",
+    "ENUM",
+    "GFXF",
+    "GIDX",
+    "ORES",
+    "TBLU",
+    "TEMP",
+    "UICB",
+    "VIDB",
+    "WSGB",
+    "WSWB",
+    "enums",
+]

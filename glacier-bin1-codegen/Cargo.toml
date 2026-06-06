@@ -1,0 +1,13 @@
+[package]
+name = "glacier-bin1-codegen"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+codegen = "0.3.0"
+Inflector = "0.11.4"
+lazy-regex = "3.4.1"
+edit-distance = "2.1.3"
+rayon = "1.11.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"

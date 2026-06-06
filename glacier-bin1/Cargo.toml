@@ -1,0 +1,198 @@
+[package]
+name = "glacier-bin1"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+glacier-bin1-core.workspace = true
+glacier-bin1-h1 = { workspace = true, optional = true }
+glacier-bin1-h2 = { workspace = true, optional = true }
+glacier-bin1-h3 = { workspace = true, optional = true }
+glacier-bin1-fl = { workspace = true, optional = true }
+
+ecow = { version = "0.3.0", features = ["serde"] }
+thiserror = "2.0.15"
+tryvial = "0.2.0"
+serde_json = { version = "1.0.150", features = ["preserve_order"] }
+
+tracing = { version = "0.1.41", optional = true }
+
+[dev-dependencies]
+hitman-commons = { git = "https://github.com/atampy25/hitman-commons", features = [
+    "game_detection",
+    "rpkg-rs",
+] }
+static_init = "1.0.4"
+rpkg-rs = "1.4.0"
+rayon = "1.12.0"
+glacier-ini = "1.0.0"
+
+[build-dependencies]
+anyhow = "1.0.100"
+codegen = "0.3.0"
+Inflector = "0.11.4"
+lazy-regex = "3.4.1"
+crc32fast = "1.5.0"
+edit-distance = "2.1.3"
+rayon = "1.11.0"
+
+[features]
+# Games
+h1 = ["dep:glacier-bin1-h1"]
+h2 = ["dep:glacier-bin1-h2"]
+h3 = ["dep:glacier-bin1-h3"]
+fl = ["dep:glacier-bin1-fl"]
+all-games = ["h1", "h2", "h3", "fl"]
+
+# Resource types
+AIBB = [
+    "glacier-bin1-h1?/AIBB",
+    "glacier-bin1-h2?/AIBB",
+    "glacier-bin1-h3?/AIBB",
+]
+AIRG = [
+    "glacier-bin1-h1?/AIRG",
+    "glacier-bin1-h2?/AIRG",
+    "glacier-bin1-h3?/AIRG",
+]
+ASVA = [
+    "glacier-bin1-h1?/ASVA",
+    "glacier-bin1-h2?/ASVA",
+    "glacier-bin1-h3?/ASVA",
+]
+ATMD = [
+    "glacier-bin1-h1?/ATMD",
+    "glacier-bin1-h2?/ATMD",
+    "glacier-bin1-h3?/ATMD",
+]
+BMSK = [
+    "glacier-bin1-h1?/BMSK",
+    "glacier-bin1-h2?/BMSK",
+    "glacier-bin1-h3?/BMSK",
+]
+CBLU = [
+    "glacier-bin1-h1?/CBLU",
+    "glacier-bin1-h2?/CBLU",
+    "glacier-bin1-h3?/CBLU",
+    "glacier-bin1-fl?/CBLU",
+]
+CPPT = [
+    "glacier-bin1-h1?/CPPT",
+    "glacier-bin1-h2?/CPPT",
+    "glacier-bin1-h3?/CPPT",
+    "glacier-bin1-fl?/CPPT",
+]
+CRMD = [
+    "glacier-bin1-h1?/CRMD",
+    "glacier-bin1-h2?/CRMD",
+    "glacier-bin1-h3?/CRMD",
+    "glacier-bin1-fl?/CRMD",
+]
+ECPB = [
+    "glacier-bin1-h2?/ECPB",
+    "glacier-bin1-h3?/ECPB",
+    "glacier-bin1-fl?/ECPB",
+]
+ENUM = [
+    "glacier-bin1-h1?/ENUM",
+    "glacier-bin1-h2?/ENUM",
+    "glacier-bin1-h3?/ENUM",
+    "glacier-bin1-fl?/ENUM",
+]
+GFXF = [
+    "glacier-bin1-h1?/GFXF",
+    "glacier-bin1-h2?/GFXF",
+    "glacier-bin1-h3?/GFXF",
+    "glacier-bin1-fl?/GFXF",
+]
+GIDX = [
+    "glacier-bin1-h1?/GIDX",
+    "glacier-bin1-h2?/GIDX",
+    "glacier-bin1-h3?/GIDX",
+    "glacier-bin1-fl?/GIDX",
+]
+ORES = [
+    "glacier-bin1-h1?/ORES",
+    "glacier-bin1-h2?/ORES",
+    "glacier-bin1-h3?/ORES",
+    "glacier-bin1-fl?/ORES",
+]
+TBLU = [
+    "glacier-bin1-h1?/TBLU",
+    "glacier-bin1-h2?/TBLU",
+    "glacier-bin1-h3?/TBLU",
+    "glacier-bin1-fl?/TBLU",
+]
+TEMP = [
+    "glacier-bin1-h1?/TEMP",
+    "glacier-bin1-h2?/TEMP",
+    "glacier-bin1-h3?/TEMP",
+    "glacier-bin1-fl?/TEMP",
+]
+UICB = [
+    "glacier-bin1-h1?/UICB",
+    "glacier-bin1-h2?/UICB",
+    "glacier-bin1-h3?/UICB",
+    "glacier-bin1-fl?/UICB",
+]
+VIDB = [
+    "glacier-bin1-h1?/VIDB",
+    "glacier-bin1-h2?/VIDB",
+    "glacier-bin1-h3?/VIDB",
+]
+WSGB = [
+    "glacier-bin1-h1?/WSGB",
+    "glacier-bin1-h2?/WSGB",
+    "glacier-bin1-h3?/WSGB",
+    "glacier-bin1-fl?/WSGB",
+]
+WSWB = [
+    "glacier-bin1-h1?/WSWB",
+    "glacier-bin1-h2?/WSWB",
+    "glacier-bin1-h3?/WSWB",
+    "glacier-bin1-fl?/WSWB",
+]
+CLRP = ["glacier-bin1-fl?/CLRP"]
+GFXA = ["glacier-bin1-fl?/GFXA"]
+KWOR = ["glacier-bin1-fl?/KWOR"]
+TDAT = ["glacier-bin1-fl?/TDAT"]
+TDPK = ["glacier-bin1-fl?/TDPK"]
+WEMD = ["glacier-bin1-fl?/WEMD"]
+enums = [
+    "glacier-bin1-h1?/enums",
+    "glacier-bin1-h2?/enums",
+    "glacier-bin1-h3?/enums",
+    "glacier-bin1-fl?/enums",
+]
+all-types = [
+    "AIBB",
+    "AIRG",
+    "ASVA",
+    "ATMD",
+    "BMSK",
+    "CBLU",
+    "CPPT",
+    "CRMD",
+    "ECPB",
+    "ENUM",
+    "GFXF",
+    "GIDX",
+    "ORES",
+    "TBLU",
+    "TEMP",
+    "UICB",
+    "VIDB",
+    "WSGB",
+    "WSWB",
+    "CLRP",
+    "GFXA",
+    "KWOR",
+    "TDAT",
+    "TDPK",
+    "WEMD",
+    "enums",
+]
+
+# Crate features
+tracing = ["dep:tracing", "glacier-bin1-core/tracing"]
+debug-log = ["glacier-bin1-core/debug-log"]
