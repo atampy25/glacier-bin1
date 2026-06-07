@@ -17,7 +17,7 @@ include!(concat!(env!("OUT_DIR"), "/properties.rs"));
 
 #[static_init::dynamic]
 static PROPERTIES: std::collections::HashMap<u32, &'static str, BuildIdentityHasher<u32>> =
-	PROPERTIES_HASHES.into_iter().collect();
+	PROPERTIES_HASHES.iter().copied().collect();
 
 #[static_init::dynamic]
 static CUSTOM_PROPERTIES: papaya::HashMap<u32, EcoString, rapidhash::fast::RandomState> = Default::default();
