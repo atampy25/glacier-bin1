@@ -31,7 +31,7 @@ struct Field {
 	name: String,
 
 	#[serde(rename = "type")]
-	ty: String
+	ty: Option<String>
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -83,128 +83,134 @@ fn process_types(types: Types) -> RustTypes {
 		structs: types
 			.structs
 			.into_par_iter()
-			.map(|s| RustStruct {
-				rust_name: s.name.replace('.', "_"),
-				type_id: s.name,
-				alignment: s.alignment,
-				fields: s
-					.fields
-					.into_iter()
-					.map(|f| RustField {
-						rust_name: {
-							let field_name = &f.name;
+			.filter_map(|s| {
+				Some(RustStruct {
+					rust_name: s.name.replace('.', "_"),
+					type_id: s.name,
+					alignment: s.alignment,
+					fields: s
+						.fields
+						.into_iter()
+						.map(|f| {
+							Some(RustField {
+								rust_name: {
+									let field_name = &f.name;
 
-							let field_name = if (field_name.len() != 2 && !regex_is_match!(r"m\d+", field_name))
-								|| field_name.chars().next().unwrap().is_uppercase()
-							{
-								field_name.to_snake_case()
-							} else {
-								field_name.into()
-							};
+									let field_name = if (field_name.len() != 2 && !regex_is_match!(r"m\d+", field_name))
+										|| field_name.chars().next().unwrap().is_uppercase()
+									{
+										field_name.to_snake_case()
+									} else {
+										field_name.into()
+									};
 
-							let field_name = if let Some((start, rest)) = field_name.split_once('_')
-								&& start.len() == 1 && !["x", "y", "z"].contains(&start)
-								&& !rest.is_empty()
-							{
-								rest.into()
-							} else {
-								field_name
-							};
+									let field_name = if let Some((start, rest)) = field_name.split_once('_')
+										&& start.len() == 1 && !["x", "y", "z"].contains(&start)
+										&& !rest.is_empty()
+									{
+										rest.into()
+									} else {
+										field_name
+									};
 
-							let field_name = if let Some((start, rest)) = field_name.split_once('_')
-								&& start.len() == 1 && !["x", "y", "z"].contains(&start)
-								&& !rest.is_empty()
-							{
-								rest.into()
-							} else {
-								field_name
-							};
+									let field_name = if let Some((start, rest)) = field_name.split_once('_')
+										&& start.len() == 1 && !["x", "y", "z"].contains(&start)
+										&& !rest.is_empty()
+									{
+										rest.into()
+									} else {
+										field_name
+									};
 
-							let field_name = match field_name.as_str() {
-								"type" => "r#type",
-								"ref" => "reference",
-								"move" => "r#move",
-								x => x
-							};
+									let field_name = match field_name.as_str() {
+										"type" => "r#type",
+										"ref" => "reference",
+										"move" => "r#move",
+										x => x
+									};
 
-							field_name.into()
-						},
-						field_name: f.name,
-						ty: {
-							fn process_type_name(type_name: &str) -> String {
-								match type_name {
-									"int8" => "i8".into(),
-									"int16" => "i16".into(),
-									"int32" => "i32".into(),
-									"int64" => "i64".into(),
+									field_name.into()
+								},
+								field_name: f.name,
+								ty: {
+									fn process_type_name(type_name: &str) -> String {
+										match type_name {
+											"int8" => "i8".into(),
+											"int16" => "i16".into(),
+											"int32" => "i32".into(),
+											"int64" => "i64".into(),
 
-									"char" | "uint8" => "u8".into(),
-									"uint16" => "u16".into(),
-									"uint32" => "u32".into(),
-									"uint64" => "u64".into(),
+											"char" | "uint8" => "u8".into(),
+											"uint16" => "u16".into(),
+											"uint32" => "u32".into(),
+											"uint64" => "u64".into(),
 
-									"float32" => "f32".into(),
-									"float64" => "f64".into(),
+											"float32" => "f32".into(),
+											"float64" => "f64".into(),
 
-									"bool" => "bool".into(),
+											"bool" => "bool".into(),
 
-									"ZString" => "EcoString".into(),
+											"ZString" => "EcoString".into(),
 
-									"ZResourcePtr" => "TResourcePtr".into(),
-									x if x.starts_with("TResourcePtr<") => "TResourcePtr".into(),
+											"ZResourcePtr" => "TResourcePtr".into(),
+											x if x.starts_with("TResourcePtr<") => "TResourcePtr".into(),
 
-									x if x.starts_with("TArray<") => format!(
-										"Vec<{}>",
-										process_type_name(
-											&x["TArray<".len()..]
-												.chars()
-												.rev()
-												.skip(1)
-												.collect::<Vec<_>>()
-												.into_iter()
-												.rev()
-												.collect::<String>()
-										)
-									),
+											x if x.starts_with("TArray<") => format!(
+												"Vec<{}>",
+												process_type_name(
+													&x["TArray<".len()..]
+														.chars()
+														.rev()
+														.skip(1)
+														.collect::<Vec<_>>()
+														.into_iter()
+														.rev()
+														.collect::<String>()
+												)
+											),
 
-									x if x.starts_with("TFixedArray<") => format!(
-										"[{}; {}]",
-										process_type_name(regex_captures!(r"TFixedArray<(.*), *(.*)>", x).unwrap().1),
-										regex_captures!(r"TFixedArray<(.*), *(.*)>", x)
-											.unwrap()
-											.2
-											.parse::<usize>()
-											.unwrap()
-									),
+											x if x.starts_with("TFixedArray<") => format!(
+												"[{}; {}]",
+												process_type_name(
+													regex_captures!(r"TFixedArray<(.*), *(.*)>", x).unwrap().1
+												),
+												regex_captures!(r"TFixedArray<(.*), *(.*)>", x)
+													.unwrap()
+													.2
+													.parse::<usize>()
+													.unwrap()
+											),
 
-									x if x.starts_with("TPair<") => format!(
-										"({}, {})",
-										process_type_name(regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().1),
-										process_type_name(regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().2)
-									),
+											x if x.starts_with("TPair<") => format!(
+												"({}, {})",
+												process_type_name(regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().1),
+												process_type_name(regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().2)
+											),
 
-									x if x.starts_with("ZHMPtrLen<") => format!(
-										"ZHMPtrLen<{}>",
-										process_type_name(
-											&x["ZHMPtrLen<".len()..]
-												.chars()
-												.rev()
-												.skip(1)
-												.collect::<Vec<_>>()
-												.into_iter()
-												.rev()
-												.collect::<String>()
-										)
-									),
+											x if x.starts_with("ZHMPtrLen<") => format!(
+												"ZHMPtrLen<{}>",
+												process_type_name(
+													&x["ZHMPtrLen<".len()..]
+														.chars()
+														.rev()
+														.skip(1)
+														.collect::<Vec<_>>()
+														.into_iter()
+														.rev()
+														.collect::<String>()
+												)
+											),
 
-									x => x.replace('.', "_")
+											x => x.replace('.', "_")
+										}
+									}
+
+									process_type_name(&f.ty?)
 								}
-							}
-
-							process_type_name(&f.ty)
-						}
-					})
-					.collect()
+							})
+						})
+						.collect::<Option<_>>()?
+				})
 			})
 			.collect(),
 		enums: types

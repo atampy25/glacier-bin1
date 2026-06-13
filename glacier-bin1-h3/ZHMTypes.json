@@ -14781,15 +14781,6 @@
 			]
 		},
 		{
-			"name": "SAudioDynamicSequenceItemData",
-			"size": 16,
-			"alignment": 8,
-			"fields": [
-				{ "name": "m_nAudioNodeId", "type": "uint32", "offset": 0 },
-				{ "name": "m_pCustomInfo", "type": "void", "offset": 8 }
-			]
-		},
-		{
 			"name": "SAudioEmitterEventSaveData",
 			"size": 24,
 			"alignment": 4,
@@ -14846,7 +14837,8 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_EmitterID", "type": "uint64", "offset": 0 },
-				{ "name": "m_EventID", "type": "uint32", "offset": 8 }
+				{ "name": "m_EventID", "type": "uint32", "offset": 8 },
+				{ "name": "m_pPlayingSound", "type": null, "offset": 12 }
 			]
 		},
 		{
@@ -15003,6 +14995,7 @@
 			"size": 24,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZAimReactionBehaviorEntity", "offset": 16 }
 			]
 		},
@@ -15156,6 +15149,7 @@
 			"size": 32,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZControlledFormationMoveBehaviorEntity", "offset": 16 },
 				{ "name": "m_bRequestedCancelMove", "type": "bool", "offset": 24 }
 			]
@@ -15165,6 +15159,7 @@
 			"size": 32,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pBehaviorEntity", "type": "TEntityRef<ZConversationBehaviorEntity>", "offset": 16 }
 			]
 		},
@@ -15314,6 +15309,7 @@
 			"size": 24,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZEscortBehaviorEntity", "offset": 16 }
 			]
 		},
@@ -15330,6 +15326,7 @@
 			"size": 32,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZEscortSearchBehaviorEntity", "offset": 16 },
 				{ "name": "m_bStartBySearchingLastKnownLocation", "type": "bool", "offset": 24 }
 			]
@@ -15411,6 +15408,7 @@
 			"size": 24,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZFollowHitmanBehaviorEntity", "offset": 16 }
 			]
 		},
@@ -15483,6 +15481,7 @@
 			"size": 32,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZHeroEscortBehaviorEntity", "offset": 16 },
 				{ "name": "m_bRequestedCancelMove", "type": "bool", "offset": 24 }
 			]
@@ -15590,6 +15589,7 @@
 			"fields": [
 				{ "name": "m_EscortedActor", "type": "TEntityRef<ZHM5BaseCharacter>", "offset": 8 },
 				{ "name": "m_pWaypoints", "type": "TArray<TEntityRef<ZSpatialEntity>>", "offset": 24 },
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 32 },
 				{ "name": "m_pEntity", "type": "ZLeadEscortBehaviorEntity", "offset": 40 },
 				{ "name": "m_fTurnRadius", "type": "float32", "offset": 48 },
 				{ "name": "m_fPathWidth", "type": "float32", "offset": 52 },
@@ -15601,6 +15601,7 @@
 			"size": 32,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_rBehaviorEntity", "type": "TEntityRef<ZLeadEscortBehavior2Entity>", "offset": 16 }
 			]
 		},
@@ -16161,6 +16162,7 @@
 			"size": 72,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_bEnableReposition", "type": "bool", "offset": 16 },
 				{ "name": "m_bCrouch", "type": "bool", "offset": 17 },
 				{ "name": "m_bShooting", "type": "bool", "offset": 18 },
@@ -16555,6 +16557,8 @@
 			"alignment": 16,
 			"fields": [
 				{ "name": "m_BRInputs", "type": "ZRayQueryInput", "offset": 0 },
+				{ "name": "m_BROutputs", "type": null, "offset": 480 },
+				{ "name": "m_pHandles", "type": null, "offset": 1280 },
 				{ "name": "m_HitMaterial", "type": "TResourcePtr", "offset": 1320 },
 				{ "name": "m_fBloodSplatModifier", "type": "float32", "offset": 1328 }
 			]
@@ -16936,7 +16940,12 @@
 				{ "name": "m_vContactNormal", "type": "float4", "offset": 80 },
 				{ "name": "m_vContactForce", "type": "float4", "offset": 96 },
 				{ "name": "m_nSupportCount", "type": "uint32", "offset": 112 },
-				{ "name": "m_nID", "type": "uint32", "offset": 784 }
+				{ "name": "m_eCollisionPairType", "type": null, "offset": 116 },
+				{ "name": "m_eSupport", "type": null, "offset": 120 },
+				{ "name": "m_allContacts", "type": null, "offset": 128 },
+				{ "name": "m_nID", "type": "uint32", "offset": 784 },
+				{ "name": "m_pCollider", "type": null, "offset": 792 },
+				{ "name": "m_pListener", "type": null, "offset": 800 }
 			]
 		},
 		{
@@ -18542,7 +18551,8 @@
 				{ "name": "eAttacher", "type": "TEntityRef<ICrowdCoreProvider>", "offset": 8 },
 				{ "name": "fRadius", "type": "float32", "offset": 24 },
 				{ "name": "fTime", "type": "float32", "offset": 28 },
-				{ "name": "vPos", "type": "float4", "offset": 32 }
+				{ "name": "vPos", "type": "float4", "offset": 32 },
+				{ "name": "eState", "type": null, "offset": 48 }
 			]
 		},
 		{
@@ -20716,11 +20726,16 @@
 				{ "name": "m_rWeaponOwner", "type": "ZEntityRef", "offset": 16 },
 				{ "name": "m_rSetpiece", "type": "ZEntityRef", "offset": 24 },
 				{ "name": "m_rHitCrowdActor", "type": "ZEntityRef", "offset": 32 },
+				{ "name": "m_pHitBody", "type": null, "offset": 40 },
 				{ "name": "m_nHitBoneIndex", "type": "uint32", "offset": 48 },
 				{ "name": "m_fBloodSplatModifier", "type": "float32", "offset": 52 },
 				{ "name": "m_vHitPos", "type": "float4", "offset": 64 },
 				{ "name": "m_vHitNormal", "type": "float4", "offset": 80 },
 				{ "name": "m_vHitDistance", "type": "float4", "offset": 96 },
+				{ "name": "m_Explosion", "type": null, "offset": 112 },
+				{ "name": "m_coliIn", "type": null, "offset": 208 },
+				{ "name": "m_coliOut", "type": null, "offset": 240 },
+				{ "name": "m_Projectile", "type": null, "offset": 352 },
 				{ "name": "m_nDeathType", "type": "uint32", "offset": 496 },
 				{ "name": "m_nDeathContext", "type": "uint32", "offset": 500 },
 				{ "name": "m_fContactForce", "type": "float32", "offset": 504 },
@@ -21202,8 +21217,10 @@
 			"fields": [
 				{ "name": "m_pActor", "type": "ZEntityRef", "offset": 0 },
 				{ "name": "m_nRefCount", "type": "uint32", "offset": 8 },
+				{ "name": "m_pSharedKnowledge", "type": null, "offset": 16 },
 				{ "name": "m_nBooleanEvents", "type": "uint32", "offset": 24 },
 				{ "name": "m_nBooleanEventsHandled", "type": "uint32", "offset": 28 },
+				{ "name": "m_events", "type": null, "offset": 32 },
 				{ "name": "m_knownWorldMatrix", "type": "SMatrix", "offset": 80 },
 				{ "name": "m_tLastWorldMatrixUpdate", "type": "ZGameTime", "offset": 144 },
 				{ "name": "m_nGoals", "type": "int16", "offset": 152 }
@@ -21450,14 +21467,17 @@
 			"fields": [
 				{ "name": "aLoadout", "type": "TArray", "offset": 0 },
 				{ "name": "m_loadoutData", "type": "ZDynamicObject", "offset": 24 },
+				{ "name": "m_loadoutChanged", "type": null, "offset": 40 },
 				{ "name": "m_sLoadoutContractId", "type": "ZString", "offset": 72 },
 				{ "name": "m_bIsAvailableSavesCacheInitialized", "type": "bool", "offset": 88 },
 				{ "name": "m_aCachedAvailableSaves", "type": "TArray", "offset": 96 },
+				{ "name": "m_cachedAvailableSavesChanged", "type": null, "offset": 120 },
 				{ "name": "selectedAgencyPickup", "type": "ZString", "offset": 152 },
 				{ "name": "m_enabledEntranceId", "type": "ZRepositoryID", "offset": 168 },
 				{ "name": "m_enabledEntranceUnlockable", "type": "ZDynamicObject", "offset": 184 },
 				{ "name": "m_aEnabledEntranceEquip", "type": "ZDynamicObject", "offset": 200 },
 				{ "name": "m_persistentContext", "type": "ZDynamicObject", "offset": 216 },
+				{ "name": "m_loadingScreenData", "type": null, "offset": 232 },
 				{ "name": "m_opportunities", "type": "ZDynamicObject", "offset": 304 }
 			]
 		},
