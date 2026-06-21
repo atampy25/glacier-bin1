@@ -54,7 +54,9 @@ pub struct Bin1Serializer {
 	type_names: Vec<Cow<'static, str>>,
 
 	rrids_segment: bool,
-	resource_ptrs_segment: bool
+	resource_ptrs_segment: bool,
+
+	inline_arrays: bool
 }
 
 impl Default for Bin1Serializer {
@@ -78,7 +80,8 @@ impl Default for Bin1Serializer {
 			type_ids: vec![],
 			type_names: vec![],
 			rrids_segment: true,
-			resource_ptrs_segment: true
+			resource_ptrs_segment: true,
+			inline_arrays: true
 		}
 	}
 }
@@ -98,6 +101,11 @@ impl Bin1Serializer {
 		self
 	}
 
+	pub fn with_inline_arrays(mut self, enabled: bool) -> Self {
+		self.inline_arrays = enabled;
+		self
+	}
+
 	pub fn align_to(&mut self, alignment: usize) {
 		let padding = alignment - ((self.buffer.len() - 0x10) % alignment);
 		if padding < alignment {
@@ -107,6 +115,10 @@ impl Bin1Serializer {
 
 	pub fn position(&self) -> usize {
 		self.buffer.len()
+	}
+
+	pub fn inline_arrays(&self) -> bool {
+		self.inline_arrays
 	}
 
 	pub fn write_unaligned(&mut self, data: &[u8]) {

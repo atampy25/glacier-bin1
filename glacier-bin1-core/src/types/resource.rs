@@ -41,8 +41,8 @@ impl Bin1Serialize for ZResourceID {
 	}
 
 	fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
-		ser.write_runtime_resource_id(self.id_high, self.id_low);
-
+		self.id_high.write(ser)?;
+		self.id_low.write(ser)?;
 		Ok(())
 	}
 }

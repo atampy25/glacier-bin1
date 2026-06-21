@@ -19,7 +19,7 @@ tracing = { version = "0.1.41", optional = true }
 
 [dev-dependencies]
 hitman-commons = { git = "https://github.com/atampy25/hitman-commons", features = [
-    "game_detection",
+    "game-detection",
     "rpkg-rs",
 ] }
 static_init = "1.0.4"
