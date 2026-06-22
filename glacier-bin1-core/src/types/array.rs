@@ -101,7 +101,7 @@ impl<T: Bin1Serialize + Aligned + Bin1Sized> Bin1Serialize for Vec<T> {
 			ser.write_pointer(u64::MAX);
 			ser.write_pointer(u64::MAX);
 		} else {
-			if self.len() * T::SIZE <= 16 && ser.inline_arrays() {
+			if T::SIZE != 0 && self.len() * T::SIZE <= 16 && ser.inline_arrays() {
 				#[cfg(feature = "debug-log")]
 				eprintln!(
 					"0x{:6X}: writing inline Vec<{}> of {} items",
@@ -141,7 +141,7 @@ impl<T: Bin1Serialize + Aligned + Bin1Sized> Bin1Serialize for Vec<T> {
 			return Ok(());
 		}
 
-		if self.len() * T::SIZE <= 16 && ser.inline_arrays() {
+		if T::SIZE != 0 && self.len() * T::SIZE <= 16 && ser.inline_arrays() {
 			#[cfg(feature = "debug-log")]
 			eprintln!(
 				"0x{:6X}: resolving inline Vec<{}> of {} items",
