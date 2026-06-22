@@ -233,13 +233,7 @@ pub mod WithoutFixupVec {
 		ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 	};
 
-	pub struct Ser<'a, T: ResourceID>(pub &'a [T]);
-
-	impl<'a, T: ResourceID> From<&'a [T]> for Ser<'a, T> {
-		fn from(value: &'a [T]) -> Self {
-			Self(value)
-		}
-	}
+	pub struct Ser<'a, T: ResourceID>(pub &'a Vec<T>);
 
 	impl<'a, T: ResourceID> From<&'a Vec<T>> for Ser<'a, T> {
 		fn from(value: &'a Vec<T>) -> Self {
@@ -251,23 +245,101 @@ pub mod WithoutFixupVec {
 		const ALIGNMENT: usize = Vec::<T>::ALIGNMENT;
 	}
 
-	impl<'a, T: ResourceID> Bin1Serialize for Ser<'a, T> {
+	impl<'a, T: ResourceID + Bin1Serialize> Bin1Serialize for Ser<'a, T> {
 		fn alignment(&self) -> usize {
 			Self::ALIGNMENT
 		}
 
+		#[tryvial::try_fn]
 		fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
-			Vec::write(
-				&self.0.iter().map(super::WithoutFixup::Ser::from).collect::<Vec<_>>(),
-				ser
-			)
+			if self.0.is_empty() {
+				#[cfg(feature = "debug-log")]
+				eprintln!(
+					"0x{:6X}: writing empty Vec<{}>",
+					ser.position(),
+					std::any::type_name::<T>()
+				);
+				ser.write_pointer(u64::MAX);
+				ser.write_pointer(u64::MAX);
+				ser.write_pointer(u64::MAX);
+			} else {
+				if T::SIZE != 0 && ser.inline_arrays() && self.0.len() * T::SIZE <= 16 {
+					#[cfg(feature = "debug-log")]
+					eprintln!(
+						"0x{:6X}: writing inline Vec<{}> of {} items",
+						ser.position(),
+						std::any::type_name::<T>(),
+						self.0.len()
+					);
+					// Inline optimisation
+					let pos = ser.position();
+					self.0
+						.iter()
+						.map(super::WithoutFixup::Ser::from)
+						.collect::<Vec<_>>()
+						.as_slice()
+						.write(ser)?;
+					ser.write_unaligned(&vec![0; 16 - (ser.position() - pos)]);
+
+					// inline flag, count, capacity
+					((1u64 << 62) | (self.0.len() as u8 as u64) | ((self.0.len() as u8 as u64) << 8)).write(ser)?;
+				} else {
+					#[cfg(feature = "debug-log")]
+					eprintln!(
+						"0x{:6X}: writing allocated Vec<{}> of {} items",
+						ser.position(),
+						std::any::type_name::<T>(),
+						self.0.len()
+					);
+
+					let start_id = self.0.as_ptr() as u64 | 0xABCD000000000000; // fake pointers to avoid colliding with actual data
+					let end_id = start_id | 0xCAFE000000000000;
+					ser.write_pointer(start_id);
+					ser.write_pointer(end_id);
+					ser.write_pointer(end_id); // allocation end, which in serialisation/deserialisation is the same as the end
+				}
+			}
 		}
 
+		#[tryvial::try_fn]
 		fn resolve(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
-			Vec::resolve(
-				&self.0.iter().map(super::WithoutFixup::Ser::from).collect::<Vec<_>>(),
-				ser
-			)
+			if self.0.is_empty() {
+				return Ok(());
+			}
+
+			if T::SIZE != 0 && ser.inline_arrays() && self.0.len() * T::SIZE <= 16 {
+				#[cfg(feature = "debug-log")]
+				eprintln!(
+					"0x{:6X}: resolving inline Vec<{}> of {} items",
+					ser.position(),
+					std::any::type_name::<T>(),
+					self.0.len()
+				);
+
+				for item in self.0 {
+					item.resolve(ser)?;
+				}
+			} else {
+				#[cfg(feature = "debug-log")]
+				eprintln!(
+					"0x{:6X}: resolving allocated Vec<{}> of {} items",
+					ser.position(),
+					std::any::type_name::<T>(),
+					self.0.len()
+				);
+
+				let start_id = self.0.as_ptr() as u64 | 0xABCD000000000000;
+				let end_id = start_id | 0xCAFE000000000000;
+				ser.write_pointee(
+					start_id,
+					Some(end_id),
+					self.0
+						.iter()
+						.map(super::WithoutFixup::Ser::from)
+						.collect::<Vec<_>>()
+						.as_slice()
+				)?;
+			}
 		}
 	}
 

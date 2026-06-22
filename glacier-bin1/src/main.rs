@@ -73,7 +73,14 @@ macro_rules! impl_generate {
 					},
 					PathBuf::from
 				),
-				serialize(&value).unwrap()
+				if env::args().nth(6).unwrap_or_else(|| "true".into()) == "false" {
+					Bin1Serializer::new()
+						.with_inline_arrays(false)
+						.serialize(&value)
+						.unwrap()
+				} else {
+					serialize(&value).unwrap()
+				}
 			)
 			.unwrap();
 
@@ -97,63 +104,14 @@ macro_rules! impl_generate {
 					},
 					PathBuf::from
 				),
-				serialize(&value).unwrap()
-			)
-			.unwrap();
-
-			return;
-		}
-	};
-}
-
-macro_rules! impl_generate_noresptrs {
-	($resource_type:ident, $feature:literal, $ty:literal, $res:ty) => {
-		#[cfg(feature = $feature)]
-		if $resource_type.as_deref() == Some($ty) {
-			let value: $res = serde_json::from_slice(
-				&fs::read(env::args().nth(4).expect("4th argument must be input path")).unwrap()
-			)
-			.unwrap();
-
-			fs::write(
-				env::args().nth(5).map_or_else(
-					|| {
-						let path = PathBuf::from(env::args().nth(4).unwrap());
-						path.with_file_name(path.file_stem().unwrap_or_else(|| path.file_name().unwrap()))
-					},
-					PathBuf::from
-				),
-				Bin1Serializer::new()
-					.with_resource_ptrs_segment(false)
-					.serialize(&value)
-					.unwrap()
-			)
-			.unwrap();
-
-			return;
-		}
-	};
-
-	($resource_type:ident, $ty:literal, $res:ty) => {
-		#[cfg(feature = $ty)]
-		if $resource_type.as_deref() == Some($ty) {
-			let value: $res = serde_json::from_slice(
-				&fs::read(env::args().nth(4).expect("4th argument must be input path")).unwrap()
-			)
-			.unwrap();
-
-			fs::write(
-				env::args().nth(5).map_or_else(
-					|| {
-						let path = PathBuf::from(env::args().nth(4).unwrap());
-						path.with_file_name(path.file_stem().unwrap_or_else(|| path.file_name().unwrap()))
-					},
-					PathBuf::from
-				),
-				Bin1Serializer::new()
-					.with_resource_ptrs_segment(false)
-					.serialize(&value)
-					.unwrap()
+				if env::args().nth(6).unwrap_or_else(|| "true".into()) == "false" {
+					Bin1Serializer::new()
+						.with_inline_arrays(false)
+						.serialize(&value)
+						.unwrap()
+				} else {
+					serialize(&value).unwrap()
+				}
 			)
 			.unwrap();
 
