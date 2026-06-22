@@ -1,7 +1,7 @@
 use ecow::EcoString;
 
 use crate::{
-	de::{Bin1Deserialize, Bin1Deserializer, DeserializeError},
+	de::{Bin1Deserialize, Bin1Deserializer, Bin1Sized, DeserializeError},
 	ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 };
 
@@ -39,10 +39,12 @@ impl Bin1Serialize for EcoString {
 	}
 }
 
-impl Bin1Deserialize for EcoString {
+impl Bin1Sized for EcoString {
 	// u32 (len) + alignment padding + u64 (pointer)
 	const SIZE: usize = 16;
+}
 
+impl Bin1Deserialize for EcoString {
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		de.read_zstring()
 	}

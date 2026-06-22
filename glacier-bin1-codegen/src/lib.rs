@@ -499,6 +499,11 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 			.associate_const("ALIGNMENT", "usize", size.to_string(), "");
 
 		scope
+			.new_impl(&enum_name)
+			.impl_trait("Bin1Sized")
+			.associate_const("SIZE", "usize", size.to_string(), "");
+
+		scope
 			.new_impl("&'static str")
 			.impl_trait(format!("From<{enum_name}>"))
 			.new_fn("from")
@@ -610,7 +615,6 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 			.line("Ok(())");
 
 		let de_impl = scope.new_impl(&enum_name).impl_trait("Bin1Deserialize");
-		de_impl.associate_const("SIZE", "usize", size.to_string(), "");
 		de_impl
 			.new_fn("read")
 			.arg("de", "&mut Bin1Deserializer")

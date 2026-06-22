@@ -12,7 +12,7 @@ use tryvial::try_fn;
 
 pub use crate::__impl_variant as impl_variant;
 use crate::{
-	de::{Bin1Deserialize, Bin1Deserializer, DeserializeError},
+	de::{Bin1Deserialize, Bin1Deserializer, Bin1Sized, DeserializeError},
 	ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError},
 	types::{
 		repository::ZRepositoryID,
@@ -200,7 +200,7 @@ impl<T: StaticVariant> StaticVariant for Vec<T> {
 		};
 }
 
-impl<T: Variant + StaticVariant + Serialize + Aligned + PartialEq + Clone + Bin1Deserialize> Variant for Vec<T> {
+impl<T: Variant + StaticVariant + Serialize + Aligned + PartialEq + Clone + Bin1Sized> Variant for Vec<T> {
 	fn type_id(&self) -> &'static str {
 		Self::TYPE_ID
 	}
@@ -343,9 +343,11 @@ impl Bin1Serialize for TypeID {
 	}
 }
 
-impl Bin1Deserialize for TypeID {
+impl Bin1Sized for TypeID {
 	const SIZE: usize = 8;
+}
 
+impl Bin1Deserialize for TypeID {
 	#[try_fn]
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		Self(de.read_type()?.into())

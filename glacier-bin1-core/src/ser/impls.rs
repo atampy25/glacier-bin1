@@ -15,7 +15,7 @@ macro_rules! impl_primitive {
 
 			fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
 				#[cfg(feature = "debug-log")]
-				eprintln!("0x{:6X}: writing {}", ser.position(), stringify!($ty));
+				eprintln!("0x{:6X}: writing {}: {}", ser.position(), stringify!($ty), self);
 
 				ser.write_unaligned(&self.to_le_bytes());
 				Ok(())
@@ -50,7 +50,7 @@ impl Bin1Serialize for bool {
 
 	fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
 		#[cfg(feature = "debug-log")]
-		eprintln!("0x{:6X}: writing bool", ser.position());
+		eprintln!("0x{:6X}: writing bool: {}", ser.position(), self);
 
 		ser.write_unaligned(&[*self as u8]);
 		Ok(())

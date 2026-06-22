@@ -9,7 +9,7 @@ use serde::{
 };
 
 use crate::{
-	de::{Bin1Deserialize, Bin1Deserializer, DeserializeError},
+	de::{Bin1Deserialize, Bin1Deserializer, Bin1Sized, DeserializeError},
 	ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 };
 
@@ -57,9 +57,11 @@ impl Bin1Serialize for PropertyID {
 	}
 }
 
-impl Bin1Deserialize for PropertyID {
+impl Bin1Sized for PropertyID {
 	const SIZE: usize = u32::SIZE;
+}
 
+impl Bin1Deserialize for PropertyID {
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		u32::read(de).map(Self)
 	}

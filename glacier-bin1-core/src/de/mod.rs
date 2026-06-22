@@ -53,9 +53,11 @@ pub struct Bin1Deserializer<'a> {
 	type_names: HashMap<u32, &'a str, rapidhash::fast::RandomState>
 }
 
-pub trait Bin1Deserialize: Sized + Aligned {
+pub trait Bin1Sized {
 	const SIZE: usize;
+}
 
+pub trait Bin1Deserialize: Sized + Aligned {
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError>;
 }
 

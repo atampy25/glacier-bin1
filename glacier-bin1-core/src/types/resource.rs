@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use tryvial::try_fn;
 
 use crate::{
-	de::{Bin1Deserialize, Bin1Deserializer, DeserializeError},
+	de::{Bin1Deserialize, Bin1Deserializer, Bin1Sized, DeserializeError},
 	ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 };
 
@@ -47,9 +47,11 @@ impl Bin1Serialize for ZResourceID {
 	}
 }
 
-impl Bin1Deserialize for ZResourceID {
+impl Bin1Sized for ZResourceID {
 	const SIZE: usize = 8;
+}
 
+impl Bin1Deserialize for ZResourceID {
 	#[try_fn]
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		let id_high = u32::read(de)?;
@@ -98,9 +100,11 @@ impl Bin1Serialize for ZRuntimeResourceID {
 	}
 }
 
-impl Bin1Deserialize for ZRuntimeResourceID {
+impl Bin1Sized for ZRuntimeResourceID {
 	const SIZE: usize = 8;
+}
 
+impl Bin1Deserialize for ZRuntimeResourceID {
 	#[try_fn]
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		let id_high = u32::read(de)?;
@@ -114,11 +118,11 @@ impl Bin1Deserialize for ZRuntimeResourceID {
 #[allow(non_snake_case, private_bounds)]
 pub mod WithoutFixup {
 	use crate::{
-		de::Bin1Deserialize,
+		de::{Bin1Deserialize, Bin1Sized},
 		ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 	};
 
-	pub(crate) trait ResourceID: Aligned + Bin1Deserialize {
+	pub(crate) trait ResourceID: Aligned + Bin1Sized {
 		fn from_high_low(high: u32, low: u32) -> Self;
 		fn high(&self) -> u32;
 		fn low(&self) -> u32;
@@ -170,6 +174,10 @@ pub mod WithoutFixup {
 		const ALIGNMENT: usize = T::ALIGNMENT;
 	}
 
+	impl<'a, T: ResourceID> Bin1Sized for Ser<'a, T> {
+		const SIZE: usize = T::SIZE;
+	}
+
 	impl<'a, T: ResourceID> Bin1Serialize for Ser<'a, T> {
 		fn alignment(&self) -> usize {
 			Self::ALIGNMENT
@@ -201,9 +209,11 @@ pub mod WithoutFixup {
 		const ALIGNMENT: usize = T::ALIGNMENT;
 	}
 
-	impl<T: ResourceID> Bin1Deserialize for De<T> {
-		const SIZE: usize = 8 * 2;
+	impl<T: ResourceID> Bin1Sized for De<T> {
+		const SIZE: usize = T::SIZE;
+	}
 
+	impl<T: ResourceID> Bin1Deserialize for De<T> {
 		#[tryvial::try_fn]
 		fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
 			let id_high = u32::read(de)?;
@@ -219,7 +229,7 @@ pub mod WithoutFixup {
 pub mod WithoutFixupVec {
 	use super::WithoutFixup::ResourceID;
 	use crate::{
-		de::Bin1Deserialize,
+		de::{Bin1Deserialize, Bin1Sized},
 		ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 	};
 
@@ -247,19 +257,17 @@ pub mod WithoutFixupVec {
 		}
 
 		fn write(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
-			self.0
-				.iter()
-				.map(super::WithoutFixup::Ser::from)
-				.collect::<Vec<_>>()
-				.write(ser)
+			Vec::write(
+				&self.0.iter().map(super::WithoutFixup::Ser::from).collect::<Vec<_>>(),
+				ser
+			)
 		}
 
 		fn resolve(&self, ser: &mut Bin1Serializer) -> Result<(), SerializeError> {
-			self.0
-				.iter()
-				.map(super::WithoutFixup::Ser::from)
-				.collect::<Vec<_>>()
-				.resolve(ser)
+			Vec::resolve(
+				&self.0.iter().map(super::WithoutFixup::Ser::from).collect::<Vec<_>>(),
+				ser
+			)
 		}
 	}
 
@@ -281,9 +289,11 @@ pub mod WithoutFixupVec {
 		const ALIGNMENT: usize = Vec::<T>::ALIGNMENT;
 	}
 
-	impl<T: ResourceID + From<super::WithoutFixup::De<T>>> Bin1Deserialize for De<T> {
+	impl<T: ResourceID> Bin1Sized for De<T> {
 		const SIZE: usize = Vec::<T>::SIZE;
+	}
 
+	impl<T: ResourceID + From<super::WithoutFixup::De<T>>> Bin1Deserialize for De<T> {
 		#[tryvial::try_fn]
 		fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
 			De(Vec::<super::WithoutFixup::De<T>>::read(de)?
@@ -334,9 +344,11 @@ impl Bin1Serialize for TResourcePtr {
 	}
 }
 
-impl Bin1Deserialize for TResourcePtr {
+impl Bin1Sized for TResourcePtr {
 	const SIZE: usize = 8;
+}
 
+impl Bin1Deserialize for TResourcePtr {
 	#[try_fn]
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		let id_high = u32::read(de)?;

@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize, de::DeserializeOwned, ser::SerializeStruct};
 use tryvial::try_fn;
 
 use glacier_bin1_core::{
-	de::{Bin1Deserialize, Bin1Deserializer, DeserializeError},
+	de::{Bin1Deserialize, Bin1Deserializer, Bin1Sized, DeserializeError},
 	ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError},
 	types::{
 		property::PropertyID,
@@ -340,9 +340,11 @@ impl Bin1Serialize for ZVariant {
 	}
 }
 
-impl Bin1Deserialize for ZVariant {
+impl Bin1Sized for ZVariant {
 	const SIZE: usize = 8 * 2;
+}
 
+impl Bin1Deserialize for ZVariant {
 	#[try_fn]
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		let type_id = de.read_type()?;

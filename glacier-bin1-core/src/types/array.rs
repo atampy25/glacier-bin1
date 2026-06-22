@@ -3,7 +3,7 @@ use std::mem::MaybeUninit;
 use tryvial::try_fn;
 
 use crate::{
-	de::Bin1Deserialize,
+	de::{Bin1Deserialize, Bin1Sized},
 	ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 };
 
@@ -54,9 +54,11 @@ impl<T: Bin1Serialize + Aligned, const N: usize> Bin1Serialize for [T; N] {
 	}
 }
 
-impl<T: Bin1Deserialize, const N: usize> Bin1Deserialize for [T; N] {
+impl<T: Bin1Sized, const N: usize> Bin1Sized for [T; N] {
 	const SIZE: usize = T::SIZE * N;
+}
 
+impl<T: Bin1Deserialize, const N: usize> Bin1Deserialize for [T; N] {
 	fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
 		#[cfg(feature = "debug-log")]
 		eprintln!(
@@ -82,7 +84,7 @@ impl<T> Aligned for Vec<T> {
 }
 
 /// Serialisation of Vec<T> in TArray format, with pointers and length.
-impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
+impl<T: Bin1Serialize + Aligned + Bin1Sized> Bin1Serialize for Vec<T> {
 	fn alignment(&self) -> usize {
 		Self::ALIGNMENT
 	}
@@ -102,9 +104,10 @@ impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
 			if self.len() * T::SIZE <= 16 && ser.inline_arrays() {
 				#[cfg(feature = "debug-log")]
 				eprintln!(
-					"0x{:6X}: writing inline Vec<{}>",
+					"0x{:6X}: writing inline Vec<{}> of {} items",
 					ser.position(),
-					std::any::type_name::<T>()
+					std::any::type_name::<T>(),
+					self.len()
 				);
 				// Inline optimisation
 				let pos = ser.position();
@@ -116,9 +119,10 @@ impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
 			} else {
 				#[cfg(feature = "debug-log")]
 				eprintln!(
-					"0x{:6X}: writing allocated Vec<{}>",
+					"0x{:6X}: writing allocated Vec<{}> of {} items",
 					ser.position(),
-					std::any::type_name::<T>()
+					std::any::type_name::<T>(),
+					self.len()
 				);
 
 				let start_id = self.as_ptr() as u64 | 0xABCD000000000000; // fake pointers to avoid colliding with actual data
@@ -140,9 +144,10 @@ impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
 		if self.len() * T::SIZE <= 16 && ser.inline_arrays() {
 			#[cfg(feature = "debug-log")]
 			eprintln!(
-				"0x{:6X}: writing inline Vec<{}> items",
+				"0x{:6X}: resolving inline Vec<{}> of {} items",
 				ser.position(),
-				std::any::type_name::<T>()
+				std::any::type_name::<T>(),
+				self.len()
 			);
 
 			for item in self {
@@ -151,9 +156,10 @@ impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
 		} else {
 			#[cfg(feature = "debug-log")]
 			eprintln!(
-				"0x{:6X}: resolving allocated Vec<{}> items",
+				"0x{:6X}: resolving allocated Vec<{}> of {} items",
 				ser.position(),
-				std::any::type_name::<T>()
+				std::any::type_name::<T>(),
+				self.len()
 			);
 
 			let start_id = self.as_ptr() as u64 | 0xABCD000000000000;
@@ -165,9 +171,11 @@ impl<T: Bin1Serialize + Aligned + Bin1Deserialize> Bin1Serialize for Vec<T> {
 	}
 }
 
-impl<T: Bin1Deserialize> Bin1Deserialize for Vec<T> {
+impl<T> Bin1Sized for Vec<T> {
 	const SIZE: usize = 8 * 3;
+}
 
+impl<T: Bin1Deserialize + Bin1Sized> Bin1Deserialize for Vec<T> {
 	#[try_fn]
 	fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
 		#[cfg(feature = "debug-log")]
@@ -237,7 +245,7 @@ impl<T: Bin1Deserialize> Bin1Deserialize for Vec<T> {
 #[allow(non_snake_case)]
 pub mod TArrayRef {
 	use crate::{
-		de::Bin1Deserialize,
+		de::{Bin1Deserialize, Bin1Sized},
 		ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 	};
 
@@ -301,9 +309,11 @@ pub mod TArrayRef {
 		const ALIGNMENT: usize = 8;
 	}
 
-	impl<T: Bin1Deserialize> Bin1Deserialize for De<T> {
+	impl<T: Bin1Deserialize> Bin1Sized for De<T> {
 		const SIZE: usize = 8 * 2;
+	}
 
+	impl<T: Bin1Deserialize + Bin1Sized> Bin1Deserialize for De<T> {
 		#[tryvial::try_fn]
 		fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
 			let start = de.read_u64()?;
@@ -333,7 +343,7 @@ pub mod TArrayRef {
 #[allow(non_snake_case)]
 pub mod ZHMPtrLen {
 	use crate::{
-		de::Bin1Deserialize,
+		de::{Bin1Deserialize, Bin1Sized},
 		ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 	};
 
@@ -396,9 +406,11 @@ pub mod ZHMPtrLen {
 		const ALIGNMENT: usize = 8;
 	}
 
-	impl<T: Bin1Deserialize> Bin1Deserialize for De<T> {
+	impl<T: Bin1Deserialize> Bin1Sized for De<T> {
 		const SIZE: usize = 8 * 2;
+	}
 
+	impl<T: Bin1Deserialize> Bin1Deserialize for De<T> {
 		#[tryvial::try_fn]
 		fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
 			let start = de.read_u64()?;

@@ -201,7 +201,12 @@ impl Bin1Serializer {
 
 	pub fn write_runtime_resource_id(&mut self, high: u32, low: u32) {
 		#[cfg(feature = "debug-log")]
-		eprintln!("0x{:6X}: writing runtime resource ID", self.position());
+		eprintln!(
+			"0x{:6X}: writing runtime resource ID: {}/{}",
+			self.position(),
+			high,
+			low
+		);
 
 		self.runtime_resource_ids.push(self.buffer.len() as u32);
 		self.write_unaligned(&high.to_le_bytes());
@@ -210,7 +215,7 @@ impl Bin1Serializer {
 
 	pub fn write_resource_ptr(&mut self, high: u32, low: u32) {
 		#[cfg(feature = "debug-log")]
-		eprintln!("0x{:6X}: writing resource pointer", self.position());
+		eprintln!("0x{:6X}: writing resource pointer: {}/{}", self.position(), high, low);
 
 		self.resource_ptrs.push(self.buffer.len() as u32);
 		self.write_unaligned(&high.to_le_bytes());

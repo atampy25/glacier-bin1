@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
 use crate::{
-	de::Bin1Deserialize,
+	de::{Bin1Deserialize, Bin1Sized},
 	ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 };
 
@@ -61,9 +61,11 @@ impl<T: Bin1Serialize> Bin1Serialize for Owned<T> {
 	}
 }
 
-impl<T: Bin1Deserialize> Bin1Deserialize for Owned<T> {
+impl<T> Bin1Sized for Owned<T> {
 	const SIZE: usize = 8;
+}
 
+impl<T: Bin1Deserialize> Bin1Deserialize for Owned<T> {
 	#[tryvial::try_fn]
 	fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
 		let ptr = de.read_u64()?;
@@ -85,7 +87,7 @@ pub mod WithZeroNull {
 	use std::sync::Arc;
 
 	use crate::{
-		de::Bin1Deserialize,
+		de::{Bin1Deserialize, Bin1Sized},
 		ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError}
 	};
 
@@ -138,9 +140,11 @@ pub mod WithZeroNull {
 		const ALIGNMENT: usize = 8;
 	}
 
-	impl<T: Bin1Deserialize + 'static + Send + Sync> Bin1Deserialize for De<T> {
+	impl<T: Bin1Deserialize> Bin1Sized for De<T> {
 		const SIZE: usize = 8;
+	}
 
+	impl<T: Bin1Deserialize + 'static + Send + Sync> Bin1Deserialize for De<T> {
 		#[tryvial::try_fn]
 		fn read(de: &mut crate::de::Bin1Deserializer) -> Result<Self, crate::de::DeserializeError> {
 			let ptr = de.read_u64()?;

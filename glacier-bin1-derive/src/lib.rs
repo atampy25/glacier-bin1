@@ -363,7 +363,7 @@ pub fn derive_deserialize(input: TokenStream) -> TokenStream {
 			};
 
 			size.extend(quote! {
-				size += #alignment_padding #pad + <#ty as #crate_path::de::Bin1Deserialize>::SIZE #pad_end;
+				size += #alignment_padding #pad + <#ty as #crate_path::de::Bin1Sized>::SIZE #pad_end;
 			});
 		}
 
@@ -461,10 +461,12 @@ pub fn derive_deserialize(input: TokenStream) -> TokenStream {
 	};
 
 	let expanded = quote! {
-		impl #crate_path::de::Bin1Deserialize for #name {
+		impl #crate_path::de::Bin1Sized for #name {
 			#[allow(clippy::modulo_one)]
 			const SIZE: usize = { #size };
+		}
 
+		impl #crate_path::de::Bin1Deserialize for #name {
 			fn read(de: &mut #crate_path::de::Bin1Deserializer)
 				-> Result<Self, #crate_path::de::DeserializeError>
 			{

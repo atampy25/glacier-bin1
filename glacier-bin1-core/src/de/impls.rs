@@ -3,15 +3,17 @@ use std::sync::Arc;
 use tryvial::try_fn;
 
 use crate::{
-	de::{Bin1Deserialize, Bin1Deserializer, DeserializeError},
+	de::{Bin1Deserialize, Bin1Deserializer, Bin1Sized, DeserializeError},
 	ser::Aligned
 };
 
 macro_rules! impl_primitive {
 	($ty:ty, $size:literal, $func:ident) => {
-		impl Bin1Deserialize for $ty {
+		impl Bin1Sized for $ty {
 			const SIZE: usize = $size;
+		}
 
+		impl Bin1Deserialize for $ty {
 			fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 				#[cfg(feature = "debug-log")]
 				eprintln!("0x{:6X}: reading {}", de.position(), stringify!($ty));
@@ -35,9 +37,11 @@ impl_primitive!(i64, 8, read_i64);
 impl_primitive!(f32, 4, read_f32);
 impl_primitive!(f64, 8, read_f64);
 
-impl Bin1Deserialize for bool {
+impl Bin1Sized for bool {
 	const SIZE: usize = 1;
+}
 
+impl Bin1Deserialize for bool {
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		#[cfg(feature = "debug-log")]
 		eprintln!("0x{:6X}: reading bool", de.position());
@@ -46,17 +50,21 @@ impl Bin1Deserialize for bool {
 	}
 }
 
-impl<T: Bin1Deserialize + 'static + Send + Sync> Bin1Deserialize for Arc<T> {
+impl<T> Bin1Sized for Arc<T> {
 	const SIZE: usize = 8;
+}
 
+impl<T: Bin1Deserialize + 'static + Send + Sync> Bin1Deserialize for Arc<T> {
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		de.read_pointer(T::read)
 	}
 }
 
-impl<T: Bin1Deserialize + 'static + Send + Sync> Bin1Deserialize for Option<Arc<T>> {
+impl<T> Bin1Sized for Option<Arc<T>> {
 	const SIZE: usize = 8;
+}
 
+impl<T: Bin1Deserialize + 'static + Send + Sync> Bin1Deserialize for Option<Arc<T>> {
 	#[try_fn]
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		let ptr = de.read_u64()?;
@@ -70,10 +78,12 @@ impl<T: Bin1Deserialize + 'static + Send + Sync> Bin1Deserialize for Option<Arc<
 	}
 }
 
-impl<T: Bin1Deserialize, U: Bin1Deserialize> Bin1Deserialize for (T, U) {
+impl<T: Bin1Sized + Aligned, U: Bin1Sized + Aligned> Bin1Sized for (T, U) {
 	const SIZE: usize =
 		{ T::SIZE + ((Self::ALIGNMENT - ((T::SIZE + U::SIZE) % Self::ALIGNMENT)) % Self::ALIGNMENT) + U::SIZE };
+}
 
+impl<T: Bin1Deserialize, U: Bin1Deserialize> Bin1Deserialize for (T, U) {
 	fn read(de: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		#[cfg(feature = "debug-log")]
 		eprintln!(
@@ -91,9 +101,11 @@ impl<T: Bin1Deserialize, U: Bin1Deserialize> Bin1Deserialize for (T, U) {
 	}
 }
 
-impl Bin1Deserialize for () {
+impl Bin1Sized for () {
 	const SIZE: usize = 0;
+}
 
+impl Bin1Deserialize for () {
 	fn read(_: &mut Bin1Deserializer) -> Result<Self, DeserializeError> {
 		Ok(())
 	}
