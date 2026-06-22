@@ -10327,7 +10327,7 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "Id", "type": "ZString", "offset": 0 },
-				{ "name": "BlobRid", "type": "ZRuntimeResourceID", "offset": 16 }
+				{ "name": "BlobRid", "type": "ZRuntimeResourceIDNoFixup", "offset": 16 }
 			]
 		},
 		{
@@ -11455,7 +11455,7 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "Id", "type": "ZString", "offset": 0 },
-				{ "name": "ContractRid", "type": "ZRuntimeResourceID", "offset": 16 }
+				{ "name": "ContractRid", "type": "ZRuntimeResourceIDNoFixup", "offset": 16 }
 			]
 		},
 		{
@@ -12141,9 +12141,9 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "Name", "type": "ZString", "offset": 0 },
-				{ "name": "ContractsDatastoreRid", "type": "ZResourceID", "offset": 16 },
-				{ "name": "UnlockablesDatastoreRid", "type": "ZResourceID", "offset": 32 },
-				{ "name": "BlobsDatastoreRid", "type": "ZResourceID", "offset": 48 }
+				{ "name": "ContractsDatastoreRid", "type": "ZString", "offset": 16 },
+				{ "name": "UnlockablesDatastoreRid", "type": "ZString", "offset": 32 },
+				{ "name": "BlobsDatastoreRid", "type": "ZString", "offset": 48 }
 			]
 		},
 		{
@@ -14742,7 +14742,7 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "VideoId", "type": "ZString", "offset": 0 },
-				{ "name": "RuntimeLocalizedVideoRid", "type": "ZRuntimeResourceID", "offset": 16 }
+				{ "name": "RuntimeLocalizedVideoRid", "type": "ZRuntimeResourceIDNoFixup", "offset": 16 }
 			]
 		},
 		{

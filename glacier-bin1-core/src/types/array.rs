@@ -249,6 +249,12 @@ pub mod TArrayRef {
 		}
 	}
 
+	impl<'a, T: Bin1Serialize> From<&'a Vec<T>> for Ser<'a, T> {
+		fn from(value: &'a Vec<T>) -> Self {
+			Self(value)
+		}
+	}
+
 	impl<'a, T: Bin1Serialize> Aligned for Ser<'a, T> {
 		const ALIGNMENT: usize = 8;
 	}
@@ -335,6 +341,12 @@ pub mod ZHMPtrLen {
 
 	impl<'a, T: Bin1Serialize> From<&'a [T]> for Ser<'a, T> {
 		fn from(value: &'a [T]) -> Self {
+			Self(value)
+		}
+	}
+
+	impl<'a, T: Bin1Serialize> From<&'a Vec<T>> for Ser<'a, T> {
+		fn from(value: &'a Vec<T>) -> Self {
 			Self(value)
 		}
 	}

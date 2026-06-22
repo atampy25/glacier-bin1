@@ -171,7 +171,7 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 				#acc
 				#log
 				#padding
-				#as_type::from(self.#field.as_ref()).write_aligned(ser)?;
+				#as_type::from(&self.#field).write_aligned(ser)?;
 				#padding_end
 			}
 		} else {
@@ -208,7 +208,7 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 			quote! {
 				#acc
 				#log
-				#as_type::from(self.#field.as_ref()).resolve(ser)?;
+				#as_type::from(&self.#field).resolve(ser)?;
 			}
 		} else {
 			quote! {

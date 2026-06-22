@@ -69,6 +69,10 @@
 					"type": "TArray<ZString>"
 				},
 				{
+					"name": "aItemNames",
+					"type": "TArray<uint32>"
+				},
+				{
 					"name": "aItemValues",
 					"type": "TArray<uint32>"
 				}

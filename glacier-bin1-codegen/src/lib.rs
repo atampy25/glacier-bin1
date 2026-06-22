@@ -129,7 +129,7 @@ fn process_types(types: Types) -> RustTypes {
 										x => x
 									};
 
-									field_name.into()
+									field_name.replace("_i_d", "_id")
 								},
 								field_name: f.name,
 								ty: {
@@ -350,6 +350,9 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 					scope.import("glacier_bin1_core::types::variant", "TypeID");
 				} else if ty.starts_with("ZHMPtrLen<") {
 					scope.import("glacier_bin1_core::types::array", "ZHMPtrLen");
+				} else if ty == "ZResourceIDNoFixup" || ty == "ZRuntimeResourceIDNoFixup" {
+					scope.import("glacier_bin1_core::types::resource", "WithoutFixup");
+					scope.import("glacier_bin1_core::types::resource", "WithoutFixupVec");
 				} else if let Some(pos) = structs.iter().position(|x| x.rust_name == *ty) {
 					struct_queue.push_back((structs.remove(pos), is_variant));
 				} else if let Some(pos) = enums.iter().position(|x| x.rust_name == *ty) {
@@ -391,7 +394,7 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 		} in fields.iter()
 		{
 			let field = cls
-				.new_field(rust_name, ty)
+				.new_field(rust_name, ty.replace("NoFixup", ""))
 				.vis("pub")
 				.annotation(format!(r#"#[serde(rename = "{field_name}")]"#))
 				.annotation(format!(r#"#[facet(rename = "{field_name}")]"#));
@@ -412,6 +415,18 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 			if let Some((_, contained)) = regex_captures!(r"ZHMPtrLen<(.*)>", &ty) {
 				field.ty = format!("Vec<{contained}>").into();
 				field.annotation(format!(r#"#[bin1(as = "ZHMPtrLen::<{contained}>")]"#));
+			}
+
+			if ty == "ZResourceIDNoFixup" || ty == "ZRuntimeResourceIDNoFixup" {
+				field.annotation(format!(
+					r#"#[bin1(as = "WithoutFixup::<{}>")] "#,
+					ty.replace("NoFixup", "")
+				));
+			} else if ty == "Vec<ZResourceIDNoFixup>" || ty == "Vec<ZRuntimeResourceIDNoFixup>" {
+				field.annotation(format!(
+					r#"#[bin1(as = "WithoutFixupVec::<{}>")] "#,
+					ty.replace("NoFixup", "").replace("Vec<", "").replace('>', "")
+				));
 			}
 		}
 
