@@ -70,7 +70,7 @@
 				},
 				{
 					"name": "aItemNames",
-					"type": "TArray<uint32>"
+					"type": "TArray<ZString>"
 				},
 				{
 					"name": "aItemValues",
