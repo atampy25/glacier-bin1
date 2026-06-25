@@ -192,7 +192,7 @@ impl<T: Bin1Deserialize + Bin1Sized> Bin1Deserialize for Vec<T> {
 		let end_pos = de.position();
 		de.seek_relative(-8 * 3)?;
 
-		if (allocation_end_or_flags >> 62) & 1 == 1 {
+		if allocation_end_or_flags & (1 << 62) != 0 {
 			#[cfg(feature = "debug-log")]
 			eprintln!(
 				"0x{:6X}: reading Vec<{}> as inline",

@@ -145,10 +145,12 @@ macro_rules! impl_all {
 
 	($resource_type:ident, fl, $impl:ident) => {
 		$impl!($resource_type, "CBLU", fl::SCppEntityBlueprint);
+		$impl!($resource_type, "CLRP", fl::SColorPalette);
 		$impl!($resource_type, "CPPT", fl::SCppEntity);
 		$impl!($resource_type, "CRMD", fl::SCrowdMapData);
 		$impl!($resource_type, "ECPB", fl::SExtendedCppEntityBlueprint);
 		$impl!($resource_type, "ENUM", fl::SEnumType);
+		$impl!($resource_type, "GFXA", fl::SGFxAtlas);
 		$impl!($resource_type, "GFXF", fl::SGFxMovieResource);
 		$impl!($resource_type, "GIDX", fl::SResourceIndex);
 		$impl!($resource_type, "KWOR", fl::SSerializedKeyword);
@@ -157,6 +159,7 @@ macro_rules! impl_all {
 		$impl!($resource_type, "TDPK", fl::STerrainDataPackage);
 		$impl!($resource_type, "TEMP", fl::STemplateEntityFactory);
 		$impl!($resource_type, "UICB", fl::SControlTypeInfo);
+		$impl!($resource_type, "WEMD", Vec<fl::SAudioEventMetadata>);
 		$impl!($resource_type, "WSGB", fl::SAudioStateGroupData);
 		$impl!($resource_type, "WSWB", fl::SAudioSwitchGroupData);
 

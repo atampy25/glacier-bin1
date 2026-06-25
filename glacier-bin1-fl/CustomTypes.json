@@ -155,6 +155,82 @@
 					"type": "TArray<TArray<uint8>>"
 				}
 			]
+		},
+		{
+			"name": "SGFxAtlas",
+			"fields": [
+				{
+					"name": "atlases",
+					"type": "TArray<TArray<uint8>>"
+				},
+				{
+					"name": "sprites",
+					"type": "TArray<ZString>"
+				},
+				{
+					"name": "spriteAtlases",
+					"type": "TArray<uint32>"
+				},
+				{
+					"name": "spriteCoords",
+					"type": "TArray<TArray<uint32>>"
+				}
+			]
+		},
+		{
+			"name": "SAudioEventMetadata",
+			"fields": [
+				{
+					"name": "id",
+					"type": "uint32"
+				},
+				{
+					"name": "name",
+					"type": "ZString"
+				},
+				{
+					"_comment": "Always empty",
+					"name": "unk",
+					"type": "TArray<uint8>"
+				}
+			]
+		},
+		{
+			"name": "SColorPalette",
+			"fields": [
+				{
+					"name": "paletteName",
+					"type": "ZString"
+				},
+				{
+					"name": "names",
+					"type": "TArray<ZString>"
+				},
+				{
+					"name": "colors",
+					"type": "TArray<SColorRGB>"
+				},
+				{
+					"_comment": "All #ffffff",
+					"name": "unk1",
+					"type": "TArray<SColorRGB>"
+				},
+				{
+					"_comment": "All #ffffff",
+					"name": "unk2",
+					"type": "TArray<SColorRGB>"
+				},
+				{
+					"_comment": "All #ffffff",
+					"name": "unk3",
+					"type": "TArray<SColorRGB>"
+				},
+				{
+					"_comment": "All #ffffff",
+					"name": "unk4",
+					"type": "TArray<SColorRGB>"
+				}
+			]
 		}
 	]
 }

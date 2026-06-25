@@ -135,6 +135,8 @@ fn roundtrip_all_resources() {
 			let data = match info.data_type().as_str() {
 				#[cfg(feature = "CBLU")]
 				"CBLU" => roundtrip!(data, "original", SCppEntityBlueprint),
+				#[cfg(feature = "CLRP")]
+				"CLRP" => roundtrip!(data, "original", SColorPalette),
 				#[cfg(feature = "CPPT")]
 				"CPPT" => roundtrip!(data, "original", SCppEntity),
 				#[cfg(feature = "CRMD")]
@@ -143,6 +145,8 @@ fn roundtrip_all_resources() {
 				"ECPB" => roundtrip!(data, "original", SExtendedCppEntityBlueprint),
 				#[cfg(feature = "ENUM")]
 				"ENUM" => roundtrip!(data, "original", SEnumType),
+				#[cfg(feature = "GFXA")]
+				"GFXA" => roundtrip!(data, "original", SGFxAtlas),
 				#[cfg(feature = "GFXF")]
 				"GFXF" => roundtrip!(data, "original", SGFxMovieResource),
 				#[cfg(feature = "GIDX")]
@@ -159,6 +163,8 @@ fn roundtrip_all_resources() {
 				"TEMP" => roundtrip!(data, "original", STemplateEntityFactory),
 				#[cfg(feature = "UICB")]
 				"UICB" => roundtrip!(data, "original", SControlTypeInfo),
+				#[cfg(feature = "WEMD")]
+				"WEMD" => roundtrip!(data, "original", Vec<SAudioEventMetadata>),
 				#[cfg(feature = "WSGB")]
 				"WSGB" => roundtrip!(data, "original", SAudioStateGroupData),
 				#[cfg(feature = "WSWB")]
@@ -179,6 +185,8 @@ fn roundtrip_all_resources() {
 			let second_data = match info.data_type().as_str() {
 				#[cfg(feature = "CBLU")]
 				"CBLU" => roundtrip!(data, "roundtripped", SCppEntityBlueprint),
+				#[cfg(feature = "CLRP")]
+				"CLRP" => roundtrip!(data, "roundtripped", SColorPalette),
 				#[cfg(feature = "CPPT")]
 				"CPPT" => roundtrip!(data, "roundtripped", SCppEntity),
 				#[cfg(feature = "CRMD")]
@@ -187,6 +195,8 @@ fn roundtrip_all_resources() {
 				"ECPB" => roundtrip!(data, "roundtripped", SExtendedCppEntityBlueprint),
 				#[cfg(feature = "ENUM")]
 				"ENUM" => roundtrip!(data, "roundtripped", SEnumType),
+				#[cfg(feature = "GFXA")]
+				"GFXA" => roundtrip!(data, "roundtripped", SGFxAtlas),
 				#[cfg(feature = "GFXF")]
 				"GFXF" => roundtrip!(data, "roundtripped", SGFxMovieResource),
 				#[cfg(feature = "GIDX")]
@@ -203,6 +213,8 @@ fn roundtrip_all_resources() {
 				"TEMP" => roundtrip!(data, "roundtripped", STemplateEntityFactory),
 				#[cfg(feature = "UICB")]
 				"UICB" => roundtrip!(data, "roundtripped", SControlTypeInfo),
+				#[cfg(feature = "WEMD")]
+				"WEMD" => roundtrip!(data, "roundtripped", Vec<SAudioEventMetadata>),
 				#[cfg(feature = "WSGB")]
 				"WSGB" => roundtrip!(data, "roundtripped", SAudioStateGroupData),
 				#[cfg(feature = "WSWB")]

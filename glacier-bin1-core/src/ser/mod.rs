@@ -310,7 +310,7 @@ impl Bin1Serializer {
 		// ResourcePtrs segment
 		if self.resource_ptrs_segment && !self.resource_ptrs.is_empty() {
 			self.buffer[6] += 1;
-			self.buffer.extend_from_slice(&0x578FBCEEu32.to_le_bytes());
+			self.buffer.extend_from_slice(&0x64603664u32.to_le_bytes());
 			self.buffer.extend_from_slice(&0u32.to_le_bytes());
 			let segment_start = self.buffer.len();
 

@@ -19,7 +19,7 @@ pub fn main() -> Result<()> {
 			#[cfg(feature = "CBLU")]
 			&["SCppEntityBlueprint"],
 			#[cfg(feature = "CLRP")]
-			&[],
+			&["SColorPalette"],
 			#[cfg(feature = "CPPT")]
 			&["SCppEntity"],
 			#[cfg(feature = "CRMD")]
@@ -29,7 +29,7 @@ pub fn main() -> Result<()> {
 			#[cfg(feature = "ENUM")]
 			&["SEnumType"],
 			#[cfg(feature = "GFXA")]
-			&[],
+			&["SGFxAtlas"],
 			#[cfg(feature = "GFXF")]
 			&["SGFxMovieResource"],
 			#[cfg(feature = "GIDX")]
@@ -54,7 +54,7 @@ pub fn main() -> Result<()> {
 			#[cfg(feature = "UICB")]
 			&["SControlTypeInfo"],
 			#[cfg(feature = "WEMD")]
-			&[],
+			&["SAudioEventMetadata"],
 			#[cfg(feature = "WSGB")]
 			&["SAudioStateGroupData"],
 			#[cfg(feature = "WSWB")]
