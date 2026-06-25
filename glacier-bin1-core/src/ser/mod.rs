@@ -157,7 +157,6 @@ impl Bin1Serializer {
 			end_pointer_id.map_or_else(|| "None".into(), |id| format!("{:X}", id))
 		);
 
-		self.align_to(4);
 		self.align_to(data.alignment());
 		self.register_pointee(pointer_id);
 
