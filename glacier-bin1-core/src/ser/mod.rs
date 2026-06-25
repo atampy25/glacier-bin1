@@ -157,6 +157,7 @@ impl Bin1Serializer {
 			end_pointer_id.map_or_else(|| "None".into(), |id| format!("{:X}", id))
 		);
 
+		self.align_to(4);
 		self.align_to(data.alignment());
 		self.register_pointee(pointer_id);
 
@@ -329,7 +330,7 @@ impl Bin1Serializer {
 	}
 
 	pub fn serialize(mut self, value: &impl Bin1Serialize) -> Result<Vec<u8>, SerializeError> {
-		self.buffer[5] = value.alignment().min(8) as u8;
+		self.buffer[5] = value.alignment().max(8) as u8;
 		value.write(&mut self)?;
 		value.resolve(&mut self)?;
 		self.finalise()
