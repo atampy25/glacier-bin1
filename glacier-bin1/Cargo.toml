@@ -18,9 +18,9 @@ serde_json = { version = "1.0.150", features = ["preserve_order"] }
 tracing = { version = "0.1.41", optional = true }
 
 [dev-dependencies]
-hitman-commons = { git = "https://github.com/atampy25/hitman-commons", features = [
+glacier-commons = { git = "https://github.com/atampy25/glacier-commons", features = [
     "game-detection",
-    "rpkg-rs",
+    "rpkg-rs-1",
 ] }
 static_init = "1.0.4"
 rpkg-rs = "1.4.0"
