@@ -57,3 +57,20 @@ jobs:
               with:
                   name: glacier-bin1.exe
                   path: target/release/glacier-bin1.exe
+
+            - name: Build with logging
+              run: cargo build --release -F all-games -F all-types -F debug-log
+
+            - name: Upload artifact (Linux)
+              if: matrix.platform == 'ubuntu-latest'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: glacier-bin1 (Logging)
+                  path: target/release/glacier-bin1
+
+            - name: Upload artifact (Windows)
+              if: matrix.platform == 'windows-latest'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: glacier-bin1.exe (Logging)
+                  path: target/release/glacier-bin1.exe
