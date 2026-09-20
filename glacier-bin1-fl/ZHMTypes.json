@@ -7979,7 +7979,8 @@
 				{ "name": "Skill_CombatRushGrab", "value": 46 },
 				{ "name": "Skill_DoorKick", "value": 47 },
 				{ "name": "Skill_DoorRush", "value": 48 },
-				{ "name": "TakedownAmmoReward", "value": 49 }
+				{ "name": "TakedownAmmoReward", "value": 49 },
+				{ "name": "Skill_PickupAmmo", "value": 50 }
 			]
 		},
 		{
@@ -9204,6 +9205,7 @@
 				{ "name": "UI_OPTION_DISPLAY_STEREO_STRENGTH", "value": 2330 },
 				{ "name": "UI_OPTION_GRAPHICS_FSR_RESOLUTION", "value": 2400 },
 				{ "name": "UI_OPTION_GRAPHICS_FSR_IMAGE_SHARPEN", "value": 2401 },
+				{ "name": "UI_OPTION_GRAPHICS_FSR_FRAME_GEN", "value": 2402 },
 				{ "name": "UI_OPTION_GRAPHICS_DLSS_RESOLUTION", "value": 2410 },
 				{ "name": "UI_OPTION_GRAPHICS_DLSS_RAY_RECONSTRUCTION", "value": 2411 },
 				{ "name": "UI_OPTION_GRAPHICS_DLSS_FRAME_GEN", "value": 2412 },
@@ -12154,7 +12156,9 @@
 			"name": "CustomProfileData.SCustomProfileDataFull",
 			"size": 32,
 			"alignment": 8,
-			"fields": []
+			"fields": [
+				{ "name": "m_data", "type": null, "offset": 0 }
+			]
 		},
 		{
 			"name": "DWN.SGameServerMatchPerformanceEvent",
@@ -12895,6 +12899,7 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_id", "type": "ZGuid", "offset": 0 },
+				{ "name": "m_linkedAccounts", "type": null, "offset": 16 },
 				{ "name": "m_gamertag", "type": "ZString", "offset": 48 }
 			]
 		},
@@ -13578,6 +13583,7 @@
 				{ "name": "IsAvailable", "type": "bool", "offset": 0 },
 				{ "name": "IsFrameGenAvailable", "type": "bool", "offset": 1 },
 				{ "name": "IsFrameGenDynamicAvailable", "type": "bool", "offset": 2 },
+				{ "name": "IsFrameGenVSyncSupportAvailable", "type": "bool", "offset": 3 },
 				{ "name": "MaxFrameGenCount", "type": "int32", "offset": 4 }
 			]
 		},
@@ -13590,6 +13596,16 @@
 				{ "name": "flags", "type": "ZString", "offset": 16 },
 				{ "name": "message", "type": "ZString", "offset": 32 },
 				{ "name": "level", "type": "int32", "offset": 48 }
+			]
+		},
+		{
+			"name": "JSONTemplate.SFSRSupportData",
+			"size": 3,
+			"alignment": 1,
+			"fields": [
+				{ "name": "IsAvailable", "type": "bool", "offset": 0 },
+				{ "name": "IsAPIUpscalingAvailable", "type": "bool", "offset": 1 },
+				{ "name": "IsAPIFrameGenAvailable", "type": "bool", "offset": 2 }
 			]
 		},
 		{
@@ -14534,6 +14550,7 @@
 				{ "name": "m_pSNOnlineId", "type": "ZString", "offset": 112 },
 				{ "name": "m_playfabId", "type": "ZString", "offset": 128 },
 				{ "name": "m_id", "type": "ZGuid", "offset": 144 },
+				{ "name": "m_linkedAccounts", "type": null, "offset": 160 },
 				{ "name": "m_extensions", "type": "ZVariant", "offset": 192 },
 				{ "name": "m_eTag", "type": "ZString", "offset": 208 },
 				{ "name": "m_gamertag", "type": "ZString", "offset": 224 }
@@ -14770,15 +14787,6 @@
 			]
 		},
 		{
-			"name": "SAudioDynamicSequenceItemData",
-			"size": 16,
-			"alignment": 8,
-			"fields": [
-				{ "name": "m_nAudioNodeId", "type": "uint32", "offset": 0 },
-				{ "name": "m_pCustomInfo", "type": "void", "offset": 8 }
-			]
-		},
-		{
 			"name": "SAudioEmitterEventSaveData",
 			"size": 24,
 			"alignment": 4,
@@ -14835,7 +14843,8 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_EmitterID", "type": "uint64", "offset": 0 },
-				{ "name": "m_EventID", "type": "uint32", "offset": 8 }
+				{ "name": "m_EventID", "type": "uint32", "offset": 8 },
+				{ "name": "m_pPlayingSound", "type": null, "offset": 12 }
 			]
 		},
 		{
@@ -15328,7 +15337,11 @@
 				{ "name": "m_vContactNormal", "type": "float4", "offset": 80 },
 				{ "name": "m_vContactForce", "type": "float4", "offset": 96 },
 				{ "name": "m_fMinSeparation", "type": "float32", "offset": 112 },
-				{ "name": "m_bPersistent", "type": "uint8", "offset": 116 }
+				{ "name": "m_bPersistent", "type": "uint8", "offset": 116 },
+				{ "name": "m_eCollisionPairType", "type": null, "offset": 120 },
+				{ "name": "m_allContacts", "type": null, "offset": 128 },
+				{ "name": "m_pCollider", "type": null, "offset": 784 },
+				{ "name": "m_pListener", "type": null, "offset": 800 }
 			]
 		},
 		{
@@ -15435,7 +15448,8 @@
 				{ "name": "eAttacher", "type": "TEntityRef<ICrowdCoreProvider>", "offset": 16 },
 				{ "name": "fRadius", "type": "float32", "offset": 40 },
 				{ "name": "fTime", "type": "float32", "offset": 44 },
-				{ "name": "vPos", "type": "float4", "offset": 48 }
+				{ "name": "vPos", "type": "float4", "offset": 48 },
+				{ "name": "eState", "type": null, "offset": 64 }
 			]
 		},
 		{
@@ -15976,7 +15990,8 @@
 				{ "name": "outputPins", "type": "TArray<SEntityPinDescriptor>", "offset": 248 },
 				{ "name": "exposedEntities", "type": "TArray<SExposedEntityDescriptor>", "offset": 272 },
 				{ "name": "referencedEntityTypes", "type": "TArray<ZResourceID>", "offset": 296 },
-				{ "name": "exposedEntitiesTypes", "type": "TArray<SExposedEntityTypeDescriptor>", "offset": 320 }
+				{ "name": "exposedEntitiesTypes", "type": "TArray<SExposedEntityTypeDescriptor>", "offset": 320 },
+				{ "name": "externalReferences", "type": null, "offset": 344 }
 			]
 		},
 		{
@@ -16843,6 +16858,7 @@
 			"size": 288,
 			"alignment": 16,
 			"fields": [
+				{ "name": "m_Projectile", "type": null, "offset": 0 },
 				{ "name": "m_rHitEntity", "type": "ZEntityRef", "offset": 16 },
 				{ "name": "m_pBlockingSpatialEntity", "type": "ZEntityRef", "offset": 32 },
 				{ "name": "m_nHitBoneIndex", "type": "uint16", "offset": 48 },
@@ -16853,6 +16869,8 @@
 				{ "name": "m_vTo", "type": "float4", "offset": 128 },
 				{ "name": "m_nBodyPart", "type": "uint8", "offset": 144 },
 				{ "name": "m_vTrajectory", "type": "float4", "offset": 160 },
+				{ "name": "m_pHitBody", "type": null, "offset": 176 },
+				{ "name": "m_Explosion", "type": null, "offset": 184 },
 				{ "name": "m_fContactForce", "type": "float32", "offset": 272 },
 				{ "name": "m_bVRCloseCombatHit", "type": "bool", "offset": 276 }
 			]
@@ -17395,6 +17413,7 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_newSessionId", "type": "ZGuid", "offset": 0 },
+				{ "name": "m_sessionResult", "type": null, "offset": 16 },
 				{ "name": "m_progression", "type": "SKntDynamicProgression", "offset": 232 }
 			]
 		},
@@ -17425,7 +17444,10 @@
 			"name": "SKntGroup",
 			"size": 56,
 			"alignment": 8,
-			"fields": []
+			"fields": [
+				{ "name": "m_parent", "type": null, "offset": 0 },
+				{ "name": "m_children", "type": null, "offset": 24 }
+			]
 		},
 		{
 			"name": "SKntGroupProgression",
@@ -17451,7 +17473,9 @@
 			"name": "SKntWallet",
 			"size": 32,
 			"alignment": 8,
-			"fields": []
+			"fields": [
+				{ "name": "m_currency", "type": null, "offset": 0 }
+			]
 		},
 		{
 			"name": "SKntInventory",
@@ -17469,6 +17493,7 @@
 			"fields": [
 				{ "name": "m_isConfirmed", "type": "bool", "offset": 0 },
 				{ "name": "m_linkedEmail", "type": "ZString", "offset": 8 },
+				{ "name": "m_ioiAccountId", "type": null, "offset": 24 },
 				{ "name": "m_ioiAccountBaseUrl", "type": "ZString", "offset": 48 }
 			]
 		},
@@ -17555,7 +17580,8 @@
 				{ "name": "m_id", "type": "ZGuid", "offset": 0 },
 				{ "name": "m_gameplay", "type": "SKntGameplay", "offset": 16 },
 				{ "name": "m_ui", "type": "SKntUi", "offset": 152 },
-				{ "name": "m_ugc", "type": "SKntUgc", "offset": 312 }
+				{ "name": "m_ugc", "type": "SKntUgc", "offset": 312 },
+				{ "name": "m_group", "type": null, "offset": 336 }
 			]
 		},
 		{
@@ -17566,7 +17592,8 @@
 				{ "name": "m_id", "type": "ZGuid", "offset": 0 },
 				{ "name": "m_profileId", "type": "ZGuid", "offset": 16 },
 				{ "name": "m_missionId", "type": "ZGuid", "offset": 32 },
-				{ "name": "m_common", "type": "SKntCommonProgression", "offset": 48 }
+				{ "name": "m_common", "type": "SKntCommonProgression", "offset": 48 },
+				{ "name": "m_group", "type": null, "offset": 64 }
 			]
 		},
 		{
@@ -17601,7 +17628,8 @@
 			"size": 664,
 			"alignment": 8,
 			"fields": [
-				{ "name": "m_static", "type": "SKntStaticMissionContext", "offset": 0 }
+				{ "name": "m_static", "type": "SKntStaticMissionContext", "offset": 0 },
+				{ "name": "m_dynamic", "type": null, "offset": 400 }
 			]
 		},
 		{
@@ -17968,14 +17996,17 @@
 			"fields": [
 				{ "name": "aLoadout", "type": "TArray", "offset": 0 },
 				{ "name": "m_loadoutData", "type": "ZDynamicObject", "offset": 24 },
+				{ "name": "m_loadoutChanged", "type": null, "offset": 40 },
 				{ "name": "m_sLoadoutContractId", "type": "ZString", "offset": 72 },
 				{ "name": "m_bIsAvailableSavesCacheInitialized", "type": "bool", "offset": 88 },
 				{ "name": "m_aCachedAvailableSaves", "type": "TArray", "offset": 96 },
+				{ "name": "m_cachedAvailableSavesChanged", "type": null, "offset": 120 },
 				{ "name": "selectedAgencyPickup", "type": "ZString", "offset": 152 },
 				{ "name": "m_enabledEntranceId", "type": "ZRepositoryID", "offset": 168 },
 				{ "name": "m_enabledEntranceUnlockable", "type": "ZDynamicObject", "offset": 184 },
 				{ "name": "m_aEnabledEntranceEquip", "type": "ZDynamicObject", "offset": 200 },
 				{ "name": "m_persistentContext", "type": "ZDynamicObject", "offset": 216 },
+				{ "name": "m_loadingScreenData", "type": null, "offset": 232 },
 				{ "name": "m_opportunities", "type": "ZDynamicObject", "offset": 304 }
 			]
 		},
@@ -20240,7 +20271,8 @@
 				{ "name": "m_avoidanceStrength", "type": "float32", "offset": 12 },
 				{ "name": "m_targetPosition", "type": "float4", "offset": 16 },
 				{ "name": "m_previousOffset", "type": "float4", "offset": 32 },
-				{ "name": "m_collisionChannel", "type": "EObjectCollisionChannel", "offset": 48 }
+				{ "name": "m_collisionChannel", "type": "EObjectCollisionChannel", "offset": 48 },
+				{ "name": "m_blockingChannels", "type": null, "offset": 52 }
 			]
 		},
 		{
@@ -20249,6 +20281,7 @@
 			"alignment": 16,
 			"fields": [
 				{ "name": "m_targetTransform", "type": "SQV", "offset": 0 },
+				{ "name": "m_followSettings", "type": null, "offset": 32 },
 				{ "name": "m_movementMultiplier", "type": "float32", "offset": 36 },
 				{ "name": "m_previousTargetTransform", "type": "SQV", "offset": 48 }
 			]
@@ -20297,7 +20330,11 @@
 			"fields": [
 				{ "name": "m_targetTransform", "type": "SQV", "offset": 0 },
 				{ "name": "m_numberOfFramesToLock", "type": "int32", "offset": 32 },
-				{ "name": "m_lockedFramesRemaining", "type": "int32", "offset": 36 }
+				{ "name": "m_lockedFramesRemaining", "type": "int32", "offset": 36 },
+				{ "name": "m_commandData", "type": null, "offset": 48 },
+				{ "name": "m_currentCommand", "type": null, "offset": 96 },
+				{ "name": "m_newCommand", "type": null, "offset": 97 },
+				{ "name": "m_activationCommand", "type": null, "offset": 98 }
 			]
 		},
 		{
@@ -20325,6 +20362,7 @@
 			"alignment": 16,
 			"fields": [
 				{ "name": "m_mappings", "type": "TArray<SVirtualCameraBehaviorPlayerInputData.SMapping>", "offset": 0 },
+				{ "name": "m_inputGroup", "type": null, "offset": 24 },
 				{ "name": "m_translationInput", "type": "float4", "offset": 32 },
 				{ "name": "m_rotationInput", "type": "float4", "offset": 48 }
 			]
@@ -20336,6 +20374,7 @@
 			"fields": [
 				{ "name": "m_multiplier", "type": "float32", "offset": 0 },
 				{ "name": "m_mode", "type": "EVirtualCameraShakeApplicationMode", "offset": 4 },
+				{ "name": "m_referencePosition", "type": null, "offset": 16 },
 				{ "name": "m_unconditionalShakes", "type": "TArray<uint32>", "offset": 48 },
 				{ "name": "m_shakesToIgnore", "type": "TArray<uint32>", "offset": 72 }
 			]
@@ -20345,6 +20384,7 @@
 			"size": 64,
 			"alignment": 16,
 			"fields": [
+				{ "name": "m_spline", "type": null, "offset": 0 },
 				{ "name": "m_splinePosition", "type": "float32", "offset": 32 },
 				{ "name": "m_previousPosition", "type": "float4", "offset": 48 }
 			]
@@ -20374,7 +20414,8 @@
 			"size": 48,
 			"alignment": 16,
 			"fields": [
-				{ "name": "m_applicationMode", "type": "EVirtualCameraStabilizeApplicationMode", "offset": 0 }
+				{ "name": "m_applicationMode", "type": "EVirtualCameraStabilizeApplicationMode", "offset": 0 },
+				{ "name": "m_value", "type": null, "offset": 16 }
 			]
 		},
 		{
