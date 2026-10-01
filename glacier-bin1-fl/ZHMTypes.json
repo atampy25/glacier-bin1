@@ -979,8 +979,7 @@
 				{ "name": "eDC_Rumble", "value": 2 },
 				{ "name": "eDC_XInput", "value": 4 },
 				{ "name": "eDC_Durango", "value": 8 },
-				{ "name": "COUNT", "value": 14 },
-				{ "name": "eDC_Mouse", "value": 16 },
+				{ "name": "COUNT", "value": 16 },
 				{ "name": "eDC_Keyboard", "value": 32 },
 				{ "name": "eDC_Gamepad", "value": 64 },
 				{ "name": "eDC_Dualshock", "value": 128 },
@@ -989,7 +988,9 @@
 				{ "name": "eDC_GDK", "value": 1024 },
 				{ "name": "eDC_AdaptiveTriggers", "value": 2048 },
 				{ "name": "eDC_HapticRumble", "value": 4096 },
-				{ "name": "eDC_SwitchPro", "value": 8192 }
+				{ "name": "eDC_SwitchPro", "value": 8192 },
+				{ "name": "eDC_SteamDeckController", "value": 16384 },
+				{ "name": "eDC_Gyro", "value": 32768 }
 			]
 		},
 		{
@@ -1301,6 +1302,15 @@
 			]
 		},
 		{
+			"name": "EDynamicBrickAssetState",
+			"size": 4,
+			"values": [
+				{ "name": "Empty", "value": 0 },
+				{ "name": "PreloadStarted", "value": 1 },
+				{ "name": "PreloadEnded", "value": 2 }
+			]
+		},
+		{
 			"name": "EDynamicBrickLoadState",
 			"size": 4,
 			"values": [
@@ -1556,13 +1566,14 @@
 				{ "name": "MagazineOut", "value": 0 },
 				{ "name": "MagazineIn", "value": 1 },
 				{ "name": "PullChamber", "value": 2 },
-				{ "name": "Holster", "value": 3 },
-				{ "name": "Unholster", "value": 4 },
-				{ "name": "Pickup", "value": 5 },
-				{ "name": "Aim", "value": 6 },
-				{ "name": "Attach", "value": 7 },
-				{ "name": "Detach", "value": 8 },
-				{ "name": "Count", "value": 9 }
+				{ "name": "PushChamber", "value": 3 },
+				{ "name": "Holster", "value": 4 },
+				{ "name": "Unholster", "value": 5 },
+				{ "name": "Pickup", "value": 6 },
+				{ "name": "Aim", "value": 7 },
+				{ "name": "Attach", "value": 8 },
+				{ "name": "Detach", "value": 9 },
+				{ "name": "Count", "value": 10 }
 			]
 		},
 		{
@@ -2552,7 +2563,8 @@
 				{ "name": "Locale_Tc", "value": 11 },
 				{ "name": "Locale_Ko", "value": 12 },
 				{ "name": "Locale_Tr", "value": 13 },
-				{ "name": "Locale_Placeholder", "value": 14 }
+				{ "name": "Locale_Uk", "value": 14 },
+				{ "name": "Locale_Placeholder", "value": 15 }
 			]
 		},
 		{
@@ -2814,9 +2826,10 @@
 				{ "name": "CostumeOneMore", "value": 19 },
 				{ "name": "CostumeCasinoSuit", "value": 20 },
 				{ "name": "CostumeDiamondintheRough", "value": 21 },
-				{ "name": "WeaponAgentsMark", "value": 22 },
-				{ "name": "WeaponGoldenGun", "value": 23 },
-				{ "name": "COUNT", "value": 24 }
+				{ "name": "CostumeGoldenEyeSuit", "value": 22 },
+				{ "name": "WeaponAgentsMark", "value": 23 },
+				{ "name": "WeaponGoldenGun", "value": 24 },
+				{ "name": "COUNT", "value": 25 }
 			]
 		},
 		{
@@ -3289,7 +3302,22 @@
 				{ "name": "SkipCinematic", "value": 1004 },
 				{ "name": "InspectItemZoom", "value": 1005 },
 				{ "name": "ItemRotateLeft", "value": 1006 },
-				{ "name": "ItemRotateRight", "value": 1007 }
+				{ "name": "ItemRotateRight", "value": 1007 },
+				{ "name": "PhotoMode_Open", "value": 1008 },
+				{ "name": "PhotoMode_ActivateCameraMode", "value": 1009 },
+				{ "name": "PhotoMode_ChangeCameraSpeed", "value": 1010 },
+				{ "name": "PhotoMode_ChangeGridVisibility", "value": 1011 },
+				{ "name": "PhotoMode_ResetCamera", "value": 1012 },
+				{ "name": "PhotoMode_MoveCameraUp", "value": 1013 },
+				{ "name": "PhotoMode_MoveCameraDown", "value": 1014 },
+				{ "name": "PhotoMode_MoveCameraLeft", "value": 1015 },
+				{ "name": "PhotoMode_MoveCameraRight", "value": 1016 },
+				{ "name": "PhotoMode_MoveCameraForward", "value": 1017 },
+				{ "name": "PhotoMode_MoveCameraBackward", "value": 1018 },
+				{ "name": "PhotoMode_LookCameraLeft", "value": 1019 },
+				{ "name": "PhotoMode_LookCameraRight", "value": 1020 },
+				{ "name": "PhotoMode_LookCameraUp", "value": 1021 },
+				{ "name": "PhotoMode_LookCameraDown", "value": 1022 }
 			]
 		},
 		{
@@ -3368,7 +3396,11 @@
 				{ "name": "ES_SelectSpecialFirearm", "value": 69 },
 				{ "name": "ES_CombatRushGrab", "value": 70 },
 				{ "name": "ES_GrabThrow", "value": 71 },
-				{ "name": "ES_SpecialFirearmAbility", "value": 72 }
+				{ "name": "ES_SpecialFirearmAbility", "value": 72 },
+				{ "name": "ES_AimGyroLeft", "value": 73 },
+				{ "name": "ES_AimGyroRight", "value": 74 },
+				{ "name": "ES_AimGyroUp", "value": 75 },
+				{ "name": "ES_AimGyroDown", "value": 76 }
 			]
 		},
 		{
@@ -4142,6 +4174,15 @@
 			]
 		},
 		{
+			"name": "EUpdateMode",
+			"size": 1,
+			"values": [
+				{ "name": "eUpdatePlayMode", "value": 0 },
+				{ "name": "eUpdatePaused", "value": 1 },
+				{ "name": "eUpdateAlways", "value": 2 }
+			]
+		},
+		{
 			"name": "EVRRenderDeviceType",
 			"size": 4,
 			"values": [
@@ -4493,6 +4534,14 @@
 			"values": [
 				{ "name": "Transform", "value": 0 },
 				{ "name": "Offset", "value": 1 }
+			]
+		},
+		{
+			"name": "EVirtualCameraTimeDomain",
+			"size": 1,
+			"values": [
+				{ "name": "GameTime", "value": 0 },
+				{ "name": "RealTime", "value": 1 }
 			]
 		},
 		{
@@ -4983,7 +5032,8 @@
 				{ "name": "AllowWhileAiming", "value": 4 },
 				{ "name": "AllowWhileInConfrontation", "value": 8 },
 				{ "name": "AllowWhileGrounded", "value": 16 },
-				{ "name": "AllowWhilePerformingSelf", "value": 32 }
+				{ "name": "AllowWhilePerformingSelf", "value": 32 },
+				{ "name": "AllowWhileInteracting", "value": 64 }
 			]
 		},
 		{
@@ -5643,7 +5693,8 @@
 			"values": [
 				{ "name": "None", "value": 0 },
 				{ "name": "Jump", "value": 1 },
-				{ "name": "Impact", "value": 2 }
+				{ "name": "Impact", "value": 2 },
+				{ "name": "DeepImpact", "value": 3 }
 			]
 		},
 		{
@@ -6647,7 +6698,8 @@
 				{ "name": "Sidestep", "value": 25 },
 				{ "name": "Block", "value": 26 },
 				{ "name": "CoverTakedown", "value": 27 },
-				{ "name": "AttackFromAbove", "value": 28 }
+				{ "name": "AttackFromAbove", "value": 28 },
+				{ "name": "EquipItem", "value": 29 }
 			]
 		},
 		{
@@ -6921,16 +6973,6 @@
 				{ "name": "AGENCY_FOCUS", "value": 56 },
 				{ "name": "LOWEST", "value": 57 },
 				{ "name": "COUNT", "value": 58 }
-			]
-		},
-		{
-			"name": "Gameplay.EGrabRushOffTheLedgeGroundPositionResult",
-			"size": 4,
-			"values": [
-				{ "name": "Invalid_NoGround", "value": 0 },
-				{ "name": "Invalid_OutOfReach", "value": 1 },
-				{ "name": "Invalid_NoNavMeshPoint", "value": 2 },
-				{ "name": "Valid", "value": 3 }
 			]
 		},
 		{
@@ -7399,6 +7441,15 @@
 			]
 		},
 		{
+			"name": "Gameplay.EKntMissionTimerModificationType",
+			"size": 1,
+			"values": [
+				{ "name": "AddTime", "value": 0 },
+				{ "name": "SubstractTime", "value": 1 },
+				{ "name": "SetTime", "value": 2 }
+			]
+		},
+		{
 			"name": "Gameplay.EKntMissionTimerType",
 			"size": 4,
 			"values": [
@@ -7712,6 +7763,16 @@
 			]
 		},
 		{
+			"name": "Gameplay.EOffTheLedgeGroundPositionResult",
+			"size": 4,
+			"values": [
+				{ "name": "Invalid_NoGround", "value": 0 },
+				{ "name": "Invalid_OutOfReach", "value": 1 },
+				{ "name": "Invalid_NoNavMeshPoint", "value": 2 },
+				{ "name": "Valid", "value": 3 }
+			]
+		},
+		{
 			"name": "Gameplay.EParryVariationType",
 			"size": 1,
 			"values": [
@@ -7745,6 +7806,14 @@
 				{ "name": "Social", "value": 0 },
 				{ "name": "Trespass", "value": 1 },
 				{ "name": "Trespass_Bluffed", "value": 2 }
+			]
+		},
+		{
+			"name": "Gameplay.EPlayerApproachGoalCancelMode",
+			"size": 4,
+			"values": [
+				{ "name": "CancelAllCoreLogicApproaches", "value": 0 },
+				{ "name": "CancelOnlyApproachesStartedByThisEntity", "value": 1 }
 			]
 		},
 		{
@@ -8281,6 +8350,15 @@
 			]
 		},
 		{
+			"name": "Gameplay.EStaggerOverlapSource",
+			"size": 1,
+			"values": [
+				{ "name": "PairedAction", "value": 0 },
+				{ "name": "Grab", "value": 1 },
+				{ "name": "CombatRush", "value": 2 }
+			]
+		},
+		{
 			"name": "Gameplay.EStaggerSource",
 			"size": 4,
 			"values": [
@@ -8291,7 +8369,6 @@
 				{ "name": "GrabThrow", "value": 4 },
 				{ "name": "Taser", "value": 5 },
 				{ "name": "Flashbang", "value": 6 },
-				{ "name": "CoreLogic", "value": 7 },
 				{ "name": "Parry", "value": 8 },
 				{ "name": "DoorImpact", "value": 9 },
 				{ "name": "Firearm", "value": 10 },
@@ -8597,6 +8674,15 @@
 			]
 		},
 		{
+			"name": "Gameplay.EVehicleAerodynamicsAirControls",
+			"size": 1,
+			"values": [
+				{ "name": "Disabled", "value": 0 },
+				{ "name": "AutoAirStabilization", "value": 1 },
+				{ "name": "InputBasedAirControl", "value": 2 }
+			]
+		},
+		{
 			"name": "Gameplay.EVehicleAerodynamicsDownforceMode",
 			"size": 1,
 			"values": [
@@ -8756,7 +8842,8 @@
 				{ "name": "Drifting", "value": 0 },
 				{ "name": "CollisionHandling", "value": 1 },
 				{ "name": "Aerodynamics", "value": 2 },
-				{ "name": "CameraController", "value": 3 }
+				{ "name": "CameraController", "value": 3 },
+				{ "name": "MotorbikeConfig", "value": 4 }
 			]
 		},
 		{
@@ -8850,6 +8937,23 @@
 			]
 		},
 		{
+			"name": "Gameplay.EVehicleMotorbikePhysicalPartType",
+			"size": 1,
+			"values": [
+				{ "name": "WheelFront", "value": 0 },
+				{ "name": "WheelRear", "value": 1 },
+				{ "name": "Chassis", "value": 2 }
+			]
+		},
+		{
+			"name": "Gameplay.EVehicleMotorbikeWheelIndex",
+			"size": 1,
+			"values": [
+				{ "name": "Front", "value": 0 },
+				{ "name": "Rear", "value": 1 }
+			]
+		},
+		{
 			"name": "Gameplay.EVehiclePhysicalPartType",
 			"size": 4,
 			"values": [
@@ -8906,8 +9010,7 @@
 				{ "name": "WorldPositionPhysicsBodyRotation", "value": 3 },
 				{ "name": "WorldPositionSpeedBasedWheelRotation", "value": 4 },
 				{ "name": "SkeletonBoneTransformFromPhysicalPart", "value": 5 },
-				{ "name": "SkeletonBoneTransformCustom", "value": 6 },
-				{ "name": "CustomVehicleSpatialPositionSpeedBasedWheelRotation", "value": 7 }
+				{ "name": "SkeletonBoneTransformCustom", "value": 6 }
 			]
 		},
 		{
@@ -9710,7 +9813,10 @@
 				{ "name": "EJoystickRightVertical", "value": 3 },
 				{ "name": "ETriggerLeft", "value": 4 },
 				{ "name": "ETriggerRight", "value": 5 },
-				{ "name": "eMAX", "value": 6 }
+				{ "name": "EGyroDeltaYaw", "value": 6 },
+				{ "name": "EGyroDeltaPitch", "value": 7 },
+				{ "name": "EGyroDeltaRoll", "value": 8 },
+				{ "name": "eMAX", "value": 9 }
 			]
 		},
 		{
@@ -10323,7 +10429,10 @@
 				{ "name": "Watcher", "value": 42 },
 				{ "name": "PerformingPrivateSpaceReaction", "value": 43 },
 				{ "name": "AffectedBySmoke", "value": 44 },
-				{ "name": "PerformingFakeSurrenderFinisher", "value": 45 }
+				{ "name": "PerformingFakeSurrenderFinisher", "value": 45 },
+				{ "name": "RollingOverCover", "value": 46 },
+				{ "name": "Vaulting", "value": 47 },
+				{ "name": "InCombat", "value": 48 }
 			]
 		},
 		{
@@ -10498,7 +10607,17 @@
 				{ "name": "MeleeAttacking", "value": 55 },
 				{ "name": "Falling", "value": 56 },
 				{ "name": "InterruptedFinisherCamera", "value": 57 },
-				{ "name": "HasRubberCameraControls", "value": 58 }
+				{ "name": "HasRubberCameraControls", "value": 58 },
+				{ "name": "IsAnyAnimatedCameraActive", "value": 59 }
+			]
+		},
+		{
+			"name": "ZCLPlayerStateListenerEntity.ESequenceType",
+			"size": 4,
+			"values": [
+				{ "name": "Cinematic", "value": 0 },
+				{ "name": "Gameplay", "value": 1 },
+				{ "name": "Any", "value": 2 }
 			]
 		},
 		{
@@ -10889,6 +11008,16 @@
 			]
 		},
 		{
+			"name": "ZGetVirtualCameraTransformEntity.EMode",
+			"size": 4,
+			"values": [
+				{ "name": "Full", "value": 0 },
+				{ "name": "WithoutShakes", "value": 1 },
+				{ "name": "WithoutOffset", "value": 2 },
+				{ "name": "WithoutAnyOffset", "value": 3 }
+			]
+		},
+		{
 			"name": "ZHUDCamera3DControllerEntity.ESpace",
 			"size": 4,
 			"values": [
@@ -11172,17 +11301,18 @@
 				{ "name": "LegShot", "value": 1 },
 				{ "name": "DoubleLegShot", "value": 2 },
 				{ "name": "HeadShot", "value": 3 },
-				{ "name": "ShootArmor", "value": 4 },
-				{ "name": "DestroyArmor", "value": 5 },
-				{ "name": "DisarmShot", "value": 6 },
-				{ "name": "WeaponThrow", "value": 7 },
-				{ "name": "WeaponThrowImpacted", "value": 8 },
-				{ "name": "WeaponSwitch", "value": 9 },
-				{ "name": "MagazineOutOfAmmo", "value": 10 },
-				{ "name": "OutOfAmmo", "value": 11 },
-				{ "name": "ItemThrow", "value": 12 },
-				{ "name": "ItemThrowImpacted", "value": 13 },
-				{ "name": "MissedShot", "value": 14 }
+				{ "name": "LethalShot", "value": 4 },
+				{ "name": "ShootArmor", "value": 5 },
+				{ "name": "DestroyArmor", "value": 6 },
+				{ "name": "DisarmShot", "value": 7 },
+				{ "name": "WeaponThrow", "value": 8 },
+				{ "name": "WeaponThrowImpacted", "value": 9 },
+				{ "name": "WeaponSwitch", "value": 10 },
+				{ "name": "MagazineOutOfAmmo", "value": 11 },
+				{ "name": "OutOfAmmo", "value": 12 },
+				{ "name": "ItemThrow", "value": 13 },
+				{ "name": "ItemThrowImpacted", "value": 14 },
+				{ "name": "MissedShot", "value": 15 }
 			]
 		},
 		{
@@ -11229,7 +11359,8 @@
 				{ "name": "AlreadyStarting", "value": 8 },
 				{ "name": "OfflineCheckpointNotFound", "value": 9 },
 				{ "name": "Unknown", "value": 10 },
-				{ "name": "CheckpointNotInBoot", "value": 11 }
+				{ "name": "CheckpointNotInBoot", "value": 11 },
+				{ "name": "NotOwned", "value": 12 }
 			]
 		},
 		{
@@ -12802,13 +12933,41 @@
 			]
 		},
 		{
-			"name": "SKeyHandle",
-			"size": 12,
+			"name": "Gameplay.SVehicleMotorbikeGeometryConfig",
+			"size": 224,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_maxSteeringAngle", "type": "float32", "offset": 0 },
+				{ "name": "m_steerLerpDecayRate", "type": "float32", "offset": 4 },
+				{ "name": "m_wheelRadius", "type": "float32", "offset": 8 },
+				{ "name": "m_chassisLocalPos", "type": "SVector3", "offset": 12 },
+				{ "name": "m_handlebarsLocalPos", "type": "SVector3", "offset": 24 },
+				{ "name": "m_leftHandleverLocalPos", "type": "SVector3", "offset": 36 },
+				{ "name": "m_rightHandleverLocalPos", "type": "SVector3", "offset": 48 },
+				{ "name": "m_frontWheelLocalPos", "type": "SVector3", "offset": 60 },
+				{ "name": "m_frontWheelTargetLocalPos", "type": "SVector3", "offset": 72 },
+				{ "name": "m_rearWheelLocalPos", "type": "SVector3", "offset": 84 },
+				{ "name": "m_rearWheelTargetLocalPos", "type": "SVector3", "offset": 96, "padEnd": 116 }
+			]
+		},
+		{
+			"name": "Gameplay.SVehicleMotorbikeLeanConfig",
+			"size": 52,
 			"alignment": 4,
 			"fields": [
-				{ "name": "nInputIndex", "type": "int32", "offset": 0 },
-				{ "name": "eDeviceType", "type": "SKeyHandle.EInputType", "offset": 4 },
-				{ "name": "eInputType", "type": "SKeyHandle.EInputValueType", "offset": 8 }
+				{ "name": "m_physicsLeanMultiplier", "type": "float32", "offset": 0 },
+				{ "name": "m_leanInSpeedThresholdMps", "type": "float32", "offset": 4 },
+				{ "name": "m_fullPhysicsLeanSpeedMps", "type": "float32", "offset": 8 },
+				{ "name": "m_steeringLeanGainDeg", "type": "float32", "offset": 12 },
+				{ "name": "m_driftLeanMultiplier", "type": "float32", "offset": 16 },
+				{ "name": "m_maxLeanAngleDeg", "type": "float32", "offset": 20 },
+				{ "name": "m_leanInSmoothTime", "type": "float32", "offset": 24 },
+				{ "name": "m_leanOutSmoothTime", "type": "float32", "offset": 28 },
+				{ "name": "m_steeringActivationThreshold", "type": "float32", "offset": 32 },
+				{ "name": "m_airborneReturnSmoothTime", "type": "float32", "offset": 36 },
+				{ "name": "m_landingTransitionDuration", "type": "float32", "offset": 40 },
+				{ "name": "m_centripetalFilterSmoothTime", "type": "float32", "offset": 44 },
+				{ "name": "m_leanAngVelReleaseDecayRate", "type": "float32", "offset": 48 }
 			]
 		},
 		{
@@ -12824,6 +12983,16 @@
 				{ "name": "B", "type": "uint32", "offset": 20 },
 				{ "name": "ColorInt", "type": "int32", "offset": 24 },
 				{ "name": "ColorStr", "type": "ZString", "offset": 32 }
+			]
+		},
+		{
+			"name": "SKeyHandle",
+			"size": 12,
+			"alignment": 4,
+			"fields": [
+				{ "name": "nInputIndex", "type": "int32", "offset": 0 },
+				{ "name": "eDeviceType", "type": "SKeyHandle.EInputType", "offset": 4 },
+				{ "name": "eInputType", "type": "SKeyHandle.EInputValueType", "offset": 8 }
 			]
 		},
 		{
@@ -13000,36 +13169,14 @@
 			]
 		},
 		{
-			"name": "JSONTemplate.SUIInputActionGestureConfigData",
-			"size": 8,
-			"alignment": 4,
-			"fields": [
-				{ "name": "GestureType", "type": "EEGestureType", "offset": 0 },
-				{ "name": "GestureTypeData", "type": "uint32", "offset": 4 }
-			]
-		},
-		{
-			"name": "JSONTemplate.SUIInputActionPromptData",
-			"size": 64,
+			"name": "JSONTemplate.SPhotoModeOptionListItemConfig",
+			"size": 56,
 			"alignment": 8,
 			"fields": [
-				{ "name": "ActionID", "type": "uint32", "offset": 0 },
-				{ "name": "IconID", "type": "int32", "offset": 4 },
-				{ "name": "ActionGlyph", "type": "ZString", "offset": 8 },
-				{ "name": "Platform", "type": "ZString", "offset": 24 },
-				{ "name": "GestureData", "type": "JSONTemplate.SUIInputActionGestureConfigData", "offset": 40 },
-				{ "name": "IsAxisInverted", "type": "bool", "offset": 48 },
-				{ "name": "IsPressed", "type": "bool", "offset": 49 },
-				{ "name": "KeyHandle", "type": "SKeyHandle", "offset": 52 }
-			]
-		},
-		{
-			"name": "JSONTemplate.SUIInputActionCombinationData",
-			"size": 32,
-			"alignment": 8,
-			"fields": [
-				{ "name": "Prompts", "type": "TArray<JSONTemplate.SUIInputActionPromptData>", "offset": 0 },
-				{ "name": "Method", "type": "ECombinationMethod", "offset": 24 }
+				{ "name": "ListItemEntity", "type": "ZEntityRef", "offset": 0 },
+				{ "name": "Value", "type": "int32", "offset": 16 },
+				{ "name": "Text", "type": "ZString", "offset": 24 },
+				{ "name": "Icon", "type": "ZString", "offset": 40 }
 			]
 		},
 		{
@@ -13045,6 +13192,15 @@
 			]
 		},
 		{
+			"name": "JSONTemplate.SUIInputActionGestureConfigData",
+			"size": 8,
+			"alignment": 4,
+			"fields": [
+				{ "name": "GestureType", "type": "EEGestureType", "offset": 0 },
+				{ "name": "GestureTypeData", "type": "uint32", "offset": 4 }
+			]
+		},
+		{
 			"name": "JSONTemplate.SArrayTestDataItem",
 			"size": 32,
 			"alignment": 8,
@@ -13052,6 +13208,21 @@
 				{ "name": "Id", "type": "int32", "offset": 0 },
 				{ "name": "Name", "type": "ZString", "offset": 8 },
 				{ "name": "Count", "type": "int32", "offset": 24 }
+			]
+		},
+		{
+			"name": "JSONTemplate.SUIInputActionPromptData",
+			"size": 64,
+			"alignment": 8,
+			"fields": [
+				{ "name": "ActionID", "type": "uint32", "offset": 0 },
+				{ "name": "IconID", "type": "int32", "offset": 4 },
+				{ "name": "ActionGlyph", "type": "ZString", "offset": 8 },
+				{ "name": "Platform", "type": "ZString", "offset": 24 },
+				{ "name": "GestureData", "type": "JSONTemplate.SUIInputActionGestureConfigData", "offset": 40 },
+				{ "name": "IsAxisInverted", "type": "bool", "offset": 48 },
+				{ "name": "IsPressed", "type": "bool", "offset": 49 },
+				{ "name": "KeyHandle", "type": "SKeyHandle", "offset": 52 }
 			]
 		},
 		{
@@ -13198,6 +13369,15 @@
 			]
 		},
 		{
+			"name": "JSONTemplate.SUIInputActionCombinationData",
+			"size": 32,
+			"alignment": 8,
+			"fields": [
+				{ "name": "Prompts", "type": "TArray<JSONTemplate.SUIInputActionPromptData>", "offset": 0 },
+				{ "name": "Method", "type": "ECombinationMethod", "offset": 24 }
+			]
+		},
+		{
 			"name": "JSONTemplate.SUIInputActionData",
 			"size": 120,
 			"alignment": 8,
@@ -13209,7 +13389,8 @@
 				{ "name": "ActionLabel", "type": "ZString", "offset": 80 },
 				{ "name": "ActionAltIcon", "type": "ZString", "offset": 96 },
 				{ "name": "IsEnabled", "type": "bool", "offset": 112 },
-				{ "name": "IsPressed", "type": "bool", "offset": 113 },
+				{ "name": "ArePromptsClickable", "type": "bool", "offset": 113 },
+				{ "name": "IsPressed", "type": "bool", "offset": 114 },
 				{ "name": "PressedAnalog", "type": "float32", "offset": 116 }
 			]
 		},
@@ -13286,6 +13467,19 @@
 			]
 		},
 		{
+			"name": "JSONTemplate.SPhotoModeOptionConfig",
+			"size": 72,
+			"alignment": 8,
+			"fields": [
+				{ "name": "Id", "type": "ZString", "offset": 8 },
+				{ "name": "IsLocked", "type": "bool", "offset": 24 },
+				{ "name": "IsEnabled", "type": "bool", "offset": 25 },
+				{ "name": "IsValid", "type": "bool", "offset": 26 },
+				{ "name": "Title", "type": "ZString", "offset": 32 },
+				{ "name": "SubOptions", "type": "TArray<ZEntityRef>", "offset": 48 }
+			]
+		},
+		{
 			"name": "JSONTemplate.SPlayerFirearmAmmoPickup",
 			"size": 8,
 			"alignment": 4,
@@ -13313,9 +13507,10 @@
 				{ "name": "Score", "type": "int32", "offset": 4 },
 				{ "name": "Percentile", "type": "int32", "offset": 8 },
 				{ "name": "ProfileId", "type": "ZGuid", "offset": 16 },
-				{ "name": "Time", "type": "int32", "offset": 32 },
-				{ "name": "Precision", "type": "int32", "offset": 36 },
-				{ "name": "Flair", "type": "int32", "offset": 40 }
+				{ "name": "GameTime", "type": "float32", "offset": 32 },
+				{ "name": "Time", "type": "int32", "offset": 36 },
+				{ "name": "Precision", "type": "int32", "offset": 40 },
+				{ "name": "Flair", "type": "int32", "offset": 44 }
 			]
 		},
 		{
@@ -13424,20 +13619,22 @@
 		},
 		{
 			"name": "JSONTemplate.SCampaignData",
-			"size": 96,
+			"size": 104,
 			"alignment": 8,
 			"fields": [
 				{ "name": "ID", "type": "ZString", "offset": 0 },
-				{ "name": "Title", "type": "ZString", "offset": 16 },
-				{ "name": "Image", "type": "ZString", "offset": 32 },
-				{ "name": "Missions", "type": "TArray<ZString>", "offset": 48 },
-				{ "name": "FistCheckpointName", "type": "ZString", "offset": 72 },
-				{ "name": "IsAnyMissionUnlocked", "type": "bool", "offset": 88 }
+				{ "name": "CampaignID", "type": "uint32", "offset": 16 },
+				{ "name": "Title", "type": "ZString", "offset": 24 },
+				{ "name": "Image", "type": "ZString", "offset": 40 },
+				{ "name": "Missions", "type": "TArray<ZString>", "offset": 56 },
+				{ "name": "FistCheckpointName", "type": "ZString", "offset": 80 },
+				{ "name": "IsAnyMissionUnlocked", "type": "bool", "offset": 96 },
+				{ "name": "IsCampaignCompleted", "type": "bool", "offset": 97 }
 			]
 		},
 		{
 			"name": "JSONTemplate.SCampaignMissionData",
-			"size": 240,
+			"size": 256,
 			"alignment": 8,
 			"fields": [
 				{ "name": "ID", "type": "ZString", "offset": 0 },
@@ -13449,13 +13646,14 @@
 				{ "name": "HighResImage", "type": "ZString", "offset": 96 },
 				{ "name": "PortraitImage", "type": "ZString", "offset": 112 },
 				{ "name": "LandscapeImage", "type": "ZString", "offset": 128 },
-				{ "name": "Video", "type": "ZString", "offset": 144 },
-				{ "name": "CheckpointIds", "type": "TArray<ZString>", "offset": 160 },
-				{ "name": "CodeName", "type": "ZString", "offset": 184 },
-				{ "name": "NeededRootResources", "type": "TArray<ZString>", "offset": 200 },
-				{ "name": "IsUnlocked", "type": "bool", "offset": 224 },
-				{ "name": "Progress", "type": "int32", "offset": 228 },
-				{ "name": "IsInterludeMission", "type": "bool", "offset": 232 }
+				{ "name": "HeroImage", "type": "ZString", "offset": 144 },
+				{ "name": "Video", "type": "ZString", "offset": 160 },
+				{ "name": "CheckpointIds", "type": "TArray<ZString>", "offset": 176 },
+				{ "name": "CodeName", "type": "ZString", "offset": 200 },
+				{ "name": "NeededRootResources", "type": "TArray<ZString>", "offset": 216 },
+				{ "name": "IsUnlocked", "type": "bool", "offset": 240 },
+				{ "name": "Progress", "type": "int32", "offset": 244 },
+				{ "name": "IsInterludeMission", "type": "bool", "offset": 248 }
 			]
 		},
 		{
@@ -13800,11 +13998,12 @@
 		},
 		{
 			"name": "JSONTemplate.SKntIOIAccountStatusData",
-			"size": 24,
+			"size": 40,
 			"alignment": 8,
 			"fields": [
 				{ "name": "LinkState", "type": "EKntIoiAccountLinkState", "offset": 0 },
-				{ "name": "LinkedEmail", "type": "ZString", "offset": 8 }
+				{ "name": "LinkedEmail", "type": "ZString", "offset": 8 },
+				{ "name": "BaseUrl", "type": "ZString", "offset": 24 }
 			]
 		},
 		{
@@ -13938,7 +14137,7 @@
 		},
 		{
 			"name": "JSONTemplate.SOnlineMissionData",
-			"size": 352,
+			"size": 368,
 			"alignment": 8,
 			"fields": [
 				{ "name": "MissionId", "type": "ZGuid", "offset": 0 },
@@ -13954,15 +14153,17 @@
 				{ "name": "Objectives", "type": "TArray<ZString>", "offset": 152 },
 				{ "name": "Requirements", "type": "TArray<ZString>", "offset": 176 },
 				{ "name": "RequiredCheckpoint", "type": "ZString", "offset": 200 },
-				{ "name": "GameChangers", "type": "TArray<JSONTemplate.SGameChangerData>", "offset": 216 },
-				{ "name": "Rewards", "type": "JSONTemplate.SOnlineCompletionRewards", "offset": 240 },
-				{ "name": "Tags", "type": "TArray<ZString>", "offset": 272 },
-				{ "name": "ParentMissionId", "type": "ZGuid", "offset": 296 },
-				{ "name": "Children", "type": "TArray<ZGuid>", "offset": 312 },
-				{ "name": "TierCount", "type": "int32", "offset": 336 },
-				{ "name": "CurrentTier", "type": "int32", "offset": 340 },
-				{ "name": "Completed", "type": "bool", "offset": 344 },
-				{ "name": "CompletionTime", "type": "float32", "offset": 348 }
+				{ "name": "ShowGameTime", "type": "bool", "offset": 216 },
+				{ "name": "GameChangers", "type": "TArray<JSONTemplate.SGameChangerData>", "offset": 224 },
+				{ "name": "Rewards", "type": "JSONTemplate.SOnlineCompletionRewards", "offset": 248 },
+				{ "name": "Tags", "type": "TArray<ZString>", "offset": 280 },
+				{ "name": "ParentMissionId", "type": "ZGuid", "offset": 304 },
+				{ "name": "Children", "type": "TArray<ZGuid>", "offset": 320 },
+				{ "name": "TierCount", "type": "int32", "offset": 344 },
+				{ "name": "CurrentTier", "type": "int32", "offset": 348 },
+				{ "name": "Completed", "type": "bool", "offset": 352 },
+				{ "name": "CompletionTime", "type": "float32", "offset": 356 },
+				{ "name": "BestCompletionTime", "type": "float32", "offset": 360 }
 			]
 		},
 		{
@@ -14000,7 +14201,39 @@
 				{ "name": "CategoryId", "type": "ZString", "offset": 112 },
 				{ "name": "CategoryTitle", "type": "ZString", "offset": 128 },
 				{ "name": "Locked", "type": "bool", "offset": 144 },
-				{ "name": "IsEquipped", "type": "bool", "offset": 145 }
+				{ "name": "IsEquippedInCampaign", "type": "bool", "offset": 145 },
+				{ "name": "IsEquippedInTacSim", "type": "bool", "offset": 146 }
+			]
+		},
+		{
+			"name": "JSONTemplate.SPhotoModeConfig",
+			"size": 32,
+			"alignment": 8,
+			"fields": [
+				{ "name": "AreCameraControlsEnabled", "type": "bool", "offset": 0 },
+				{ "name": "IsRestrictedModeActive", "type": "bool", "offset": 1 },
+				{ "name": "Tabs", "type": "TArray<ZEntityRef>", "offset": 8 }
+			]
+		},
+		{
+			"name": "JSONTemplate.SPhotoModeOptionListActionItemConfig",
+			"size": 144,
+			"alignment": 8,
+			"fields": [
+				{ "name": "ActionData", "type": "JSONTemplate.SUIInputActionData", "offset": 0 },
+				{ "name": "PriorityDeviceForAction", "type": "SKeyHandle.EInputType", "offset": 120 },
+				{ "name": "Description", "type": "ZString", "offset": 128 }
+			]
+		},
+		{
+			"name": "JSONTemplate.SPhotoModeTabData",
+			"size": 64,
+			"alignment": 8,
+			"fields": [
+				{ "name": "TabIcon", "type": "ZString", "offset": 0 },
+				{ "name": "TabName", "type": "ZString", "offset": 16 },
+				{ "name": "IsTabEnabled", "type": "bool", "offset": 32 },
+				{ "name": "Options", "type": "TArray<ZEntityRef>", "offset": 40 }
 			]
 		},
 		{
@@ -14651,11 +14884,12 @@
 		},
 		{
 			"name": "SMissionContext",
-			"size": 32,
+			"size": 48,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_missionId", "type": "ZString", "offset": 0 },
-				{ "name": "m_missionType", "type": "ZString", "offset": 16 }
+				{ "name": "m_missionType", "type": "ZString", "offset": 16 },
+				{ "name": "m_difficulty", "type": "ZString", "offset": 32 }
 			]
 		},
 		{
@@ -14668,24 +14902,26 @@
 		},
 		{
 			"name": "SPlayerIdentityContext",
-			"size": 48,
+			"size": 56,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_playerId", "type": "ZGuid", "offset": 0 },
 				{ "name": "m_playerPlatformId", "type": "ZString", "offset": 16 },
-				{ "name": "m_playerSessionId", "type": "ZString", "offset": 32 }
+				{ "name": "m_playerSessionId", "type": "ZString", "offset": 32 },
+				{ "name": "m_isDemo", "type": "bool", "offset": 48 },
+				{ "name": "m_ioiAccountLinked", "type": "bool", "offset": 49 }
 			]
 		},
 		{
 			"name": "SAccelerateFailedMetricsContext",
-			"size": 208,
+			"size": 232,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 }
 			]
 		},
 		{
@@ -14776,14 +15012,14 @@
 		},
 		{
 			"name": "SAgilityFailedMetricsContext",
-			"size": 208,
+			"size": 232,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 }
 			]
 		},
 		{
@@ -15073,15 +15309,15 @@
 		},
 		{
 			"name": "SCameraOverrideMetricsContext",
-			"size": 224,
+			"size": 248,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 },
-				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 208 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 }
 			]
 		},
 		{
@@ -15108,14 +15344,14 @@
 		},
 		{
 			"name": "SCarCrashMetricsContext",
-			"size": 208,
+			"size": 232,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 }
 			]
 		},
 		{
@@ -15192,16 +15428,16 @@
 		},
 		{
 			"name": "SCheckpointReachedMetricsContext",
-			"size": 352,
+			"size": 376,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 },
-				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 208 },
-				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 296 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 232 },
+				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 320 }
 			]
 		},
 		{
@@ -15215,14 +15451,14 @@
 		},
 		{
 			"name": "SCinematicSkippedMetricsContext",
-			"size": 208,
+			"size": 232,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 }
 			]
 		},
 		{
@@ -15251,24 +15487,25 @@
 				{ "name": "m_attacksBlockedByNpc", "type": "uint32", "offset": 36 },
 				{ "name": "m_attacksParried", "type": "uint32", "offset": 40 },
 				{ "name": "m_attacksSidestepped", "type": "uint32", "offset": 44 },
-				{ "name": "m_attacksMissed", "type": "uint32", "offset": 48 },
-				{ "name": "m_finishers", "type": "uint32", "offset": 52 },
-				{ "name": "m_nPCKilled", "type": "uint32", "offset": 56 },
-				{ "name": "m_quickDraws", "type": "uint32", "offset": 60 },
-				{ "name": "m_lowestHealth", "type": "float32", "offset": 64 },
+				{ "name": "m_sidesteppedFailed", "type": "uint32", "offset": 48 },
+				{ "name": "m_attacksMissed", "type": "uint32", "offset": 52 },
+				{ "name": "m_finishers", "type": "uint32", "offset": 56 },
+				{ "name": "m_nPCKilled", "type": "uint32", "offset": 60 },
+				{ "name": "m_quickDraws", "type": "uint32", "offset": 64 },
+				{ "name": "m_lowestHealth", "type": "float32", "offset": 68 },
 				{ "name": "m_triggerCondition", "type": "ZString", "offset": 72 }
 			]
 		},
 		{
 			"name": "SCloseCombatStatsMetricsContext",
-			"size": 208,
+			"size": 232,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 }
 			]
 		},
 		{
@@ -15302,13 +15539,13 @@
 		},
 		{
 			"name": "SCollectibleGotMetricsContext",
-			"size": 192,
+			"size": 216,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 }
 			]
 		},
 		{
@@ -15616,6 +15853,29 @@
 			]
 		},
 		{
+			"name": "SDashToCover",
+			"size": 12,
+			"alignment": 4,
+			"fields": [
+				{ "name": "m_playerLocation", "type": "SVector3", "offset": 0 }
+			]
+		},
+		{
+			"name": "SDashToCoverMetricsContext",
+			"size": 392,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
+				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 },
+				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 248 },
+				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 336 }
+			]
+		},
+		{
 			"name": "SDecalSpawnSaveData",
 			"size": 128,
 			"alignment": 16,
@@ -15742,14 +16002,14 @@
 		},
 		{
 			"name": "SEavesdropMetricsContext",
-			"size": 208,
+			"size": 232,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 }
 			]
 		},
 		{
@@ -16000,10 +16260,10 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "Name", "type": "ZString", "offset": 0 },
-				{ "name": "ContractsDatastoreRid", "type": "ZString", "offset": 16 },
-				{ "name": "UnlockablesDatastoreRid", "type": "ZString", "offset": 32 },
-				{ "name": "BlobsDatastoreRid", "type": "ZString", "offset": 48 },
-				{ "name": "ActivityDatastoreRid", "type": "ZString", "offset": 64 }
+				{ "name": "ContractsDatastoreRid", "type": "ZResourceID", "offset": 16 },
+				{ "name": "UnlockablesDatastoreRid", "type": "ZResourceID", "offset": 32 },
+				{ "name": "BlobsDatastoreRid", "type": "ZResourceID", "offset": 48 },
+				{ "name": "ActivityDatastoreRid", "type": "ZResourceID", "offset": 64 }
 			]
 		},
 		{
@@ -16081,14 +16341,14 @@
 		},
 		{
 			"name": "SEscortedOutMetricsContext",
-			"size": 208,
+			"size": 232,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 }
 			]
 		},
 		{
@@ -16284,6 +16544,27 @@
 			]
 		},
 		{
+			"name": "SFirstPartyStoreOpen",
+			"size": 64,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_entitlements", "type": "TArray<ZString>", "offset": 0 },
+				{ "name": "m_isDemo", "type": "bool", "offset": 24 },
+				{ "name": "m_target", "type": "ZString", "offset": 32 },
+				{ "name": "m_location", "type": "ZString", "offset": 48 }
+			]
+		},
+		{
+			"name": "SFirstPartyStoreOpenMetricsContext",
+			"size": 168,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
+				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 }
+			]
+		},
+		{
 			"name": "SFloat2x2",
 			"size": 16,
 			"alignment": 4,
@@ -16471,17 +16752,17 @@
 		},
 		{
 			"name": "SGadgetStatsMetricsContext",
-			"size": 368,
+			"size": 392,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 },
-				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 208 },
-				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 224 },
-				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 312 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 },
+				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 248 },
+				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 336 }
 			]
 		},
 		{
@@ -16594,7 +16875,8 @@
 				{ "name": "m_locale", "type": "SLocaleConfig", "offset": 48 },
 				{ "name": "m_system", "type": "SSystemConfiguration", "offset": 96 },
 				{ "name": "m_hardwareSpecs", "type": "ZString", "offset": 128 },
-				{ "name": "m_isDisc", "type": "bool", "offset": 144 }
+				{ "name": "m_isDisc", "type": "bool", "offset": 144 },
+				{ "name": "m_isDemo", "type": "bool", "offset": 145 }
 			]
 		},
 		{
@@ -16618,14 +16900,14 @@
 		},
 		{
 			"name": "SGameStateChangeMetricsContext",
-			"size": 208,
+			"size": 232,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 }
 			]
 		},
 		{
@@ -17235,15 +17517,15 @@
 		},
 		{
 			"name": "SItemThrownMetricsContext",
-			"size": 224,
+			"size": 248,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 },
-				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 208 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 }
 			]
 		},
 		{
@@ -17260,15 +17542,15 @@
 		},
 		{
 			"name": "SJournalOpenMetricsContext",
-			"size": 224,
+			"size": 248,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 },
-				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 208 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 }
 			]
 		},
 		{
@@ -17345,11 +17627,12 @@
 		},
 		{
 			"name": "SKntCommonProgression",
-			"size": 16,
+			"size": 24,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_completed", "type": "bool", "offset": 0 },
-				{ "name": "m_completionTime", "type": "ZTime", "offset": 8 }
+				{ "name": "m_completionTime", "type": "ZTime", "offset": 8 },
+				{ "name": "m_gameTime", "type": "float64", "offset": 16 }
 			]
 		},
 		{
@@ -17428,7 +17711,7 @@
 		},
 		{
 			"name": "SKntGameplay",
-			"size": 136,
+			"size": 144,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_checkpoint", "type": "ZString", "offset": 0 },
@@ -17437,7 +17720,8 @@
 				{ "name": "m_rewards", "type": "SKntCompletionRewards", "offset": 48 },
 				{ "name": "m_requirementTags", "type": "ZString", "offset": 80 },
 				{ "name": "m_requiredCheckpoint", "type": "ZString", "offset": 96 },
-				{ "name": "m_entitlements", "type": "TArray<ZString>", "offset": 112 }
+				{ "name": "m_entitlements", "type": "TArray<ZString>", "offset": 112 },
+				{ "name": "m_hasCheckpointTimes", "type": "bool", "offset": 136 }
 			]
 		},
 		{
@@ -17509,25 +17793,26 @@
 		},
 		{
 			"name": "SKntLeaderboardRank",
-			"size": 40,
+			"size": 48,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_rank", "type": "int32", "offset": 0 },
 				{ "name": "m_score", "type": "int32", "offset": 4 },
 				{ "name": "m_profileId", "type": "ZGuid", "offset": 8 },
 				{ "name": "m_percentileIndex", "type": "int32", "offset": 24 },
-				{ "name": "m_scoreDetails", "type": "SKntScoreDetails", "offset": 28 }
+				{ "name": "m_scoreDetails", "type": "SKntScoreDetails", "offset": 28 },
+				{ "name": "m_gameTime", "type": "float64", "offset": 40 }
 			]
 		},
 		{
 			"name": "SKntLeaderboardPage",
-			"size": 96,
+			"size": 104,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_entries", "type": "TArray<SKntLeaderboardRank>", "offset": 0 },
 				{ "name": "m_currentPlayer", "type": "SKntLeaderboardRank", "offset": 24 },
-				{ "name": "m_hasMore", "type": "bool", "offset": 64 },
-				{ "name": "m_percentileSpread", "type": "TArray<float32>", "offset": 72 }
+				{ "name": "m_hasMore", "type": "bool", "offset": 72 },
+				{ "name": "m_percentileSpread", "type": "TArray<float32>", "offset": 80 }
 			]
 		},
 		{
@@ -17541,7 +17826,7 @@
 		},
 		{
 			"name": "SKntUi",
-			"size": 160,
+			"size": 168,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_title", "type": "ZString", "offset": 0 },
@@ -17552,7 +17837,8 @@
 				{ "name": "m_goal", "type": "ZString", "offset": 80 },
 				{ "name": "m_objectives", "type": "TArray<ZString>", "offset": 96 },
 				{ "name": "m_requirements", "type": "TArray<ZString>", "offset": 120 },
-				{ "name": "m_shortDescription", "type": "ZString", "offset": 144 }
+				{ "name": "m_shortDescription", "type": "ZString", "offset": 144 },
+				{ "name": "m_showGameTime", "type": "bool", "offset": 160 }
 			]
 		},
 		{
@@ -17574,26 +17860,27 @@
 		},
 		{
 			"name": "SKntMission",
-			"size": 400,
+			"size": 416,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_id", "type": "ZGuid", "offset": 0 },
 				{ "name": "m_gameplay", "type": "SKntGameplay", "offset": 16 },
-				{ "name": "m_ui", "type": "SKntUi", "offset": 152 },
-				{ "name": "m_ugc", "type": "SKntUgc", "offset": 312 },
-				{ "name": "m_group", "type": null, "offset": 336 }
+				{ "name": "m_ui", "type": "SKntUi", "offset": 160 },
+				{ "name": "m_ugc", "type": "SKntUgc", "offset": 328 },
+				{ "name": "m_group", "type": null, "offset": 352 }
 			]
 		},
 		{
 			"name": "SKntMissionProgression",
-			"size": 88,
+			"size": 128,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_id", "type": "ZGuid", "offset": 0 },
 				{ "name": "m_profileId", "type": "ZGuid", "offset": 16 },
 				{ "name": "m_missionId", "type": "ZGuid", "offset": 32 },
 				{ "name": "m_common", "type": "SKntCommonProgression", "offset": 48 },
-				{ "name": "m_group", "type": null, "offset": 64 }
+				{ "name": "m_group", "type": null, "offset": 72 },
+				{ "name": "m_race", "type": null, "offset": 96 }
 			]
 		},
 		{
@@ -17617,7 +17904,7 @@
 		},
 		{
 			"name": "SKntStaticMissionContext",
-			"size": 400,
+			"size": 416,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_mission", "type": "SKntMission", "offset": 0 }
@@ -17625,11 +17912,11 @@
 		},
 		{
 			"name": "SKntMissionContext",
-			"size": 664,
+			"size": 680,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_static", "type": "SKntStaticMissionContext", "offset": 0 },
-				{ "name": "m_dynamic", "type": null, "offset": 400 }
+				{ "name": "m_dynamic", "type": null, "offset": 416 }
 			]
 		},
 		{
@@ -17650,6 +17937,14 @@
 			]
 		},
 		{
+			"name": "SKntRaceProgression",
+			"size": 24,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_checkpointTimes", "type": "TArray<float32>", "offset": 0 }
+			]
+		},
+		{
 			"name": "SKntScoreDetailsDiff",
 			"size": 12,
 			"alignment": 4,
@@ -17657,6 +17952,14 @@
 				{ "name": "m_time", "type": "int32", "offset": 0 },
 				{ "name": "m_precision", "type": "int32", "offset": 4 },
 				{ "name": "m_flair", "type": "int32", "offset": 8 }
+			]
+		},
+		{
+			"name": "SKntSessionDetails",
+			"size": 24,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_checkpointTimes", "type": "TArray<float32>", "offset": 0 }
 			]
 		},
 		{
@@ -17688,7 +17991,7 @@
 				{ "name": "m_anyChallengesCompleted", "type": "bool", "offset": 48 },
 				{ "name": "m_missionId", "type": "ZGuid", "offset": 56 },
 				{ "name": "m_totalRewards", "type": "SKntCompletionRewards", "offset": 72 },
-				{ "name": "m_completionTime", "type": "float64", "offset": 104 },
+				{ "name": "m_gameTime", "type": "float64", "offset": 104 },
 				{ "name": "m_sessionProgression", "type": "SKntSessionProgression", "offset": 112 },
 				{ "name": "m_stopReason", "type": "EKntSessionStopReason", "offset": 136 },
 				{ "name": "m_missionType", "type": "EKntMissionType", "offset": 140 },
@@ -17748,7 +18051,7 @@
 		},
 		{
 			"name": "SLeaderboardPageResult",
-			"size": 128,
+			"size": 136,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_missionId", "type": "ZGuid", "offset": 0 },
@@ -17894,17 +18197,17 @@
 		},
 		{
 			"name": "SLowHealthEndMetricsContext",
-			"size": 368,
+			"size": 392,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 },
-				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 208 },
-				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 224 },
-				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 312 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 },
+				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 248 },
+				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 336 }
 			]
 		},
 		{
@@ -18022,14 +18325,14 @@
 		},
 		{
 			"name": "SMissionEndMetricsContext",
-			"size": 280,
+			"size": 304,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 216 }
 			]
 		},
 		{
@@ -18043,15 +18346,15 @@
 		},
 		{
 			"name": "SMissionStartMetricsContext",
-			"size": 336,
+			"size": 360,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 192 },
-				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 280 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 216 },
+				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 304 }
 			]
 		},
 		{
@@ -18529,15 +18832,15 @@
 		},
 		{
 			"name": "SNPCInteractionMetricsContext",
-			"size": 224,
+			"size": 248,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 },
-				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 208 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 }
 			]
 		},
 		{
@@ -18555,17 +18858,17 @@
 		},
 		{
 			"name": "SNPCKilledMetricsContext",
-			"size": 368,
+			"size": 392,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 },
-				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 208 },
-				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 224 },
-				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 312 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 },
+				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 248 },
+				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 336 }
 			]
 		},
 		{
@@ -18648,13 +18951,13 @@
 		},
 		{
 			"name": "SOpportunityCompletedMetricsContext",
-			"size": 192,
+			"size": 216,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 }
 			]
 		},
 		{
@@ -18837,6 +19140,37 @@
 			]
 		},
 		{
+			"name": "SPhotoModeChangedSetting",
+			"size": 32,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_name", "type": "ZString", "offset": 0 },
+				{ "name": "m_value", "type": "ZString", "offset": 16 }
+			]
+		},
+		{
+			"name": "SPhotoModeExit",
+			"size": 40,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_playerLocation", "type": "SVector3", "offset": 0 },
+				{ "name": "m_changedSettings", "type": "TArray<SPhotoModeChangedSetting>", "offset": 16 }
+			]
+		},
+		{
+			"name": "SPhotoModeExitMetricsContext",
+			"size": 248,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
+				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 }
+			]
+		},
+		{
 			"name": "SPhysicsSaveData",
 			"size": 3,
 			"alignment": 1,
@@ -18905,17 +19239,17 @@
 		},
 		{
 			"name": "SPlayerKilledMetricsContext",
-			"size": 368,
+			"size": 392,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 },
-				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 208 },
-				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 224 },
-				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 312 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 },
+				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 248 },
+				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 336 }
 			]
 		},
 		{
@@ -18937,7 +19271,7 @@
 		},
 		{
 			"name": "SPlayerSettingsChangedMetricsContext",
-			"size": 120,
+			"size": 128,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
@@ -18955,14 +19289,14 @@
 		},
 		{
 			"name": "SPlayerSpottedMetricsContext",
-			"size": 208,
+			"size": 232,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 }
 			]
 		},
 		{
@@ -19084,17 +19418,17 @@
 		},
 		{
 			"name": "SReinforcementsCalledMetricsContext",
-			"size": 368,
+			"size": 392,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 },
-				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 208 },
-				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 224 },
-				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 312 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 },
+				{ "name": "m_situationContext", "type": "SSituationContext", "offset": 232 },
+				{ "name": "m_playerLoadoutContext", "type": "SPlayerLoadoutContext", "offset": 248 },
+				{ "name": "m_playerResourcesContext", "type": "SPlayerResourcesContext", "offset": 336 }
 			]
 		},
 		{
@@ -19455,12 +19789,12 @@
 		},
 		{
 			"name": "STacSimStoreItemDetailsViewedMetricsContext",
-			"size": 160,
+			"size": 168,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 }
 			]
 		},
 		{
@@ -19773,12 +20107,12 @@
 		},
 		{
 			"name": "STrophyGotMetricsContext",
-			"size": 160,
+			"size": 168,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 }
 			]
 		},
 		{
@@ -19966,25 +20300,26 @@
 		},
 		{
 			"name": "SUISelectableGadgetData",
-			"size": 168,
+			"size": 160,
 			"alignment": 8,
 			"fields": [
 				{ "name": "name", "type": "ZString", "offset": 0 },
 				{ "name": "type", "type": "ZString", "offset": 16 },
-				{ "name": "ammoCount", "type": "float32", "offset": 32 },
-				{ "name": "ammoMax", "type": "float32", "offset": 36 },
-				{ "name": "activationCost", "type": "float32", "offset": 40 },
-				{ "name": "resourceType", "type": "uint32", "offset": 44 },
-				{ "name": "isRecharging", "type": "bool", "offset": 48 },
-				{ "name": "rechargingProgress", "type": "float32", "offset": 52 },
-				{ "name": "isEnabled", "type": "bool", "offset": 56 },
-				{ "name": "gadgetDisabledFlags", "type": "TArray<Gameplay.EGadgetDisabledFlag>", "offset": 64 },
-				{ "name": "promptData", "type": "ZHUDDataproviderButtonPromptBaseWidget.SPromptData", "offset": 88 },
-				{ "name": "cooldownDuration", "type": "float32", "offset": 152 },
-				{ "name": "cooldownRemainingTime", "type": "float32", "offset": 156 },
-				{ "name": "isInCooldown", "type": "bool", "offset": 160 },
-				{ "name": "isPrimaryGadgetForSelectedTarget", "type": "bool", "offset": 161 },
-				{ "name": "gadgetActionDigital", "type": "bool", "offset": 162 }
+				{ "name": "gadgetDisabledFlags", "type": "TArray<Gameplay.EGadgetDisabledFlag>", "offset": 32 },
+				{ "name": "promptData", "type": "ZHUDDataproviderButtonPromptBaseWidget.SPromptData", "offset": 56 },
+				{ "name": "ammoCount", "type": "float32", "offset": 120 },
+				{ "name": "ammoMax", "type": "float32", "offset": 124 },
+				{ "name": "activationCost", "type": "float32", "offset": 128 },
+				{ "name": "rechargingProgress", "type": "float32", "offset": 132 },
+				{ "name": "cooldownDuration", "type": "float32", "offset": 136 },
+				{ "name": "cooldownRemainingTime", "type": "float32", "offset": 140 },
+				{ "name": "resourceType", "type": "uint32", "offset": 144 },
+				{ "name": "disabledFlagsValue", "type": "uint32", "offset": 148 },
+				{ "name": "isRecharging", "type": "bool", "offset": 152 },
+				{ "name": "isEnabled", "type": "bool", "offset": 153 },
+				{ "name": "isInCooldown", "type": "bool", "offset": 154 },
+				{ "name": "isPrimaryGadgetForSelectedTarget", "type": "bool", "offset": 155 },
+				{ "name": "gadgetActionDigital", "type": "bool", "offset": 156 }
 			]
 		},
 		{
@@ -20030,12 +20365,12 @@
 		},
 		{
 			"name": "SUnlockableGotMetricsContext",
-			"size": 160,
+			"size": 168,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 }
 			]
 		},
 		{
@@ -20259,6 +20594,16 @@
 			]
 		},
 		{
+			"name": "SVirtualCameraBehaviorBoxConstraintData",
+			"size": 48,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_center", "type": "float4", "offset": 0 },
+				{ "name": "m_orientation", "type": "SQuaternion", "offset": 16 },
+				{ "name": "m_halfExtents", "type": "float4", "offset": 32 }
+			]
+		},
+		{
 			"name": "SVirtualCameraBehaviorCollisionData",
 			"size": 64,
 			"alignment": 16,
@@ -20284,6 +20629,23 @@
 				{ "name": "m_followSettings", "type": null, "offset": 32 },
 				{ "name": "m_movementMultiplier", "type": "float32", "offset": 36 },
 				{ "name": "m_previousTargetTransform", "type": "SQV", "offset": 48 }
+			]
+		},
+		{
+			"name": "SVirtualCameraBehaviorFreeMovementCollisionData",
+			"size": 80,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_resetTransform", "type": "SQV", "offset": 0 },
+				{ "name": "m_safePosition", "type": "float4", "offset": 32 },
+				{ "name": "m_behaviorID", "type": "uint32", "offset": 48 },
+				{ "name": "m_sphereRadius", "type": "float32", "offset": 52 },
+				{ "name": "m_skinWidth", "type": "float32", "offset": 56 },
+				{ "name": "m_maxSlideIterations", "type": "uint32", "offset": 60 },
+				{ "name": "m_collisionChannel", "type": "EObjectCollisionChannel", "offset": 64 },
+				{ "name": "m_blockingChannels", "type": null, "offset": 68 },
+				{ "name": "m_enableInitialCollisionCheck", "type": "bool", "offset": 70 },
+				{ "name": "m_reset", "type": "bool", "offset": 71 }
 			]
 		},
 		{
@@ -20368,6 +20730,19 @@
 			]
 		},
 		{
+			"name": "SVirtualCameraBehaviorRoomConstraintData",
+			"size": 80,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_initialPosition", "type": "float4", "offset": 0 },
+				{ "name": "m_validRooms", "type": "TArray", "offset": 16 },
+				{ "name": "m_testedRooms", "type": "TArray", "offset": 40 },
+				{ "name": "m_initialRoomId", "type": null, "offset": 64 },
+				{ "name": "m_currentRoomId", "type": null, "offset": 66 },
+				{ "name": "m_constrainOnInvalidRooms", "type": "bool", "offset": 68 }
+			]
+		},
+		{
 			"name": "SVirtualCameraBehaviorShakableData",
 			"size": 96,
 			"alignment": 16,
@@ -20377,6 +20752,15 @@
 				{ "name": "m_referencePosition", "type": null, "offset": 16 },
 				{ "name": "m_unconditionalShakes", "type": "TArray<uint32>", "offset": 48 },
 				{ "name": "m_shakesToIgnore", "type": "TArray<uint32>", "offset": 72 }
+			]
+		},
+		{
+			"name": "SVirtualCameraBehaviorSphereConstraintData",
+			"size": 32,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_center", "type": "float4", "offset": 0 },
+				{ "name": "m_radius", "type": "float32", "offset": 16 }
 			]
 		},
 		{
@@ -20540,14 +20924,14 @@
 		},
 		{
 			"name": "SWeaponStatsMetricsContext",
-			"size": 208,
+			"size": 232,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_applicationSessionContext", "type": "SApplicationSessionContext", "offset": 0 },
 				{ "name": "m_playerIdentityContext", "type": "SPlayerIdentityContext", "offset": 72 },
-				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 120 },
-				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 160 },
-				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 192 }
+				{ "name": "m_playerProgressContext", "type": "SPlayerProgressContext", "offset": 128 },
+				{ "name": "m_missionContext", "type": "SMissionContext", "offset": 168 },
+				{ "name": "m_checkpointContext", "type": "SCheckpointContext", "offset": 216 }
 			]
 		},
 		{
@@ -21685,6 +22069,15 @@
 			"fields": [
 				{ "name": "m_sourceName", "type": "ZString", "offset": 0 },
 				{ "name": "m_directionType", "type": "ESubtitleSourceDirectionType", "offset": 16 }
+			]
+		},
+		{
+			"name": "ZUIAnimationCurve",
+			"size": 88,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_name", "type": "ZString", "offset": 0 },
+				{ "name": "m_curve", "type": "ZCurve", "offset": 16 }
 			]
 		},
 		{

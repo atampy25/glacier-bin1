@@ -31,7 +31,10 @@ struct Field {
 	name: String,
 
 	#[serde(rename = "type")]
-	ty: Option<String>
+	ty: Option<String>,
+
+	#[serde(rename = "padEnd")]
+	pad_end: Option<usize>
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -69,7 +72,9 @@ struct RustField {
 	rust_name: String,
 
 	#[serde(rename = "type")]
-	ty: String
+	ty: String,
+
+	pad_end: Option<usize>
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -206,7 +211,8 @@ fn process_types(types: Types) -> RustTypes {
 									}
 
 									process_type_name(&f.ty?)
-								}
+								},
+								pad_end: f.pad_end
 							})
 						})
 						.collect::<Option<_>>()?
@@ -390,7 +396,8 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 		for RustField {
 			rust_name,
 			field_name,
-			ty
+			ty,
+			pad_end
 		} in fields.iter()
 		{
 			let field = cls
@@ -427,6 +434,10 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 					r#"#[bin1(as = "WithoutFixupVec::<{}>")] "#,
 					ty.replace("NoFixup", "").replace("Vec<", "").replace('>', "")
 				));
+			}
+
+			if let Some(pad_end) = pad_end {
+				field.annotation(format!(r#"#[bin1(pad_end = {pad_end})]"#));
 			}
 		}
 

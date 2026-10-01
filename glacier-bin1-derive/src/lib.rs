@@ -161,7 +161,7 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 				quote! {
 					eprintln!("0x{:6X}: writing field {}::{}", ser.position(), stringify!(#name), stringify!(#field));
 				}
-			},
+			}
 			_ => quote! {}
 		};
 
@@ -199,7 +199,7 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 				quote! {
 					eprintln!("0x{:6X}: resolving field {}::{}", ser.position(), stringify!(#name), stringify!(#field));
 				}
-			},
+			}
 			_ => quote! {}
 		};
 
@@ -224,7 +224,7 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 			quote! {
 				eprintln!("0x{:6X}: writing {}", ser.position(), stringify!(#name));
 			}
-		},
+		}
 		_ => quote! {}
 	};
 
@@ -233,7 +233,7 @@ pub fn derive_serialize(input: TokenStream) -> TokenStream {
 			quote! {
 				eprintln!("0x{:6X}: resolving {}", ser.position(), stringify!(#name));
 			}
-		},
+		}
 		_ => quote! {}
 	};
 
@@ -417,7 +417,7 @@ pub fn derive_deserialize(input: TokenStream) -> TokenStream {
 				quote! {
 					eprintln!("0x{:6X}: reading field {}::{}", de.position(), stringify!(#name), stringify!(#field));
 				}
-			},
+			}
 			_ => quote! {}
 		};
 
@@ -456,7 +456,7 @@ pub fn derive_deserialize(input: TokenStream) -> TokenStream {
 			quote! {
 				eprintln!("0x{:6X}: deserializing {}", de.position(), stringify!(#name));
 			}
-		},
+		}
 		_ => quote! {}
 	};
 
