@@ -129,6 +129,7 @@
 	"ZSharedSensorDef.SVisibilitySetting",
 	"ZStorylineBaseEntity.SCLStorylineFeatureEntry",
 	"ZSubtitleManagerEntity.SGlobalSourceDirectionOverride",
+	"ZUIAnimationCurve",
 	"ZUILensDistortionManagerEntity.SLensDistortionSetup",
 	"ZUILensDistortionManagerEntity.SPlayerVelocityDistortion",
 	"ZUILensDistortionManagerEntity.SPlayerVelocitySetup"
