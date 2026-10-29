@@ -98,7 +98,9 @@ fn process_types(types: Types) -> RustTypes {
 						.into_iter()
 						.map(|f| {
 							Some(RustField {
-								rust_name: {
+								rust_name: if f.name == "m_nNeighbourBits" {
+									"n_neighbour_bits".into()
+								} else {
 									let field_name = &f.name;
 
 									let field_name = if (field_name.len() != 2 && !regex_is_match!(r"m\d+", field_name))
@@ -110,7 +112,8 @@ fn process_types(types: Types) -> RustTypes {
 									};
 
 									let field_name = if let Some((start, rest)) = field_name.split_once('_')
-										&& start.len() == 1 && !["x", "y", "z"].contains(&start)
+										&& start.len() == 1
+										&& !["x", "y", "z"].contains(&start)
 										&& !rest.is_empty()
 									{
 										rest.into()
@@ -119,7 +122,8 @@ fn process_types(types: Types) -> RustTypes {
 									};
 
 									let field_name = if let Some((start, rest)) = field_name.split_once('_')
-										&& start.len() == 1 && !["x", "y", "z"].contains(&start)
+										&& start.len() == 1
+										&& !["x", "y", "z"].contains(&start)
 										&& !rest.is_empty()
 									{
 										rest.into()

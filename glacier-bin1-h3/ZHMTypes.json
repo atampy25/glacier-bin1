@@ -230,10 +230,13 @@
 				{ "name": "AIET_ArrestReason_DragBody", "value": 223 },
 				{ "name": "AIET_ArrestReason_KnockDown", "value": 224 },
 				{ "name": "AIET_ARREST_REASONS_END", "value": 225 },
-				{ "name": "AIET_END_NORMAL_EVENTS", "value": 226 },
-				{ "name": "AIET_DEBUG_EVENTS_START", "value": 227 },
-				{ "name": "AIET_Debug_ThrowFlashbangHere", "value": 228 },
-				{ "name": "AIET_DEBUG_EVENTS_END", "value": 229 }
+				{ "name": "AIET_SeenPlayerWeapon", "value": 226 },
+				{ "name": "AIET_SeenPlayerPour", "value": 227 },
+				{ "name": "AIET_UnseenIllegalAction", "value": 228 },
+				{ "name": "AIET_END_NORMAL_EVENTS", "value": 229 },
+				{ "name": "AIET_DEBUG_EVENTS_START", "value": 230 },
+				{ "name": "AIET_Debug_ThrowFlashbangHere", "value": 231 },
+				{ "name": "AIET_DEBUG_EVENTS_END", "value": 232 }
 			]
 		},
 		{
@@ -2572,7 +2575,8 @@
 				{ "name": "eAVV_ET_GREENTINI", "value": 591 },
 				{ "name": "eAVV_ET_GREENTINY", "value": 592 },
 				{ "name": "eAVV_ET_SHAMROCK", "value": 593 },
-				{ "name": "eAVV_ET_GROG", "value": 594 }
+				{ "name": "eAVV_BRAYDEN", "value": 594 },
+				{ "name": "eAVV_CHASE", "value": 595 }
 			]
 		},
 		{
@@ -5724,7 +5728,8 @@
 				{ "name": "HAPT_Clip", "value": 1 },
 				{ "name": "HAPT_Slide", "value": 2 },
 				{ "name": "HAPT_WeaponAimAndSupport", "value": 3 },
-				{ "name": "HAPT_WeaponSupport", "value": 4 }
+				{ "name": "HAPT_WeaponSupport", "value": 4 },
+				{ "name": "HAPT_GrenadePin", "value": 5 }
 			]
 		},
 		{
@@ -7459,7 +7464,9 @@
 				{ "name": "EREQUIREMENT_H3_ET_POMADA", "value": 72 },
 				{ "name": "EREQUIREMENT_H3_ET_PENICILLIN_ITEMS", "value": 73 },
 				{ "name": "EREQUIREMENT_H3_ET_GREENTINI", "value": 74 },
-				{ "name": "EREQUIREMENT_H3_VANITY_EG04", "value": 75 }
+				{ "name": "EREQUIREMENT_H3_VANITY_EG04", "value": 75 },
+				{ "name": "EREQUIREMENT_H3_ET_SHAMROCK", "value": 76 },
+				{ "name": "EREQUIREMENT_H3_VANITY_EG05", "value": 77 }
 			]
 		},
 		{
@@ -8676,7 +8683,9 @@
 				{ "name": "TriggerL", "value": 15 },
 				{ "name": "TriggerR", "value": 16 },
 				{ "name": "BumperL", "value": 17 },
-				{ "name": "BumperR", "value": 18 }
+				{ "name": "BumperR", "value": 18 },
+				{ "name": "Dpad", "value": 19 },
+				{ "name": "DpadPressDirections", "value": 20 }
 			]
 		},
 		{
@@ -10161,6 +10170,15 @@
 				{ "name": "COMMAND_PREVIEW_PLAY", "value": 13 },
 				{ "name": "COMMAND_PREVIEW_LOOPED", "value": 14 },
 				{ "name": "COMMAND_CLEAR", "value": 15 }
+			]
+		},
+		{
+			"name": "ZHM5BodyContainer.EBCBloodSeepMode",
+			"size": 4,
+			"values": [
+				{ "name": "BC_SEEP_AUTO", "value": 0 },
+				{ "name": "BC_SEEP_UNDERNEATH", "value": 1 },
+				{ "name": "BC_SEEP_AT_FRONT_EDGE", "value": 2 }
 			]
 		},
 		{
@@ -11852,6 +11870,14 @@
 			]
 		},
 		{
+			"name": "ZEvergreenMenuEntryPromptScrollAction.EScrollAxis",
+			"size": 1,
+			"values": [
+				{ "name": "X_AXIS", "value": 0 },
+				{ "name": "Y_AXIS", "value": 1 }
+			]
+		},
+		{
 			"name": "ZEvergreenMenuGlobalCondition.EQuery",
 			"size": 4,
 			"values": [
@@ -13517,12 +13543,14 @@
 				{ "name": "eHPReason_MovementContext", "value": 1 },
 				{ "name": "eHPReason_ItemHandlingInProcess", "value": 2 },
 				{ "name": "eHPReason_SniperMode", "value": 4 },
-				{ "name": "eHPReason_NUM", "value": 8 },
+				{ "name": "eHPReason_CrippleBox", "value": 8 },
+				{ "name": "eHPReason_NUM", "value": 9 },
 				{ "name": "eHPReason_LevelDesign", "value": 16 },
 				{ "name": "eHPReason_PlayerInput", "value": 32 },
 				{ "name": "eHPReason_InstinctBlendIn", "value": 64 },
 				{ "name": "eHPReason_FocusInteraction", "value": 128 },
-				{ "name": "eHPReason_VrDropInteraction", "value": 256 }
+				{ "name": "eHPReason_VrDropInteraction", "value": 256 },
+				{ "name": "eHPReason_VrFiberwireKill", "value": 512 }
 			]
 		},
 		{
@@ -22513,12 +22541,13 @@
 		},
 		{
 			"name": "STimerManagerSaveData",
-			"size": 168,
+			"size": 216,
 			"alignment": 8,
 			"fields": [
 				{ "name": "m_TimersData", "type": "STimerEntitiesSaveData", "offset": 0 },
 				{ "name": "m_RandomTimersData", "type": "SRandomTimerEntitiesSaveData", "offset": 48 },
-				{ "name": "m_GameTimersData", "type": "SGameTimersSaveData", "offset": 96 }
+				{ "name": "m_GameTimersData", "type": "SGameTimersSaveData", "offset": 96 },
+				{ "name": "m_BasicTimersData", "type": "STimerEntitiesSaveData", "offset": 168 }
 			]
 		},
 		{
@@ -22870,7 +22899,7 @@
 				{ "name": "m_aSVONodes", "type": "TArray<SVoxelSVONode>", "offset": 16 },
 				{ "name": "m_aLeaves", "type": "TArray<SVoxelSVONavLeaf>", "offset": 40 },
 				{ "name": "m_aNeighbourBits", "type": "TArray<uint64>", "offset": 64 },
-				{ "name": "m_n_nNeighbourBits", "type": "uint32", "offset": 88 },
+				{ "name": "m_nNeighbourBits", "type": "uint32", "offset": 88 },
 				{ "name": "m_nNeighbourCount", "type": "uint32", "offset": 92 },
 				{ "name": "m_aNeighbourClearance", "type": "TArray<uint16>", "offset": 96 }
 			]
