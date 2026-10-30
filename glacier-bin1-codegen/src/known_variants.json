@@ -133,5 +133,6 @@
 	"ZUILensDistortionManagerEntity.SLensDistortionSetup",
 	"ZUILensDistortionManagerEntity.SPlayerVelocityDistortion",
 	"ZUILensDistortionManagerEntity.SPlayerVelocitySetup",
-	"ZVirtualCameraBehaviorPlayerInputEntity.SMapping"
+	"ZVirtualCameraBehaviorPlayerInputEntity.SMapping",
+	"SVoxelSpaceBakeOptions"
 ]
