@@ -496,7 +496,6 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 		let item = scope
 			.new_enum(&enum_name)
 			.derive("Facet")
-			.derive("Debug")
 			.derive("Clone")
 			.derive("Copy")
 			.derive("PartialEq")
@@ -543,6 +542,40 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 		};
 
 		item.repr(size_ty);
+
+		// Alternate formatting uses original variant name rather than rustified name
+		scope
+			.new_impl(&enum_name)
+			.impl_trait("Debug")
+			.new_fn("fmt")
+			.arg_ref_self()
+			.arg("f", "&mut std::fmt::Formatter<'_>")
+			.ret("std::fmt::Result")
+			.push_block({
+				let mut block = Block::new("if !f.alternate()");
+				block.push_block({
+					let mut block = Block::new("match self");
+					if values.is_empty() {
+						block.line(format!("{enum_name}::Value => f.write_str(\"Value\")"));
+					} else {
+						for RustVariant { rust_name, .. } in &values {
+							block.line(format!("{enum_name}::{rust_name} => f.write_str(\"{rust_name}\"),"));
+						}
+					}
+					block
+				});
+				block.after("else");
+				block
+			})
+			.push_block({
+				let mut block = Block::new("");
+				if values.is_empty() {
+					block.line("f.write_str(\"Value\")");
+				} else {
+					block.line("f.write_str(<&'static str>::from(*self))");
+				}
+				block
+			});
 
 		scope
 			.new_impl(&enum_name)
