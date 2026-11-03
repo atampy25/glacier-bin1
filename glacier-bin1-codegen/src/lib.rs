@@ -328,7 +328,7 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 	enums.append(&mut custom_enums);
 
 	// Special cased
-	for ty in ["ZResourceID", "ZRuntimeResourceID", "SEntityTemplateProperty"] {
+	for ty in ["ZRuntimeResourceID", "SEntityTemplateProperty"] {
 		if let Some(pos) = structs.iter().position(|x| x.type_id == ty) {
 			structs.remove(pos);
 		}
