@@ -91,8 +91,7 @@ fn process_types(types: Types) -> RustTypes {
 			.filter_map(|s| {
 				Some(RustStruct {
 					rust_name: s.name.replace('.', "_"),
-					type_id: s.name,
-					alignment: s.alignment,
+					alignment: if s.name == "ZGuid" { Some(4) } else { s.alignment },
 					fields: s
 						.fields
 						.into_iter()
@@ -140,9 +139,14 @@ fn process_types(types: Types) -> RustTypes {
 
 									field_name.replace("_i_d", "_id")
 								},
-								field_name: f.name,
-								ty: {
-									fn process_type_name(type_name: &str) -> String {
+								ty: if s.name == "SVoxelSpaceDataHeader" && f.name == "aReserved" {
+									"[u8; 8]".into()
+								} else {
+									fn process_type_name(
+										struct_name: &str,
+										field_name: &str,
+										type_name: &str
+									) -> String {
 										match type_name {
 											"int8" => "i8".into(),
 											"int16" => "i16".into(),
@@ -163,10 +167,15 @@ fn process_types(types: Types) -> RustTypes {
 
 											"ZResourcePtr" => "TResourcePtr".into(),
 											x if x.starts_with("TResourcePtr<") => "TResourcePtr".into(),
+											"TResourcePtr" if struct_name == "ZEditorEnumValue" => {
+												"ZRuntimeResourceID".into()
+											}
 
 											x if x.starts_with("TArray<") => format!(
 												"Vec<{}>",
 												process_type_name(
+													struct_name,
+													field_name,
 													&x["TArray<".len()..]
 														.chars()
 														.rev()
@@ -181,6 +190,8 @@ fn process_types(types: Types) -> RustTypes {
 											x if x.starts_with("TFixedArray<") => format!(
 												"[{}; {}]",
 												process_type_name(
+													struct_name,
+													field_name,
 													regex_captures!(r"TFixedArray<(.*), *(.*)>", x).unwrap().1
 												),
 												regex_captures!(r"TFixedArray<(.*), *(.*)>", x)
@@ -192,13 +203,23 @@ fn process_types(types: Types) -> RustTypes {
 
 											x if x.starts_with("TPair<") => format!(
 												"({}, {})",
-												process_type_name(regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().1),
-												process_type_name(regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().2)
+												process_type_name(
+													struct_name,
+													field_name,
+													regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().1
+												),
+												process_type_name(
+													struct_name,
+													field_name,
+													regex_captures!(r"TPair<(.*), *(.*)>", x).unwrap().2
+												)
 											),
 
 											x if x.starts_with("ZHMPtrLen<") => format!(
 												"ZHMPtrLen<{}>",
 												process_type_name(
+													struct_name,
+													field_name,
 													&x["ZHMPtrLen<".len()..]
 														.chars()
 														.rev()
@@ -210,16 +231,31 @@ fn process_types(types: Types) -> RustTypes {
 												)
 											),
 
+											"ZRuntimeResourceID"
+												if field_name == "externalSceneRuntimeResourceIDs"
+													|| [
+														"SBlobsConfigResourceEntry",
+														"SContractConfigResourceEntry",
+														"SVideoDatabaseEntry"
+													]
+													.iter()
+													.any(|&x| x == struct_name) =>
+											{
+												"ZRuntimeResourceIDNoFixup".into()
+											}
+
 											x => x.replace('.', "_")
 										}
 									}
 
-									process_type_name(&f.ty?)
+									process_type_name(&s.name, &f.name, &f.ty?)
 								},
+								field_name: f.name,
 								pad_end: f.pad_end
 							})
 						})
-						.collect::<Option<_>>()?
+						.collect::<Option<_>>()?,
+					type_id: s.name
 				})
 			})
 			.collect(),

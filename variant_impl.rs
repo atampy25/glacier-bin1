@@ -16,7 +16,7 @@ use glacier_bin1_core::{
 	ser::{Aligned, Bin1Serialize, Bin1Serializer, SerializeError},
 	types::{
 		property::PropertyID,
-		resource::{ZResourceID, ZRuntimeResourceID},
+		resource::{ZResourceID as Runtime_ZResourceID, ZRuntimeResourceID},
 		variant::{StaticVariant, Variant, impl_variant}
 	}
 };
@@ -516,7 +516,7 @@ submit!(bool);
 submit!(());
 submit_nofacet!(EcoString);
 submit_nofacet!((EcoString, ZVariant));
-submit!(ZResourceID);
+submit!(Runtime_ZResourceID);
 submit!(ZRuntimeResourceID);
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Bin1Serialize, Bin1Deserialize, Facet)]

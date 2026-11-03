@@ -12239,7 +12239,7 @@
 		{
 			"name": "ZGuid",
 			"size": 16,
-			"alignment": 4,
+			"alignment": 8,
 			"fields": [
 				{ "name": "_a", "type": "uint32", "offset": 0 },
 				{ "name": "_b", "type": "uint16", "offset": 4 },
@@ -15212,7 +15212,7 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "Id", "type": "ZString", "offset": 0 },
-				{ "name": "BlobRid", "type": "ZRuntimeResourceIDNoFixup", "offset": 16 },
+				{ "name": "BlobRid", "type": "ZRuntimeResourceID", "offset": 16 },
 				{ "name": "Parameter", "type": "ZString", "offset": 24 },
 				{ "name": "SubIds", "type": "TArray<ZString>", "offset": 40 }
 			]
@@ -15626,7 +15626,7 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "Id", "type": "ZString", "offset": 0 },
-				{ "name": "ContractRid", "type": "ZRuntimeResourceIDNoFixup", "offset": 16 }
+				{ "name": "ContractRid", "type": "ZRuntimeResourceID", "offset": 16 }
 			]
 		},
 		{
@@ -19823,7 +19823,7 @@
 				{ "name": "sourceResourceID", "type": "ZString", "offset": 8 },
 				{ "name": "subEntities", "type": "TArray<STemplateBlueprintSubEntity>", "offset": 24 },
 				{ "name": "externalSceneTypeIndicesInResourceHeader", "type": "TArray<int32>", "offset": 48 },
-				{ "name": "externalSceneRuntimeResourceIDs", "type": "TArray<ZRuntimeResourceIDNoFixup>", "offset": 72 },
+				{ "name": "externalSceneRuntimeResourceIDs", "type": "TArray<ZRuntimeResourceID>", "offset": 72 },
 				{ "name": "pinConnections", "type": "TArray<SEntityTemplatePinConnection>", "offset": 96 },
 				{ "name": "inputPinForwardings", "type": "TArray<SEntityTemplatePinConnection>", "offset": 120 },
 				{ "name": "outputPinForwardings", "type": "TArray<SEntityTemplatePinConnection>", "offset": 144 },
@@ -19856,7 +19856,7 @@
 				{ "name": "subEntities", "type": "TArray<STemplateFactorySubEntity>", "offset": 32 },
 				{ "name": "propertyOverrides", "type": "TArray<SEntityTemplatePropertyOverride>", "offset": 56 },
 				{ "name": "externalSceneTypeIndicesInResourceHeader", "type": "TArray<int32>", "offset": 80 },
-				{ "name": "externalSceneRuntimeResourceIDs", "type": "TArray<ZRuntimeResourceIDNoFixup>", "offset": 104 }
+				{ "name": "externalSceneRuntimeResourceIDs", "type": "TArray<ZRuntimeResourceID>", "offset": 104 }
 			]
 		},
 		{
@@ -20582,7 +20582,7 @@
 			"alignment": 8,
 			"fields": [
 				{ "name": "VideoId", "type": "ZString", "offset": 0 },
-				{ "name": "RuntimeLocalizedVideoRid", "type": "ZRuntimeResourceIDNoFixup", "offset": 16 }
+				{ "name": "RuntimeLocalizedVideoRid", "type": "ZRuntimeResourceID", "offset": 16 }
 			]
 		},
 		{
@@ -20973,7 +20973,7 @@
 			"size": 12,
 			"alignment": 4,
 			"fields": [
-				{ "name": "m_EnumType", "type": "ZRuntimeResourceID", "offset": 0 },
+				{ "name": "m_EnumType", "type": "TResourcePtr", "offset": 0 },
 				{ "name": "m_nValue", "type": "uint32", "offset": 8 }
 			]
 		},
