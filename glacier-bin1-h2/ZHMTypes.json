@@ -11021,6 +11021,18 @@
 			]
 		},
 		{
+			"name": "IContractObjective.STargetCondition",
+			"size": 72,
+			"alignment": 8,
+			"fields": [
+				{ "name": "type", "type": "ZString", "offset": 0 },
+				{ "name": "repositoryId", "type": "ZRepositoryID", "offset": 16 },
+				{ "name": "hardCondition", "type": "bool", "offset": 32 },
+				{ "name": "objectiveId", "type": "ZGuid", "offset": 40 },
+				{ "name": "sKillMethod", "type": "ZString", "offset": 56 }
+			]
+		},
+		{
 			"name": "S25DProjectionSettings",
 			"size": 56,
 			"alignment": 4,
@@ -11048,6 +11060,35 @@
 			"fields": [
 				{ "name": "m_fAngleYaw", "type": "float32", "offset": 0 },
 				{ "name": "m_fAnglePitch", "type": "float32", "offset": 4 }
+			]
+		},
+		{
+			"name": "SStimuliSaveData",
+			"size": 1152,
+			"alignment": 8,
+			"fields": [
+				{ "name": "AddAgentData_BehaviorsDisabled_Pool_SaveData", "type": "AI.Private.Details.SStimulus_AddAgentData_BehaviorsDisabled_Pool_SaveData", "offset": 0 },
+				{ "name": "AddAgentData_GuardDomain_Pool_SaveData", "type": "AI.Private.Details.SStimulus_AddAgentData_GuardDomain_Pool_SaveData", "offset": 96 },
+				{ "name": "AddAgentData_GuardHeadDomain_Pool_SaveData", "type": "AI.Private.Details.SStimulus_AddAgentData_GuardHeadDomain_Pool_SaveData", "offset": 192 },
+				{ "name": "AddAgentData_HumanoidNPC_Pool_SaveData", "type": "AI.Private.Details.SStimulus_AddAgentData_HumanoidNPC_Pool_SaveData", "offset": 288 },
+				{ "name": "AddAgentData_HumanoidWorldState_Pool_SaveData", "type": "AI.Private.Details.SStimulus_AddAgentData_HumanoidWorldState_Pool_SaveData", "offset": 384 },
+				{ "name": "AddAgentData_NPC_Pool_SaveData", "type": "AI.Private.Details.SStimulus_AddAgentData_NPC_Pool_SaveData", "offset": 480 },
+				{ "name": "RemoveAgentData_BehaviorsDisabled_Pool_SaveData", "type": "AI.Private.Details.SStimulus_RemoveAgentData_BehaviorsDisabled_Pool_SaveData", "offset": 576 },
+				{ "name": "RemoveAgentData_GuardDomain_Pool_SaveData", "type": "AI.Private.Details.SStimulus_RemoveAgentData_GuardDomain_Pool_SaveData", "offset": 672 },
+				{ "name": "RemoveAgentData_GuardHeadDomain_Pool_SaveData", "type": "AI.Private.Details.SStimulus_RemoveAgentData_GuardHeadDomain_Pool_SaveData", "offset": 768 },
+				{ "name": "RemoveAgentData_HumanoidNPC_Pool_SaveData", "type": "AI.Private.Details.SStimulus_RemoveAgentData_HumanoidNPC_Pool_SaveData", "offset": 864 },
+				{ "name": "RemoveAgentData_HumanoidWorldState_Pool_SaveData", "type": "AI.Private.Details.SStimulus_RemoveAgentData_HumanoidWorldState_Pool_SaveData", "offset": 960 },
+				{ "name": "RemoveAgentData_NPC_Pool_SaveData", "type": "AI.Private.Details.SStimulus_RemoveAgentData_NPC_Pool_SaveData", "offset": 1056 }
+			]
+		},
+		{
+			"name": "SAIEnvironmentSaveData",
+			"size": 1200,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_Agent_SlotVersions", "type": "TArray<uint16>", "offset": 0 },
+				{ "name": "m_Agent_FreeSlots", "type": "TArray<uint16>", "offset": 24 },
+				{ "name": "m_StimuliSaveData", "type": "SStimuliSaveData", "offset": 48 }
 			]
 		},
 		{
@@ -11181,6 +11222,16 @@
 			]
 		},
 		{
+			"name": "SActionInfo",
+			"size": 32,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_eActionType", "type": "EActionType", "offset": 0 },
+				{ "name": "m_pOperator", "type": "TEntityRef<ZHM5BaseCharacter>", "offset": 8 },
+				{ "name": "m_Object", "type": "ZEntityRef", "offset": 24 }
+			]
+		},
+		{
 			"name": "SActionRadialArcDisplayInfo",
 			"size": 24,
 			"alignment": 8,
@@ -11277,6 +11328,39 @@
 			"fields": [
 				{ "name": "mQuaterion", "type": "SVector4", "offset": 0 },
 				{ "name": "mTranslation", "type": "SVector4", "offset": 16 }
+			]
+		},
+		{
+			"name": "SActorDamageControlSaveData",
+			"size": 96,
+			"alignment": 8,
+			"fields": [
+				{ "name": "bExplosive", "type": "bool", "offset": 0 },
+				{ "name": "bProjectile", "type": "bool", "offset": 1 },
+				{ "name": "bHeadshot", "type": "bool", "offset": 2 },
+				{ "name": "bSniperShot", "type": "bool", "offset": 3 },
+				{ "name": "bThroughWall", "type": "bool", "offset": 4 },
+				{ "name": "bKillByAccident", "type": "bool", "offset": 5 },
+				{ "name": "bWeaponSilenced", "type": "bool", "offset": 6 },
+				{ "name": "bLongRange", "type": "bool", "offset": 7 },
+				{ "name": "fTotalDamage", "type": "float32", "offset": 8 },
+				{ "name": "fPacifyDamage", "type": "float32", "offset": 12 },
+				{ "name": "nImpactBodyPart", "type": "int32", "offset": 16 },
+				{ "name": "maxDeathType", "type": "EDeathType", "offset": 20 },
+				{ "name": "maxDeathContext", "type": "EDeathContext", "offset": 24 },
+				{ "name": "rAccidentSetup", "type": "uint32", "offset": 28 },
+				{ "name": "bFirearmPacifiesTarget", "type": "bool", "offset": 32 },
+				{ "name": "bBulletCausesHitReaction", "type": "bool", "offset": 33 },
+				{ "name": "fHitsNumberTimeout", "type": "float32", "offset": 36 },
+				{ "name": "fHealthPercentTimeout", "type": "float32", "offset": 40 },
+				{ "name": "rCharacter", "type": "uint32", "offset": 44 },
+				{ "name": "rSource", "type": "uint32", "offset": 48 },
+				{ "name": "m_accuseUnconsciousOutfit", "type": "ZRepositoryID", "offset": 56 },
+				{ "name": "m_bValidAccuseUnconsciousOutfit", "type": "bool", "offset": 72 },
+				{ "name": "eDeathSpeak", "type": "EActorSoundDefs", "offset": 76 },
+				{ "name": "bDefaultDeathSound", "type": "bool", "offset": 80 },
+				{ "name": "iEvents", "type": "int32", "offset": 84 },
+				{ "name": "fAgilityElementUncosciousTime", "type": "float32", "offset": 88 }
 			]
 		},
 		{
@@ -11412,6 +11496,17 @@
 			]
 		},
 		{
+			"name": "SSharedKnowledgeSaveData",
+			"size": 128,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_rEntity", "type": "uint32", "offset": 0 },
+				{ "name": "m_OutfitId", "type": "ZRepositoryID", "offset": 8 },
+				{ "name": "m_ActualMatrix", "type": "SMatrix", "offset": 32 },
+				{ "name": "m_aEvents", "type": "TArray<SEventSaveData>", "offset": 96 }
+			]
+		},
+		{
 			"name": "SSituationGroupSaveData",
 			"size": 72,
 			"alignment": 8,
@@ -11475,6 +11570,15 @@
 			]
 		},
 		{
+			"name": "SLongTermMemorySaveData",
+			"size": 24,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_sOutfit", "type": "ZRepositoryID", "offset": 0 },
+				{ "name": "m_Memory", "type": "uint8", "offset": 16 }
+			]
+		},
+		{
 			"name": "SKnownEntitySaveData",
 			"size": 128,
 			"alignment": 16,
@@ -11530,6 +11634,66 @@
 			]
 		},
 		{
+			"name": "SActorSaveData",
+			"size": 880,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_vPosition", "type": "SVector3", "offset": 0 },
+				{ "name": "m_vQuaternion", "type": "SVector4", "offset": 12 },
+				{ "name": "m_Inventory", "type": "SActorInventorySaveData", "offset": 32 },
+				{ "name": "m_AnimSet", "type": "SActorAnimSetSaveData", "offset": 56 },
+				{ "name": "m_ThrowHandler", "type": "SActorThrowSaveData", "offset": 128 },
+				{ "name": "m_nCurrentBehaviorType", "type": "int32", "offset": 208 },
+				{ "name": "m_CurrentBehaviorState", "type": "ZVariant", "offset": 216 },
+				{ "name": "m_aCurrentBehaviorEntities", "type": "TArray<uint32>", "offset": 232 },
+				{ "name": "m_aBehaviorEntities", "type": "TArray<uint32>", "offset": 256 },
+				{ "name": "m_KnowledgeData", "type": "SKnowledgeSaveData", "offset": 280 },
+				{ "name": "m_OutfitRepositoryId", "type": "ZRepositoryID", "offset": 432 },
+				{ "name": "m_nOutfitCharset", "type": "int32", "offset": 448 },
+				{ "name": "m_nOutfitVariation", "type": "int32", "offset": 452 },
+				{ "name": "m_tSequenceEndTime", "type": "ZGameTime", "offset": 456 },
+				{ "name": "m_nState", "type": "EActorState", "offset": 464 },
+				{ "name": "m_rBodyContainerEntity", "type": "uint32", "offset": 468 },
+				{ "name": "m_nBodyContainerSlot", "type": "int32", "offset": 472 },
+				{ "name": "m_eEmotionState", "type": "EActorEmotionState", "offset": 476 },
+				{ "name": "m_rCorpseBodybagEntity", "type": "uint32", "offset": 480 },
+				{ "name": "m_rDragBodybagEntity", "type": "uint32", "offset": 484 },
+				{ "name": "m_AccidentContext", "type": "uint32", "offset": 488 },
+				{ "name": "m_ActorDamageControlData", "type": "SActorDamageControlSaveData", "offset": 496 },
+				{ "name": "m_AnimatedActorOrderData", "type": "ZVariant", "offset": 592 },
+				{ "name": "m_fStepsFraction", "type": "float32", "offset": 608 },
+				{ "name": "m_fZBeforeEnteringStairs", "type": "float32", "offset": 612 },
+				{ "name": "m_fZError", "type": "float32", "offset": 616 },
+				{ "name": "m_aDynamicTemplates", "type": "TArray<SActorDynamicTemplateSaveData>", "offset": 624 },
+				{ "name": "m_sEndOrientation", "type": "SMatrix", "offset": 656 },
+				{ "name": "m_eOverrideSensorState", "type": "EActorAIState", "offset": 720 },
+				{ "name": "m_eDeathBehavior", "type": "EDeathBehavior", "offset": 724 },
+				{ "name": "m_bumpsHistory", "type": "SEventHistorySaveData", "offset": 728 },
+				{ "name": "m_RagdollPose", "type": "SActorRagdollPoseSaveData", "offset": 752 },
+				{ "name": "m_aLongTermMemorySaveData", "type": "TArray<SLongTermMemorySaveData>", "offset": 816 },
+				{ "name": "m_AgentData", "type": "uint32", "offset": 840 },
+				{ "name": "m_KnockdownsWhileConscious", "type": "uint32", "offset": 844 },
+				{ "name": "m_SecondaryAIIconState", "type": "uint32", "offset": 848 },
+				{ "name": "m_HadValidAgent", "type": "bool", "offset": 852 },
+				{ "name": "m_bNude", "type": "bool", "offset": 853 },
+				{ "name": "m_bActiveEnforcer", "type": "bool", "offset": 854 },
+				{ "name": "m_bIsPotentialEnforcer", "type": "bool", "offset": 855 },
+				{ "name": "m_bDynamicEnforcer", "type": "bool", "offset": 856 },
+				{ "name": "m_bIsCrowdCharacter", "type": "bool", "offset": 857 },
+				{ "name": "m_bIsWoozy", "type": "bool", "offset": 858 },
+				{ "name": "m_bBlendingOrientation", "type": "bool", "offset": 859 },
+				{ "name": "m_bMakeMainWeaponUndroppable", "type": "bool", "offset": 860 },
+				{ "name": "m_bFinalizePendingSpawnGrenade", "type": "bool", "offset": 861 },
+				{ "name": "m_bWeaponIsHidden", "type": "bool", "offset": 862 },
+				{ "name": "m_bRegisteredForLT", "type": "bool", "offset": 863 },
+				{ "name": "m_bKeepOverrideSensorStateAfterBeingUnconscious", "type": "bool", "offset": 864 },
+				{ "name": "m_bWeaponReady", "type": "bool", "offset": 865 },
+				{ "name": "m_bDynamicWeaponUnholstered", "type": "bool", "offset": 866 },
+				{ "name": "m_bForceInteractionGlow", "type": "bool", "offset": 867 },
+				{ "name": "m_bIsOutfitRuined", "type": "bool", "offset": 868 }
+			]
+		},
+		{
 			"name": "SCombatMetricsSaveData",
 			"size": 56,
 			"alignment": 8,
@@ -11545,6 +11709,39 @@
 			"alignment": 4,
 			"fields": [
 				{ "name": "m_rCastActor", "type": "uint32", "offset": 0 }
+			]
+		},
+		{
+			"name": "SActorManagerSaveData",
+			"size": 1696,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_aSharedKnowledgeSaveData", "type": "TArray<SSharedKnowledgeSaveData>", "offset": 0 },
+				{ "name": "m_nCurrentHitman", "type": "int32", "offset": 24 },
+				{ "name": "m_aSituations", "type": "TArray<SSituationSaveData>", "offset": 32 },
+				{ "name": "m_AIEnvSaveData", "type": "SAIEnvironmentSaveData", "offset": 56 },
+				{ "name": "m_CombatMetricsSaveData", "type": "SCombatMetricsSaveData", "offset": 1256 },
+				{ "name": "m_aActors", "type": "TArray<uint32>", "offset": 1312 },
+				{ "name": "m_aActorData", "type": "TArray<SActorSaveData>", "offset": 1336 },
+				{ "name": "m_aActorProviders", "type": "TArray<uint32>", "offset": 1360 },
+				{ "name": "m_aActorProvidersData", "type": "TArray<SActorProviderDirectSaveData>", "offset": 1384 },
+				{ "name": "m_aActorApproachProviders", "type": "TArray<uint32>", "offset": 1408 },
+				{ "name": "m_aActorApproachProvidersData", "type": "TArray<SActorProviderApproachSaveData>", "offset": 1432 },
+				{ "name": "m_aActorIKControllers", "type": "TArray<uint32>", "offset": 1456 },
+				{ "name": "m_aActorIKControllersData", "type": "TArray<SActorIKControllerSaveData>", "offset": 1480 },
+				{ "name": "m_bDisableAIBehavior", "type": "bool", "offset": 1504 },
+				{ "name": "m_bDisableAIBehaviorLast", "type": "bool", "offset": 1505 },
+				{ "name": "m_aDisabledAIBehaviorFiringActors", "type": "TArray<uint32>", "offset": 1512 },
+				{ "name": "m_BodySensorData", "type": "ZVariant", "offset": 1536 },
+				{ "name": "m_CuriousEventServiceData", "type": "ZVariant", "offset": 1552 },
+				{ "name": "m_GetHelpServiceData", "type": "ZVariant", "offset": 1568 },
+				{ "name": "m_DynamicEnforcerServiceData", "type": "ZVariant", "offset": 1584 },
+				{ "name": "m_AIModifierServiceData", "type": "ZVariant", "offset": 1600 },
+				{ "name": "m_LockdownManagerData", "type": "ZVariant", "offset": 1616 },
+				{ "name": "m_DangerousAreaServiceData", "type": "ZVariant", "offset": 1632 },
+				{ "name": "m_TargetTrackingServiceData", "type": "ZVariant", "offset": 1648 },
+				{ "name": "m_ManHuntServiceData", "type": "ZVariant", "offset": 1664 },
+				{ "name": "m_PerceptibleCrowd_Service_SaveData", "type": "ZVariant", "offset": 1680 }
 			]
 		},
 		{
@@ -11658,6 +11855,16 @@
 			]
 		},
 		{
+			"name": "SAgencyPickupInfo",
+			"size": 64,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_AgencyPickupId", "type": "ZRepositoryID", "offset": 0 },
+				{ "name": "m_aItemIds", "type": "TArray<ZRepositoryID>", "offset": 16 },
+				{ "name": "m_aModifierIds", "type": "TArray<ZRepositoryID>", "offset": 40 }
+			]
+		},
+		{
 			"name": "SAgitatedBystanderOrderSaveData",
 			"size": 48,
 			"alignment": 16,
@@ -11696,6 +11903,18 @@
 			]
 		},
 		{
+			"name": "SAnimatedActorActOrderRuntimeSaveData",
+			"size": 112,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_bOverrideExistingAct", "type": "bool", "offset": 0 },
+				{ "name": "m_nForcedAnimationNode", "type": "uint32", "offset": 4 },
+				{ "name": "m_rChildNetworkAct", "type": "TEntityRef<ZChildNetworkActEntity>", "offset": 8 },
+				{ "name": "m_rListener", "type": "TEntityRef<IActListener>", "offset": 24 },
+				{ "name": "m_AnimationOrigin", "type": "SMatrix", "offset": 48 }
+			]
+		},
+		{
 			"name": "SAnimatedActorActOrderSaveData",
 			"size": 44,
 			"alignment": 4,
@@ -11730,6 +11949,24 @@
 			"fields": [
 				{ "name": "m_eOrderType", "type": "EActorAnimationOrder", "offset": 0 },
 				{ "name": "m_OrderData", "type": "ZVariant", "offset": 8 }
+			]
+		},
+		{
+			"name": "SAnimatedActorReactOrderRuntimeSaveData",
+			"size": 72,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_vFaceTarget", "type": "SVector3", "offset": 0 },
+				{ "name": "m_vLookAtTarget", "type": "SVector3", "offset": 12 },
+				{ "name": "m_rChildNetworkEntity", "type": "TEntityRef<IChildNetworkEntity>", "offset": 24 },
+				{ "name": "m_targetEmotionState", "type": "EActorEmotionState", "offset": 40 },
+				{ "name": "m_bDeadbody", "type": "bool", "offset": 44 },
+				{ "name": "m_bExplosion", "type": "bool", "offset": 45 },
+				{ "name": "m_bTrespassing", "type": "bool", "offset": 46 },
+				{ "name": "m_bDropCarriedItems", "type": "bool", "offset": 47 },
+				{ "name": "m_bFaceTargetSet", "type": "bool", "offset": 48 },
+				{ "name": "m_bLookAtTargetSet", "type": "bool", "offset": 49 },
+				{ "name": "m_sAct", "type": "ZString", "offset": 56 }
 			]
 		},
 		{
@@ -11827,6 +12064,16 @@
 			"fields": [
 				{ "name": "m_nGroupId", "type": "uint32", "offset": 0 },
 				{ "name": "m_nStateId", "type": "uint32", "offset": 4 }
+			]
+		},
+		{
+			"name": "SAudioEventData",
+			"size": 16,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_EmitterID", "type": "uint64", "offset": 0 },
+				{ "name": "m_EventID", "type": "uint32", "offset": 8 },
+				{ "name": "m_pPlayingSound", "type": null, "offset": 12 }
 			]
 		},
 		{
@@ -11983,6 +12230,7 @@
 			"size": 24,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZAimReactionBehaviorEntity", "offset": 16 }
 			]
 		},
@@ -12136,6 +12384,7 @@
 			"size": 32,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZControlledFormationMoveBehaviorEntity", "offset": 16 },
 				{ "name": "m_bRequestedCancelMove", "type": "bool", "offset": 24 }
 			]
@@ -12145,6 +12394,7 @@
 			"size": 32,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pBehaviorEntity", "type": "TEntityRef<ZConversationBehaviorEntity>", "offset": 16 }
 			]
 		},
@@ -12294,6 +12544,7 @@
 			"size": 24,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZEscortBehaviorEntity", "offset": 16 }
 			]
 		},
@@ -12310,6 +12561,7 @@
 			"size": 32,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZEscortSearchBehaviorEntity", "offset": 16 },
 				{ "name": "m_bStartBySearchingLastKnownLocation", "type": "bool", "offset": 24 }
 			]
@@ -12391,6 +12643,7 @@
 			"size": 24,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZFollowHitmanBehaviorEntity", "offset": 16 }
 			]
 		},
@@ -12463,6 +12716,7 @@
 			"size": 32,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_pEntity", "type": "ZHeroEscortBehaviorEntity", "offset": 16 },
 				{ "name": "m_bRequestedCancelMove", "type": "bool", "offset": 24 }
 			]
@@ -12570,6 +12824,7 @@
 			"fields": [
 				{ "name": "m_EscortedActor", "type": "TEntityRef<ZHM5BaseCharacter>", "offset": 8 },
 				{ "name": "m_pWaypoints", "type": "TArray<TEntityRef<ZSpatialEntity>>", "offset": 24 },
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 32 },
 				{ "name": "m_pEntity", "type": "ZLeadEscortBehaviorEntity", "offset": 40 },
 				{ "name": "m_fTurnRadius", "type": "float32", "offset": 48 },
 				{ "name": "m_fPathWidth", "type": "float32", "offset": 52 },
@@ -12581,6 +12836,7 @@
 			"size": 32,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_rBehaviorEntity", "type": "TEntityRef<ZLeadEscortBehavior2Entity>", "offset": 16 }
 			]
 		},
@@ -13141,6 +13397,7 @@
 			"size": 72,
 			"alignment": 8,
 			"fields": [
+				{ "name": "m_pActiveBehavior", "type": null, "offset": 8 },
 				{ "name": "m_bEnableReposition", "type": "bool", "offset": 16 },
 				{ "name": "m_bCrouch", "type": "bool", "offset": 17 },
 				{ "name": "m_bShooting", "type": "bool", "offset": 18 },
@@ -13530,6 +13787,18 @@
 			]
 		},
 		{
+			"name": "SBloodSplatReq",
+			"size": 1344,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_BRInputs", "type": "ZRayQueryInput", "offset": 0 },
+				{ "name": "m_BROutputs", "type": null, "offset": 480 },
+				{ "name": "m_pHandles", "type": null, "offset": 1280 },
+				{ "name": "m_HitMaterial", "type": "TResourcePtr", "offset": 1320 },
+				{ "name": "m_fBloodSplatModifier", "type": "float32", "offset": 1328 }
+			]
+		},
+		{
 			"name": "SBodyContainerSaveData",
 			"size": 16,
 			"alignment": 4,
@@ -13796,6 +14065,19 @@
 			]
 		},
 		{
+			"name": "SClothBundleSaveData",
+			"size": 64,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_vPosition", "type": "SVector3", "offset": 0 },
+				{ "name": "m_vQuaternion", "type": "SVector4", "offset": 12 },
+				{ "name": "m_OutfitID", "type": "ZRepositoryID", "offset": 32 },
+				{ "name": "m_nOutfitVariation", "type": "int32", "offset": 48 },
+				{ "name": "m_nOutfitCharset", "type": "int32", "offset": 52 },
+				{ "name": "bSpawnedByHitman", "type": "bool", "offset": 56 }
+			]
+		},
+		{
 			"name": "SClothBundleSpawnSaveData",
 			"size": 4,
 			"alignment": 4,
@@ -13851,6 +14133,27 @@
 			"fields": [
 				{ "name": "m_aEntities", "type": "TArray<uint32>", "offset": 0 },
 				{ "name": "m_aData", "type": "TArray<SCollisionControllerAspectSaveData>", "offset": 24 }
+			]
+		},
+		{
+			"name": "SCollisionInfo",
+			"size": 816,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_vColliderLinearVelocity", "type": "float4", "offset": 0 },
+				{ "name": "m_vColliderAngularVelocity", "type": "float4", "offset": 16 },
+				{ "name": "m_vListenerLinearVelocity", "type": "float4", "offset": 32 },
+				{ "name": "m_vListenerAngularVelocity", "type": "float4", "offset": 48 },
+				{ "name": "m_vContactPoint", "type": "float4", "offset": 64 },
+				{ "name": "m_vContactNormal", "type": "float4", "offset": 80 },
+				{ "name": "m_vContactForce", "type": "float4", "offset": 96 },
+				{ "name": "m_nSupportCount", "type": "uint32", "offset": 112 },
+				{ "name": "m_eCollisionPairType", "type": null, "offset": 116 },
+				{ "name": "m_eSupport", "type": null, "offset": 120 },
+				{ "name": "m_allContacts", "type": null, "offset": 128 },
+				{ "name": "m_nID", "type": "uint32", "offset": 784 },
+				{ "name": "m_pCollider", "type": null, "offset": 792 },
+				{ "name": "m_pListener", "type": null, "offset": 800 }
 			]
 		},
 		{
@@ -15252,6 +15555,27 @@
 			]
 		},
 		{
+			"name": "SInventoryItem",
+			"size": 96,
+			"alignment": 8,
+			"fields": [
+				{ "name": "sInstanceId", "type": "ZString", "offset": 0 },
+				{ "name": "sUnlockableId", "type": "ZString", "offset": 16 },
+				{ "name": "repositoryId", "type": "ZRepositoryID", "offset": 32 },
+				{ "name": "aRepositoryAssetIds", "type": "TArray<ZRepositoryID>", "offset": 48 },
+				{ "name": "aModifierIds", "type": "TArray<ZRepositoryID>", "offset": 72 }
+			]
+		},
+		{
+			"name": "SContainerItemInfo",
+			"size": 112,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_sContainerInstanceId", "type": "ZString", "offset": 0 },
+				{ "name": "m_concealedItem", "type": "SInventoryItem", "offset": 16 }
+			]
+		},
+		{
 			"name": "SContextActionSaveData",
 			"size": 3,
 			"alignment": 1,
@@ -15319,6 +15643,48 @@
 			]
 		},
 		{
+			"name": "SContractObjectiveStateMachineSaveData",
+			"size": 344,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_Id", "type": "ZGuid", "offset": 0 },
+				{ "name": "m_eCategory", "type": "IContractObjective.Category", "offset": 16 },
+				{ "name": "m_sBriefingText", "type": "ZDynamicObject", "offset": 24 },
+				{ "name": "m_sLongBriefingText", "type": "ZDynamicObject", "offset": 40 },
+				{ "name": "m_State", "type": "ZDynamicObject", "offset": 56 },
+				{ "name": "m_Definition", "type": "ZDynamicObject", "offset": 72 },
+				{ "name": "m_aTargets", "type": "ZDynamicObject", "offset": 88 },
+				{ "name": "m_bTargetsHidden", "type": "bool", "offset": 104 },
+				{ "name": "m_HUDTmpl", "type": "ZDynamicObject", "offset": 112 },
+				{ "name": "m_ActivationCondition", "type": "ZDynamicObject", "offset": 128 },
+				{ "name": "m_bActivationValue", "type": "bool", "offset": 144 },
+				{ "name": "m_bUpdateActivationOnCompleted", "type": "bool", "offset": 145 },
+				{ "name": "m_OnInactive", "type": "ZDynamicObject", "offset": 152 },
+				{ "name": "m_OnActive", "type": "ZDynamicObject", "offset": 168 },
+				{ "name": "m_aExits", "type": "ZDynamicObject", "offset": 184 },
+				{ "name": "m_timerEndTime", "type": "float64", "offset": 200 },
+				{ "name": "m_bTimerHasJustStarted", "type": "bool", "offset": 208 },
+				{ "name": "m_bTimerHasJustStopped", "type": "bool", "offset": 209 },
+				{ "name": "m_bIsActiveTimerVisible", "type": "bool", "offset": 210 },
+				{ "name": "m_bDisplayAsKill", "type": "bool", "offset": 211 },
+				{ "name": "m_bIgnoreIfInactive", "type": "bool", "offset": 212 },
+				{ "name": "m_bShowInHud", "type": "bool", "offset": 213 },
+				{ "name": "m_bCombinedDisplayInHud", "type": "bool", "offset": 214 },
+				{ "name": "m_bIsCounterVisibleInTile", "type": "bool", "offset": 215 },
+				{ "name": "m_aTargetConditions", "type": "TArray<IContractObjective.STargetCondition>", "offset": 216 },
+				{ "name": "m_sImage", "type": "ZString", "offset": 240 },
+				{ "name": "m_sObjectiveType", "type": "ZString", "offset": 256 },
+				{ "name": "m_sBriefingName", "type": "ZString", "offset": 272 },
+				{ "name": "m_nObjectivesCounterCount", "type": "int32", "offset": 288 },
+				{ "name": "m_sObjectivesCounterHeader", "type": "ZString", "offset": 296 },
+				{ "name": "m_nObjectivesCounterDeactivate", "type": "int32", "offset": 312 },
+				{ "name": "m_dObjectivesCounterExtraData", "type": "ZDynamicObject", "offset": 320 },
+				{ "name": "m_bTimerHasStopped", "type": "bool", "offset": 336 },
+				{ "name": "m_bForceShowOnLoadingScreen", "type": "bool", "offset": 337 },
+				{ "name": "m_nObjectivesCounterType", "type": "uint8", "offset": 338 }
+			]
+		},
+		{
 			"name": "SConversationEntry",
 			"size": 8,
 			"alignment": 4,
@@ -15371,6 +15737,19 @@
 				{ "name": "typeName", "type": "TypeID", "offset": 0 },
 				{ "name": "typeFlags", "type": "uint32", "offset": 8 },
 				{ "name": "subsets", "type": "TArray<SCppEntitySubsetInfo>", "offset": 16 }
+			]
+		},
+		{
+			"name": "SCrowdAIEventDataPinArg",
+			"size": 64,
+			"alignment": 16,
+			"fields": [
+				{ "name": "pReactionEntity", "type": "ZEntityRef", "offset": 0 },
+				{ "name": "eAttacher", "type": "TEntityRef<ICrowdCoreProvider>", "offset": 8 },
+				{ "name": "fRadius", "type": "float32", "offset": 24 },
+				{ "name": "fTime", "type": "float32", "offset": 28 },
+				{ "name": "vPos", "type": "float4", "offset": 32 },
+				{ "name": "eState", "type": null, "offset": 48 }
 			]
 		},
 		{
@@ -15930,6 +16309,15 @@
 			"fields": [
 				{ "name": "m_aEntities", "type": "TArray<uint32>", "offset": 0 },
 				{ "name": "m_aStates", "type": "TArray<SDramaSituationSaveData>", "offset": 24 }
+			]
+		},
+		{
+			"name": "SDynObstaclePinArg",
+			"size": 24,
+			"alignment": 8,
+			"fields": [
+				{ "name": "eCoreProvider", "type": "TEntityRef<ICrowdCoreProvider>", "offset": 0 },
+				{ "name": "nUserData", "type": "uint32", "offset": 16 }
 			]
 		},
 		{
@@ -16902,6 +17290,17 @@
 			]
 		},
 		{
+			"name": "SGameStatsWeapon",
+			"size": 32,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_WeaponRepositoryID", "type": "ZRepositoryID", "offset": 0 },
+				{ "name": "m_eItemWeapon", "type": "eItemType", "offset": 16 },
+				{ "name": "m_eSpecialSituation", "type": "EWeaponSpecialSituation", "offset": 20 },
+				{ "name": "m_eAmmoType", "type": "eAmmoType", "offset": 24 }
+			]
+		},
+		{
 			"name": "STimerEntityCommandSaveData",
 			"size": 12,
 			"alignment": 4,
@@ -17269,6 +17668,30 @@
 			]
 		},
 		{
+			"name": "SHeroEscortSituation2SaveData",
+			"size": 144,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_bActivated", "type": "bool", "offset": 0 },
+				{ "name": "m_bMayEscort", "type": "bool", "offset": 1 },
+				{ "name": "m_bTargetDead", "type": "bool", "offset": 2 },
+				{ "name": "m_bTargetInRange", "type": "bool", "offset": 3 },
+				{ "name": "m_bAllEscortsAreDead", "type": "bool", "offset": 4 },
+				{ "name": "m_vLastPosition", "type": "SVector3", "offset": 8 },
+				{ "name": "m_bTargetIsMoving", "type": "bool", "offset": 20 },
+				{ "name": "m_eTargetState", "type": "ZHeroEscortSituation2Entity.ETargetState", "offset": 24 },
+				{ "name": "m_eTargetEmotionState", "type": "EActorEmotionState", "offset": 28 },
+				{ "name": "m_eTargetActState", "type": "ZActBehaviorEntity.EState", "offset": 32 },
+				{ "name": "m_fTargetNotMovingTime", "type": "float32", "offset": 36 },
+				{ "name": "m_fTargetAgitationCooldownTimer", "type": "float32", "offset": 40 },
+				{ "name": "m_aAddedActors", "type": "TArray<SHeroEscortSituation2Actors>", "offset": 48 },
+				{ "name": "m_aStates", "type": "TArray<SHeroEscortSituation2ActorStateSaveData>", "offset": 72 },
+				{ "name": "m_aEscortActs", "type": "TArray<uint32>", "offset": 96 },
+				{ "name": "m_fTimeSinceLossOfSight", "type": "float32", "offset": 120 },
+				{ "name": "m_RecordedHitmanOutfit", "type": "ZRepositoryID", "offset": 128 }
+			]
+		},
+		{
 			"name": "SHeroEscortSituationActorStateSaveData",
 			"size": 28,
 			"alignment": 4,
@@ -17288,6 +17711,30 @@
 			"alignment": 4,
 			"fields": [
 				{ "name": "m_rActor", "type": "uint32", "offset": 0 }
+			]
+		},
+		{
+			"name": "SHeroEscortSituationSaveData",
+			"size": 144,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_bActivated", "type": "bool", "offset": 0 },
+				{ "name": "m_bMayEscort", "type": "bool", "offset": 1 },
+				{ "name": "m_bTargetDead", "type": "bool", "offset": 2 },
+				{ "name": "m_bTargetInRange", "type": "bool", "offset": 3 },
+				{ "name": "m_bAllEscortsAreDead", "type": "bool", "offset": 4 },
+				{ "name": "m_vLastPosition", "type": "SVector3", "offset": 8 },
+				{ "name": "m_bTargetIsMoving", "type": "bool", "offset": 20 },
+				{ "name": "m_eTargetState", "type": "ZHeroEscortSituationEntity.ETargetState", "offset": 24 },
+				{ "name": "m_eTargetEmotionState", "type": "EActorEmotionState", "offset": 28 },
+				{ "name": "m_eTargetActState", "type": "ZActBehaviorEntity.EState", "offset": 32 },
+				{ "name": "m_fTargetNotMovingTime", "type": "float32", "offset": 36 },
+				{ "name": "m_fTargetAgitationCooldownTimer", "type": "float32", "offset": 40 },
+				{ "name": "m_aAddedActors", "type": "TArray<SHeroEscortSituationActors>", "offset": 48 },
+				{ "name": "m_aStates", "type": "TArray<SHeroEscortSituationActorStateSaveData>", "offset": 72 },
+				{ "name": "m_aEscortActs", "type": "TArray<uint32>", "offset": 96 },
+				{ "name": "m_fTimeSinceLossOfSight", "type": "float32", "offset": 120 },
+				{ "name": "m_RecordedHitmanOutfit", "type": "ZRepositoryID", "offset": 128 }
 			]
 		},
 		{
@@ -17334,6 +17781,49 @@
 				{ "name": "m_activeHint", "type": "SHintEntrySaveData", "offset": 0 },
 				{ "name": "m_aQueue", "type": "TArray<SHintEntrySaveData>", "offset": 16 },
 				{ "name": "m_bIsRunning", "type": "bool", "offset": 40 }
+			]
+		},
+		{
+			"name": "SHitInfo",
+			"size": 512,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_rHitEntity", "type": "ZEntityRef", "offset": 0 },
+				{ "name": "m_rWeapon", "type": "ZEntityRef", "offset": 8 },
+				{ "name": "m_rWeaponOwner", "type": "ZEntityRef", "offset": 16 },
+				{ "name": "m_rSetpiece", "type": "ZEntityRef", "offset": 24 },
+				{ "name": "m_rHitCrowdActor", "type": "ZEntityRef", "offset": 32 },
+				{ "name": "m_pHitBody", "type": null, "offset": 40 },
+				{ "name": "m_nHitBoneIndex", "type": "uint32", "offset": 48 },
+				{ "name": "m_fBloodSplatModifier", "type": "float32", "offset": 52 },
+				{ "name": "m_vHitPos", "type": "float4", "offset": 64 },
+				{ "name": "m_vHitNormal", "type": "float4", "offset": 80 },
+				{ "name": "m_vHitDistance", "type": "float4", "offset": 96 },
+				{ "name": "m_Explosion", "type": null, "offset": 112 },
+				{ "name": "m_coliIn", "type": null, "offset": 208 },
+				{ "name": "m_coliOut", "type": null, "offset": 240 },
+				{ "name": "m_Projectile", "type": null, "offset": 352 },
+				{ "name": "m_nDeathType", "type": "uint32", "offset": 496 },
+				{ "name": "m_nDeathContext", "type": "uint32", "offset": 500 }
+			]
+		},
+		{
+			"name": "SHitmanSaveData",
+			"size": 120,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_OutfitID", "type": "ZRepositoryID", "offset": 0 },
+				{ "name": "m_nOutfitCharset", "type": "int32", "offset": 16 },
+				{ "name": "m_nOutfitVariation", "type": "int32", "offset": 20 },
+				{ "name": "m_fHealth", "type": "float32", "offset": 24 },
+				{ "name": "m_vPosition", "type": "SVector3", "offset": 28 },
+				{ "name": "m_vRotation", "type": "SVector4", "offset": 40 },
+				{ "name": "m_Inventory", "type": "ZVariant", "offset": 56 },
+				{ "name": "m_Camera", "type": "ZVariant", "offset": 72 },
+				{ "name": "m_eMovementType", "type": "EBaseMovementType", "offset": 88 },
+				{ "name": "m_MovementData", "type": "ZVariant", "offset": 96 },
+				{ "name": "m_bLethalAgilityElementUsed", "type": "bool", "offset": 112 },
+				{ "name": "m_bIsChangingClothes", "type": "bool", "offset": 113 }
 			]
 		},
 		{
@@ -17487,6 +17977,43 @@
 			]
 		},
 		{
+			"name": "SInventoryControllerSaveData",
+			"size": 184,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_aItems", "type": "TArray<SInventoryControllerItemSaveData>", "offset": 0 },
+				{ "name": "m_nEquippedItemIndex", "type": "uint32", "offset": 24 },
+				{ "name": "m_nMostRecentItemIndex", "type": "uint32", "offset": 28 },
+				{ "name": "m_StoredSlot", "type": "SStoredSlotSaveData", "offset": 32 },
+				{ "name": "m_aSlots", "type": "TArray<SInventoryControllerSlotSaveData>", "offset": 40 },
+				{ "name": "m_aPendingPickupItems", "type": "TArray<uint32>", "offset": 64 },
+				{ "name": "m_nAmmoCountGun", "type": "uint32", "offset": 88 },
+				{ "name": "m_nAmmoCountRevolver", "type": "uint32", "offset": 92 },
+				{ "name": "m_nAmmoCountSMG", "type": "uint32", "offset": 96 },
+				{ "name": "m_nAmmoCountRifle", "type": "uint32", "offset": 100 },
+				{ "name": "m_nAmmoCountShotgun", "type": "uint32", "offset": 104 },
+				{ "name": "m_nAmmoCountSniper", "type": "uint32", "offset": 108 },
+				{ "name": "m_nAmmoCountMG", "type": "uint32", "offset": 112 },
+				{ "name": "m_nAmmoCountRPG", "type": "uint32", "offset": 116 },
+				{ "name": "m_nAmmoCountFake", "type": "uint32", "offset": 120 },
+				{ "name": "m_nAmmoCountLightPistol", "type": "uint32", "offset": 124 },
+				{ "name": "m_nAmmoCountDartTranquilizer", "type": "uint32", "offset": 128 },
+				{ "name": "m_nAmmoCountAmmoShotgunBeanbag", "type": "uint32", "offset": 132 },
+				{ "name": "m_aAmmoIds", "type": "TArray<ZRepositoryID>", "offset": 136 },
+				{ "name": "m_aAmmoCounts", "type": "TArray<uint32>", "offset": 160 }
+			]
+		},
+		{
+			"name": "SInventoryInfo",
+			"size": 144,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_aPockets", "type": "TArray<SInventoryItem>", "offset": 0 },
+				{ "name": "m_CarriedItem", "type": "SInventoryItem", "offset": 24 },
+				{ "name": "m_aContainerItems", "type": "TArray<SContainerItemInfo>", "offset": 120 }
+			]
+		},
+		{
 			"name": "SInventoryMovementConfig",
 			"size": 48,
 			"alignment": 16,
@@ -17500,6 +18027,57 @@
 				{ "name": "m_bCancelIfInventoryInUse", "type": "bool", "offset": 18 },
 				{ "name": "m_bSafeDrop", "type": "bool", "offset": 19 },
 				{ "name": "m_vSafeDropPosition", "type": "float4", "offset": 32 }
+			]
+		},
+		{
+			"name": "SInventoryUISlot",
+			"size": 272,
+			"alignment": 8,
+			"fields": [
+				{ "name": "icon", "type": "ZRuntimeResourceID", "offset": 0 },
+				{ "name": "containedIcon", "type": "ZRuntimeResourceID", "offset": 8 },
+				{ "name": "label", "type": "ZString", "offset": 16 },
+				{ "name": "containedLabel", "type": "ZString", "offset": 32 },
+				{ "name": "description", "type": "ZString", "offset": 48 },
+				{ "name": "perks", "type": "TArray<ZString>", "offset": 64 },
+				{ "name": "silencer", "type": "bool", "offset": 88 },
+				{ "name": "count", "type": "int32", "offset": 92 },
+				{ "name": "ammo", "type": "int32", "offset": 96 },
+				{ "name": "id", "type": "ZRepositoryID", "offset": 104 },
+				{ "name": "weaponCategory", "type": "ZString", "offset": 120 },
+				{ "name": "nAmmoRemaining", "type": "int32", "offset": 136 },
+				{ "name": "nAmmoTotal", "type": "int32", "offset": 140 },
+				{ "name": "nAmmoInClip", "type": "int32", "offset": 144 },
+				{ "name": "nWeaponType", "type": "int32", "offset": 148 },
+				{ "name": "nItemHUDType", "type": "int32", "offset": 152 },
+				{ "name": "itemCategory", "type": "ZString", "offset": 160 },
+				{ "name": "itemCategoryLKey", "type": "ZString", "offset": 176 },
+				{ "name": "inventoryCategoryIcon", "type": "ZString", "offset": 192 },
+				{ "name": "isDroppable", "type": "bool", "offset": 208 },
+				{ "name": "isContainer", "type": "bool", "offset": 209 },
+				{ "name": "containsItem", "type": "bool", "offset": 210 },
+				{ "name": "canUseContainer", "type": "bool", "offset": 211 },
+				{ "name": "nContainedItemHUDType", "type": "int32", "offset": 212 },
+				{ "name": "bContainedItemIllegal", "type": "bool", "offset": 216 },
+				{ "name": "bContainedItemSuspicious", "type": "bool", "offset": 217 },
+				{ "name": "bContainedItemDetectedDuringFrisk", "type": "bool", "offset": 218 },
+				{ "name": "detectedDuringFrisk", "type": "bool", "offset": 219 },
+				{ "name": "actionAndKillTypes", "type": "TArray<ZString>", "offset": 224 },
+				{ "name": "suspicious", "type": "bool", "offset": 248 },
+				{ "name": "illegal", "type": "bool", "offset": 249 },
+				{ "name": "canReload", "type": "bool", "offset": 250 },
+				{ "name": "sPoisonType", "type": "ZString", "offset": 256 }
+			]
+		},
+		{
+			"name": "SInventoryUI",
+			"size": 56,
+			"alignment": 8,
+			"fields": [
+				{ "name": "mainslots", "type": "TArray<SInventoryUISlot>", "offset": 0 },
+				{ "name": "otherslots", "type": "TArray<SInventoryUISlot>", "offset": 24 },
+				{ "name": "selectedIndex", "type": "int32", "offset": 48 },
+				{ "name": "isActionInventory", "type": "bool", "offset": 52 }
 			]
 		},
 		{
@@ -17578,6 +18156,17 @@
 			]
 		},
 		{
+			"name": "SItemInstanceSaveData",
+			"size": 64,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_repositoryId", "type": "ZRepositoryID", "offset": 0 },
+				{ "name": "m_nEntityID", "type": "uint64", "offset": 16 },
+				{ "name": "m_sOnlineInstanceId", "type": "ZString", "offset": 24 },
+				{ "name": "m_aItemModifierIds", "type": "TArray<ZRepositoryID>", "offset": 40 }
+			]
+		},
+		{
 			"name": "SItemLeftHandUIData",
 			"size": 16,
 			"alignment": 4,
@@ -17636,6 +18225,22 @@
 			"fields": [
 				{ "name": "m_HolderSaveableId", "type": "uint32", "offset": 0 },
 				{ "name": "m_KeywordID", "type": "int32", "offset": 4 }
+			]
+		},
+		{
+			"name": "SKnownEntity",
+			"size": 160,
+			"alignment": 16,
+			"fields": [
+				{ "name": "m_pActor", "type": "ZEntityRef", "offset": 0 },
+				{ "name": "m_nRefCount", "type": "uint32", "offset": 8 },
+				{ "name": "m_pSharedKnowledge", "type": null, "offset": 16 },
+				{ "name": "m_nBooleanEvents", "type": "uint32", "offset": 24 },
+				{ "name": "m_nBooleanEventsHandled", "type": "uint32", "offset": 28 },
+				{ "name": "m_events", "type": null, "offset": 32 },
+				{ "name": "m_knownWorldMatrix", "type": "SMatrix", "offset": 80 },
+				{ "name": "m_tLastWorldMatrixUpdate", "type": "ZGameTime", "offset": 144 },
+				{ "name": "m_nGoals", "type": "int16", "offset": 152 }
 			]
 		},
 		{
@@ -17719,6 +18324,33 @@
 				{ "name": "m_fTransitionAmount", "type": "float32", "offset": 8 },
 				{ "name": "m_bEnteredFromSide0", "type": "bool", "offset": 12 },
 				{ "name": "m_bInTransition", "type": "bool", "offset": 13 }
+			]
+		},
+		{
+			"name": "SLevelSaveData",
+			"size": 472,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_nGameTime", "type": "int64", "offset": 0 },
+				{ "name": "m_nGameTimePrev", "type": "int64", "offset": 8 },
+				{ "name": "m_nGameTimeDelta", "type": "int64", "offset": 16 },
+				{ "name": "m_sScene", "type": "ZString", "offset": 24 },
+				{ "name": "m_sLocationId", "type": "ZString", "offset": 40 },
+				{ "name": "m_sContractId", "type": "ZString", "offset": 56 },
+				{ "name": "m_sContractSessionId", "type": "ZString", "offset": 72 },
+				{ "name": "m_sLastEventToken", "type": "ZString", "offset": 88 },
+				{ "name": "m_EnabledEntranceId", "type": "ZRepositoryID", "offset": 104 },
+				{ "name": "m_StartupDisguiseId", "type": "ZRepositoryID", "offset": 120 },
+				{ "name": "m_contractData", "type": "ZVariant", "offset": 136 },
+				{ "name": "m_trackedOpportunity", "type": "ZGuid", "offset": 152 },
+				{ "name": "m_aStartupInventory", "type": "SInventoryInfo", "offset": 168 },
+				{ "name": "m_aStartupAgencyPickupSelection", "type": "SAgencyPickupInfo", "offset": 312 },
+				{ "name": "m_aObjectives", "type": "TArray<SObjetiveSaveData>", "offset": 376 },
+				{ "name": "m_aGameChangers", "type": "TArray<ZVariant>", "offset": 400 },
+				{ "name": "m_SoundAmbienceData", "type": "SSoundAmbienceSaveData", "offset": 424 },
+				{ "name": "m_ChallengesSaveData", "type": "SChallengesSaveData", "offset": 440 },
+				{ "name": "m_nSaveGameLimit", "type": "int32", "offset": 464 },
+				{ "name": "m_fLastKillTimestamp", "type": "float32", "offset": 468 }
 			]
 		},
 		{
@@ -17843,6 +18475,25 @@
 				{ "name": "m42", "type": "float32", "offset": 52 },
 				{ "name": "m43", "type": "float32", "offset": 56 },
 				{ "name": "m44", "type": "float32", "offset": 60 }
+			]
+		},
+		{
+			"name": "SMenuPersistentData",
+			"size": 296,
+			"alignment": 8,
+			"fields": [
+				{ "name": "aLoadout", "type": "TArray", "offset": 0 },
+				{ "name": "m_loadoutData", "type": "ZDynamicObject", "offset": 24 },
+				{ "name": "m_loadoutChanged", "type": null, "offset": 40 },
+				{ "name": "m_sLoadoutContractId", "type": "ZString", "offset": 72 },
+				{ "name": "m_aCachedAvailableSaves", "type": "TArray", "offset": 88 },
+				{ "name": "m_cachedAvailableSavesChanged", "type": null, "offset": 112 },
+				{ "name": "selectedAgencyPickup", "type": "ZString", "offset": 144 },
+				{ "name": "m_enabledEntranceId", "type": "ZRepositoryID", "offset": 160 },
+				{ "name": "m_aEnabledEntranceEquip", "type": "ZDynamicObject", "offset": 176 },
+				{ "name": "m_persistentContext", "type": "ZDynamicObject", "offset": 192 },
+				{ "name": "m_loadingScreenData", "type": null, "offset": 208 },
+				{ "name": "m_opportunities", "type": "ZDynamicObject", "offset": 280 }
 			]
 		},
 		{
@@ -18518,6 +19169,18 @@
 			]
 		},
 		{
+			"name": "SStashPointSaveData",
+			"size": 56,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_arItems", "type": "TArray<uint32>", "offset": 0 },
+				{ "name": "m_pSuitcase", "type": "uint32", "offset": 24 },
+				{ "name": "m_pMainItem", "type": "uint32", "offset": 28 },
+				{ "name": "m_eContainedType", "type": "EStashpointContainedEntityType", "offset": 32 },
+				{ "name": "m_MainItemID", "type": "ZRepositoryID", "offset": 40 }
+			]
+		},
+		{
 			"name": "SStateControllerSaveDataStruct",
 			"size": 8,
 			"alignment": 4,
@@ -19002,6 +19665,14 @@
 			]
 		},
 		{
+			"name": "SWorldInventoryInstanceSaveData",
+			"size": 24,
+			"alignment": 8,
+			"fields": [
+				{ "name": "m_aItemInstanceSaveData", "type": "TArray<SItemInstanceSaveData>", "offset": 0 }
+			]
+		},
+		{
 			"name": "ZAISetpieceDistractionContextEntity.SAIDistractionContextEntitySaveData",
 			"size": 24,
 			"alignment": 8,
@@ -19233,6 +19904,16 @@
 			]
 		},
 		{
+			"name": "ZHM5AudioEventConsumer.SAudioAnimationEventData",
+			"size": 16,
+			"alignment": 4,
+			"fields": [
+				{ "name": "m_pAudioEventRes", "type": "ZResourcePtr", "offset": 0 },
+				{ "name": "m_fAttenuation", "type": "float32", "offset": 8 },
+				{ "name": "m_fPitch", "type": "float32", "offset": 12 }
+			]
+		},
+		{
 			"name": "ZHM5BodySoundEventConsumer.SBodySoundEventData",
 			"size": 4,
 			"alignment": 4,
@@ -19248,6 +19929,16 @@
 				{ "name": "m_nEvent", "type": "EHM5SoundCloseCombatEvent", "offset": 0 },
 				{ "name": "m_fAttenuation", "type": "float32", "offset": 4 },
 				{ "name": "m_fPitch", "type": "float32", "offset": 8 }
+			]
+		},
+		{
+			"name": "ZHM5CrowdEventConsumer.SCrowdSoundEventData",
+			"size": 16,
+			"alignment": 4,
+			"fields": [
+				{ "name": "m_pAudioEventRes", "type": "ZResourcePtr", "offset": 0 },
+				{ "name": "m_fAttenuation", "type": "float32", "offset": 8 },
+				{ "name": "m_fPitch", "type": "float32", "offset": 12 }
 			]
 		},
 		{
@@ -19347,6 +20038,17 @@
 			"fields": [
 				{ "name": "m_sTitleText", "type": "ZString", "offset": 0 },
 				{ "name": "m_sBodyText", "type": "ZString", "offset": 16 }
+			]
+		},
+		{
+			"name": "ZHUDUIControllerEntity.SIntelData",
+			"size": 40,
+			"alignment": 8,
+			"fields": [
+				{ "name": "intelHeadline", "type": "ZString", "offset": 0 },
+				{ "name": "repoID", "type": "ZRepositoryID", "offset": 16 },
+				{ "name": "intelType", "type": "int32", "offset": 32 },
+				{ "name": "showDuration", "type": "float32", "offset": 36 }
 			]
 		},
 		{
@@ -19601,6 +20303,88 @@
 				{ "name": "m_vEscortOutExitLocation", "type": "float4", "offset": 48 },
 				{ "name": "m_nGetHelpGroup", "type": "int32", "offset": 64 },
 				{ "name": "m_bPropagationEnabled", "type": "bool", "offset": 68 }
+			]
+		},
+		{
+			"name": "ZUIActionSelectorNavigationInventoryEntity.SActionSelectorSlotDisplayInfo",
+			"size": 248,
+			"alignment": 8,
+			"fields": [
+				{ "name": "icon", "type": "ZRuntimeResourceID", "offset": 0 },
+				{ "name": "containedIcon", "type": "ZRuntimeResourceID", "offset": 8 },
+				{ "name": "label", "type": "ZString", "offset": 16 },
+				{ "name": "containedLabel", "type": "ZString", "offset": 32 },
+				{ "name": "silencer", "type": "bool", "offset": 48 },
+				{ "name": "count", "type": "int32", "offset": 52 },
+				{ "name": "ammo", "type": "int32", "offset": 56 },
+				{ "name": "id", "type": "ZRepositoryID", "offset": 64 },
+				{ "name": "weaponCategory", "type": "ZString", "offset": 80 },
+				{ "name": "nAmmoRemaining", "type": "int32", "offset": 96 },
+				{ "name": "nAmmoTotal", "type": "int32", "offset": 100 },
+				{ "name": "nAmmoInClip", "type": "int32", "offset": 104 },
+				{ "name": "nWeaponType", "type": "int32", "offset": 108 },
+				{ "name": "itemCategory", "type": "ZString", "offset": 112 },
+				{ "name": "itemCategoryLKey", "type": "ZString", "offset": 128 },
+				{ "name": "inventoryCategoryIcon", "type": "ZString", "offset": 144 },
+				{ "name": "sPoisonType", "type": "ZString", "offset": 160 },
+				{ "name": "notininventory", "type": "bool", "offset": 176 },
+				{ "name": "isIllegal", "type": "bool", "offset": 177 },
+				{ "name": "actionName", "type": "ZString", "offset": 184 },
+				{ "name": "longDescription", "type": "ZString", "offset": 200 },
+				{ "name": "missingText", "type": "ZString", "offset": 216 },
+				{ "name": "warningText", "type": "ZString", "offset": 232 }
+			]
+		},
+		{
+			"name": "ZUIActionSelectorNavigationInventoryEntity.SActionSelectorInvokeData",
+			"size": 56,
+			"alignment": 8,
+			"fields": [
+				{ "name": "mainslots", "type": "TArray<ZUIActionSelectorNavigationInventoryEntity.SActionSelectorSlotDisplayInfo>", "offset": 0 },
+				{ "name": "otherslots", "type": "TArray<ZUIActionSelectorNavigationInventoryEntity.SActionSelectorSlotDisplayInfo>", "offset": 24 },
+				{ "name": "selectedIndex", "type": "int32", "offset": 48 },
+				{ "name": "isActionInventory", "type": "bool", "offset": 52 }
+			]
+		},
+		{
+			"name": "ZUIEmoteSelectorNavigationEntity.SActionSelectorSlotDisplayInfo",
+			"size": 232,
+			"alignment": 8,
+			"fields": [
+				{ "name": "icon", "type": "ZRuntimeResourceID", "offset": 0 },
+				{ "name": "containedIcon", "type": "ZRuntimeResourceID", "offset": 8 },
+				{ "name": "label", "type": "ZString", "offset": 16 },
+				{ "name": "containedLabel", "type": "ZString", "offset": 32 },
+				{ "name": "silencer", "type": "bool", "offset": 48 },
+				{ "name": "count", "type": "int32", "offset": 52 },
+				{ "name": "ammo", "type": "int32", "offset": 56 },
+				{ "name": "id", "type": "ZRepositoryID", "offset": 64 },
+				{ "name": "weaponCategory", "type": "ZString", "offset": 80 },
+				{ "name": "nAmmoRemaining", "type": "int32", "offset": 96 },
+				{ "name": "nAmmoTotal", "type": "int32", "offset": 100 },
+				{ "name": "nAmmoInClip", "type": "int32", "offset": 104 },
+				{ "name": "nWeaponType", "type": "int32", "offset": 108 },
+				{ "name": "itemCategory", "type": "ZString", "offset": 112 },
+				{ "name": "itemCategoryLKey", "type": "ZString", "offset": 128 },
+				{ "name": "inventoryCategoryIcon", "type": "ZString", "offset": 144 },
+				{ "name": "notininventory", "type": "bool", "offset": 160 },
+				{ "name": "isIllegal", "type": "bool", "offset": 161 },
+				{ "name": "actionName", "type": "ZString", "offset": 168 },
+				{ "name": "longDescription", "type": "ZString", "offset": 184 },
+				{ "name": "missingText", "type": "ZString", "offset": 200 },
+				{ "name": "warningText", "type": "ZString", "offset": 216 }
+			]
+		},
+		{
+			"name": "ZUIEmoteSelectorNavigationEntity.SActionSelectorInvokeData",
+			"size": 72,
+			"alignment": 8,
+			"fields": [
+				{ "name": "mainslots", "type": "TArray<ZUIEmoteSelectorNavigationEntity.SActionSelectorSlotDisplayInfo>", "offset": 0 },
+				{ "name": "otherslots", "type": "TArray<ZUIEmoteSelectorNavigationEntity.SActionSelectorSlotDisplayInfo>", "offset": 24 },
+				{ "name": "selectedIndex", "type": "int32", "offset": 48 },
+				{ "name": "isActionInventory", "type": "bool", "offset": 52 },
+				{ "name": "noItemsMessage", "type": "ZString", "offset": 56 }
 			]
 		}
 	]
