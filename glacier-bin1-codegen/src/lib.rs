@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use codegen::{Block, Scope};
+use codegen::Scope;
 use inflector::Inflector;
 use lazy_regex::{regex_captures, regex_is_match, regex_replace};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -346,7 +346,7 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 		}
 
 		if ty == "enums" {
-			scope.import("std::str", "FromStr");
+			scope.import("glacier_bin1_core::types::enums", "define_enum");
 			enum_queue.append(&mut enums);
 		}
 	}
@@ -388,7 +388,7 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 					}
 
 					// All enums are valid ZVariants
-					scope.import("std::str", "FromStr");
+					scope.import("glacier_bin1_core::types::enums", "define_enum");
 					enum_queue.append(&mut enums);
 				} else if ty == "TResourcePtr" {
 					scope.import("glacier_bin1_core::types::resource", "TResourcePtr");
@@ -402,7 +402,7 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 				} else if let Some(pos) = structs.iter().position(|x| x.rust_name == *ty) {
 					struct_queue.push_back((structs.remove(pos), is_variant));
 				} else if let Some(pos) = enums.iter().position(|x| x.rust_name == *ty) {
-					scope.import("std::str", "FromStr");
+					scope.import("glacier_bin1_core::types::enums", "define_enum");
 					enum_queue.push(enums.remove(pos));
 				}
 			}
@@ -487,53 +487,13 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 	}
 
 	for RustEnum {
-		rust_name: enum_name,
+		rust_name,
 		type_id,
 		size,
 		values
 	} in enum_queue
 	{
-		let item = scope
-			.new_enum(&enum_name)
-			.derive("Facet")
-			.derive("Clone")
-			.derive("Copy")
-			.derive("PartialEq")
-			.derive("Eq")
-			.derive("PartialOrd")
-			.derive("Ord")
-			.derive("Hash")
-			.derive("serde::Serialize")
-			.derive("serde::Deserialize")
-			.vis("pub");
-
-		if values.is_empty() {
-			// ZST
-			item.new_variant("Value")
-				.annotation(r#"#[serde(rename = "")]"#)
-				.annotation(r#"#[facet(rename = "")]"#);
-		} else {
-			for RustVariant {
-				rust_name,
-				variant_name,
-				..
-			} in &values
-			{
-				item.new_variant(rust_name)
-					.annotation(format!(r#"#[serde(rename = "{variant_name}")]"#))
-					.annotation(format!(r#"#[facet(rename = "{variant_name}")]"#));
-			}
-		}
-
-		let size_ty = match size {
-			1 => "u8",
-			2 => "u16",
-			4 => "u32",
-			8 => "u64",
-			_ => panic!("Invalid size")
-		};
-
-		let signed_size_ty = match size {
+		let repr_ty = match size {
 			1 => "i8",
 			2 => "i16",
 			4 => "i32",
@@ -541,173 +501,33 @@ pub fn generate(scope: &mut Scope, types_json: &str, custom_types_json: &str, to
 			_ => panic!("Invalid size")
 		};
 
-		item.repr(size_ty);
-
-		// Alternate formatting uses original variant name rather than rustified name
-		scope
-			.new_impl(&enum_name)
-			.impl_trait("Debug")
-			.new_fn("fmt")
-			.arg_ref_self()
-			.arg("f", "&mut std::fmt::Formatter<'_>")
-			.ret("std::fmt::Result")
-			.push_block({
-				let mut block = Block::new("if !f.alternate()");
-				block.push_block({
-					let mut block = Block::new("match self");
-					if values.is_empty() {
-						block.line(format!("{enum_name}::Value => f.write_str(\"Value\")"));
-					} else {
-						for RustVariant { rust_name, .. } in &values {
-							block.line(format!("{enum_name}::{rust_name} => f.write_str(\"{rust_name}\"),"));
-						}
-					}
-					block
-				});
-				block.after("else");
-				block
-			})
-			.push_block({
-				let mut block = Block::new("");
-				if values.is_empty() {
-					block.line("f.write_str(\"Value\")");
-				} else {
-					block.line("f.write_str(<&'static str>::from(*self))");
-				}
-				block
-			});
-
-		scope
-			.new_impl(&enum_name)
-			.impl_trait("Aligned")
-			.associate_const("ALIGNMENT", "usize", size.to_string(), "");
-
-		scope
-			.new_impl(&enum_name)
-			.impl_trait("Bin1Sized")
-			.associate_const("SIZE", "usize", size.to_string(), "");
-
-		scope
-			.new_impl("&'static str")
-			.impl_trait(format!("From<{enum_name}>"))
-			.new_fn("from")
-			.arg("value", &enum_name)
-			.ret("&'static str")
-			.push_block({
-				let mut block = Block::new("match value");
-				if values.is_empty() {
-					block.line(format!(r#"{enum_name}::Value => """#));
-				} else {
-					for RustVariant {
-						rust_name,
-						variant_name,
-						..
-					} in &values
-					{
-						block.line(format!(r#"{enum_name}::{rust_name} => "{variant_name}","#));
-					}
-				}
-				block
-			});
-
-		scope
-			.new_impl(&enum_name)
-			.impl_trait("FromStr")
-			.associate_type("Err", "()")
-			.new_fn("from_str")
-			.arg("value", "&str")
-			.ret("Result<Self, ()>")
-			.push_block({
-				if values.is_empty() {
-					let mut block = Block::new("");
-					block.line(r#"value.is_empty().then_some(Self::Value).ok_or(())"#);
-					block
-				} else {
-					let mut block = Block::new("Ok(match value");
-					for RustVariant {
-						rust_name,
-						variant_name,
-						..
-					} in &values
-					{
-						block.line(format!(r#""{variant_name}" => Self::{rust_name},"#));
-					}
-					block.line("_ => return Err(())");
-					block.after(")");
-					block
-				}
-			});
-
-		scope
-			.new_impl(signed_size_ty)
-			.impl_trait(format!("From<{enum_name}>"))
-			.new_fn("from")
-			.arg("value", &enum_name)
-			.ret(signed_size_ty)
-			.push_block({
-				let mut block = Block::new("match value");
-				if values.is_empty() {
-					block.line(format!("{enum_name}::Value => 1"));
-				} else {
-					for RustVariant { rust_name, value, .. } in &values {
-						block.line(format!("{enum_name}::{rust_name} => {value},"));
-					}
-				}
-				block
-			});
-
-		scope
-			.new_impl(&enum_name)
-			.impl_trait(format!("TryFrom<{signed_size_ty}>"))
-			.associate_type("Error", "()")
-			.new_fn("try_from")
-			.arg("value", signed_size_ty)
-			.ret("Result<Self, ()>")
-			.push_block({
-				if values.is_empty() {
-					let mut block = Block::new("");
-					block.line(format!(
-						r#"if value != 1 {{ eprintln!("Unexpected value for uninhabited enum {type_id}: {{}}", value); }}"#
-					));
-					block.line("Ok(Self::Value)");
-					block
-				} else {
-					let mut block = Block::new("Ok(match value");
-					for RustVariant { rust_name, value, .. } in &values {
-						block.line(format!("{value} => Self::{rust_name},"));
-					}
-					block.line("_ => return Err(())");
-					block.after(")");
-					block
-				}
-			});
-
-		let ser_impl = scope.new_impl(&enum_name).impl_trait("Bin1Serialize");
-		ser_impl
-			.new_fn("alignment")
-			.arg_ref_self()
-			.ret("usize")
-			.line(size.to_string());
-		ser_impl
-			.new_fn("write")
-			.arg_ref_self()
-			.arg("ser", "&mut Bin1Serializer")
-			.ret("Result<(), SerializeError>")
-			.line(format!(
-				"ser.write_unaligned(&{signed_size_ty}::from(*self).to_le_bytes());"
-			))
-			.line("Ok(())");
-
-		let de_impl = scope.new_impl(&enum_name).impl_trait("Bin1Deserialize");
-		de_impl
-			.new_fn("read")
-			.arg("de", "&mut Bin1Deserializer")
-			.ret("Result<Self, DeserializeError>")
-			.line(format!(
-				r"let value = de.read_{signed_size_ty}()?;
-value.try_into().map_err(|_| DeserializeError::InvalidEnumValue(value as i64))"
-			));
-
-		scope.raw(format!(r#"submit!({enum_name}, "{type_id}");"#));
+		scope.raw(format!(
+			r#"define_enum!({repr_ty}, {rust_name} {{ {} }});"#,
+			values
+				.iter()
+				.map(
+					|RustVariant {
+					     variant_name,
+					     rust_name,
+					     value
+					 }| format!(r#"{rust_name} => {variant_name} = {value}"#)
+				)
+				.collect::<Vec<_>>()
+				.join(", ")
+		));
+		scope.raw(format!(
+			r#"submit_enum!({rust_name}, "{type_id}", &[{}]);"#,
+			values
+				.into_iter()
+				.map(
+					|RustVariant {
+					     variant_name,
+					     rust_name,
+					     value
+					 }| format!(r#"("{rust_name}", "{variant_name}", {value})"#)
+				)
+				.collect::<Vec<_>>()
+				.join(", ")
+		));
 	}
 }

@@ -1,4 +1,5 @@
 pub mod array;
+pub mod enums;
 pub mod pointers;
 pub mod property;
 pub mod repository;

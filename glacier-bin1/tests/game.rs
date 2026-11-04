@@ -3,7 +3,7 @@ use std::{
 	sync::atomic::{AtomicUsize, Ordering}
 };
 
-use hitman_commons::game_detection::GameInstall;
+use glacier_commons::game_detection::GameInstall;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use rpkg_rs::resource::{
 	partition_manager::{PartitionManager, PartitionManagerPar},
@@ -11,17 +11,17 @@ use rpkg_rs::resource::{
 };
 
 #[static_init::dynamic]
-static GAMES: Vec<GameInstall> = hitman_commons::game_detection::detect_installs()
+static GAMES: Vec<GameInstall> = glacier_commons::game_detection::detect_installs()
 	.expect("Couldn't detect game installs")
 	.into_iter()
 	.filter(|x| {
 		[
 			#[cfg(feature = "h1")]
-			hitman_commons::game::GameVersion::H1,
+			glacier_commons::game::GameVersion::H1,
 			#[cfg(feature = "h2")]
-			hitman_commons::game::GameVersion::H2,
+			glacier_commons::game::GameVersion::H2,
 			#[cfg(feature = "h3")]
-			hitman_commons::game::GameVersion::H3
+			glacier_commons::game::GameVersion::H3
 		]
 		.contains(&x.version)
 	})
@@ -37,7 +37,12 @@ fn roundtrip_all_resources() {
 
 		let mut game_files = PartitionManager::new(game_paths.runtime_path.to_owned(), &{
 			let mut partitions = PackageDefinitionSource::from_version(
-				game.version.into(),
+				match game.version {
+					glacier_commons::game::GlacierGame::H1 => rpkg_rs::WoaVersion::HM2016,
+					glacier_commons::game::GlacierGame::H2 => rpkg_rs::WoaVersion::HM2,
+					glacier_commons::game::GlacierGame::H3 => rpkg_rs::WoaVersion::HM3,
+					_ => unreachable!()
+				},
 				fs::read(game_paths.runtime_path.join("packagedefinition.txt"))
 					.expect("Couldn't read packagedefinition")
 			)
@@ -129,7 +134,7 @@ fn roundtrip_all_resources() {
 					($data:expr, $round:literal, $h1_ty:ty, $h2_ty:ty, $h3_ty:ty) => {
 						match game.version {
 							#[cfg(feature = "h1")]
-							hitman_commons::game::GameVersion::H1 => {
+							glacier_commons::game::GameVersion::H1 => {
 								#[allow(unused_imports)]
 								use glacier_bin1::game::h1::*;
 								glacier_bin1::serialize(&glacier_bin1::deserialize::<$h1_ty>(&$data).unwrap_or_else(
@@ -152,7 +157,7 @@ fn roundtrip_all_resources() {
 							}
 
 							#[cfg(feature = "h2")]
-							hitman_commons::game::GameVersion::H2 => {
+							glacier_commons::game::GameVersion::H2 => {
 								#[allow(unused_imports)]
 								use glacier_bin1::game::h2::*;
 								glacier_bin1::serialize(&glacier_bin1::deserialize::<$h2_ty>(&$data).unwrap_or_else(
@@ -175,7 +180,7 @@ fn roundtrip_all_resources() {
 							}
 
 							#[cfg(feature = "h3")]
-							hitman_commons::game::GameVersion::H3 => {
+							glacier_commons::game::GameVersion::H3 => {
 								#[allow(unused_imports)]
 								use glacier_bin1::game::h3::*;
 								glacier_bin1::serialize(&glacier_bin1::deserialize::<$h3_ty>(&$data).unwrap_or_else(
