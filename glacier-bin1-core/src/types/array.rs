@@ -214,6 +214,10 @@ impl<T: Bin1Deserialize + Bin1Sized> Bin1Deserialize for Vec<T> {
 			let start = de.read_u64()?;
 			let end = de.read_u64()?;
 
+			if end as usize > de.len() {
+				return Err(crate::de::DeserializeError::ArrayTooLarge);
+			}
+
 			#[cfg(feature = "debug-log")]
 			eprintln!(
 				"0x{:6X}: traversing Vec<{}> to 0x{:X} (end: 0x{:X})",
@@ -321,6 +325,10 @@ pub mod TArrayRef {
 
 			if start == u64::MAX || end == u64::MAX {
 				return Ok(De(Vec::new()));
+			}
+
+			if end as usize > de.len() {
+				return Err(crate::de::DeserializeError::ArrayTooLarge);
 			}
 
 			let pos = de.position();

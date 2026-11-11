@@ -27,6 +27,9 @@ pub enum DeserializeError {
 	#[error("invalid string: {0}")]
 	Utf8Error(#[from] std::str::Utf8Error),
 
+	#[error("array length exceeded remaining file")]
+	ArrayTooLarge,
+
 	#[error("string length exceeded remaining file")]
 	StringTooLarge,
 
@@ -191,6 +194,10 @@ impl<'a> Bin1Deserializer<'a> {
 
 	pub fn position(&self) -> u64 {
 		self.buffer.position()
+	}
+
+	pub fn len(&self) -> usize {
+		self.buffer.get_ref().len()
 	}
 
 	#[try_fn]

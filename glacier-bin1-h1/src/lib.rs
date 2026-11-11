@@ -1,12 +1,21 @@
 #![allow(non_camel_case_types)]
 
 #[linkme::distributed_slice]
-static BIN1_VARIANT_TYPES_H1: [(std::any::TypeId, &'static str, Option<&'static facet::Shape>, Option<&'static [(&'static str, &'static str, i64)]>)];
+static BIN1_VARIANT_TYPES_H1: [(
+	std::any::TypeId,
+	&'static str,
+	Option<&'static facet::Shape>,
+	Option<&'static [(&'static str, &'static str, i64)]>
+)];
 
 #[static_init::dynamic]
 pub static VARIANT_TYPES: HashMap<
 	std::any::TypeId,
-	(&'static str, Option<&'static facet::Shape>, Option<&'static [(&'static str, &'static str, i64)]>),
+	(
+		&'static str,
+		Option<&'static facet::Shape>,
+		Option<&'static [(&'static str, &'static str, i64)]>
+	),
 	rapidhash::fast::RandomState
 > = BIN1_VARIANT_TYPES_H1
 	.into_iter()
@@ -72,7 +81,7 @@ macro_rules! submit {
 macro_rules! submit_enum {
 	($ty:ty, $type_id:literal, $variants:expr) => {
 		impl_variant!($ty, $type_id);
-		
+
 		mident::mident! {
 			#[linkme::distributed_slice(BIN1_VARIANT_TYPES_H1)]
 			static #concat(#flatten($ty) _Ty): (std::any::TypeId, &'static str, Option<&'static facet::Shape>, Option<&'static [(&'static str, &'static str, i64)]>)
