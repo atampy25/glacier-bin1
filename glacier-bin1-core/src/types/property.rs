@@ -16,11 +16,11 @@ use crate::{
 include!(concat!(env!("OUT_DIR"), "/properties.rs"));
 
 #[static_init::dynamic]
-static PROPERTIES: std::collections::HashMap<u32, &'static str, BuildIdentityHasher<u32>> =
+pub static PROPERTIES: std::collections::HashMap<u32, &'static str, BuildIdentityHasher<u32>> =
 	PROPERTIES_HASHES.iter().copied().collect();
 
 #[static_init::dynamic]
-static CUSTOM_PROPERTIES: papaya::HashMap<u32, EcoString, rapidhash::fast::RandomState> = Default::default();
+pub static CUSTOM_PROPERTIES: papaya::HashMap<u32, EcoString, rapidhash::fast::RandomState> = Default::default();
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Facet)]
 pub struct PropertyID(pub u32);
