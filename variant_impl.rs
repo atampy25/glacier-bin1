@@ -250,6 +250,18 @@ impl<'a> std::hash::Hash for BorrowedValueWrapper<'a> {
 	}
 }
 
+#[derive(Debug, Clone)]
+pub struct EnumMember {
+	pub name: &'static str,
+	pub serialized_name: &'static str,
+	pub discriminant: Option<i64>,
+}
+
+#[derive(Debug, Clone)]
+pub struct EnumDescriptor {
+	pub members: Vec<EnumMember>,
+}
+
 /// Reference-counted copy-on-write container for any Variant-implementing value.
 #[derive(Facet, Clone, dynex::PartialEqFix)]
 pub struct ZVariant {
@@ -293,6 +305,43 @@ impl ZVariant {
 	/// Determine whether the stored Variant value is a valid type for this game version.
 	pub fn is_valid(&self) -> bool {
 		VARIANT_TYPES.contains_key(&self.any_type())
+	}
+
+	pub fn type_name(&self) -> &'static str {
+		self.value.variant_type()
+	}
+
+	pub fn is_array(&self) -> bool {
+		self.value.as_vec().is_some()
+	}
+
+	pub fn is_enum(&self) -> bool {
+		VARIANT_TYPES
+			.get(&self.any_type())
+			.and_then(|(_, shape)| *shape)
+			.is_some_and(|shape| matches!(shape.ty, facet::Type::User(facet::UserType::Enum(_))))
+	}
+
+	pub fn to_enum(&self) -> Option<EnumDescriptor> {
+		let Some((_, Some(shape))) = VARIANT_TYPES.get(&self.any_type()) else {
+			return None;
+		};
+
+		let facet::Type::User(facet::UserType::Enum(enum_type)) = shape.ty else {
+			return None;
+		};
+
+		Some(EnumDescriptor {
+			members: enum_type
+				.variants
+				.iter()
+				.map(|v| EnumMember {
+					name: v.name,
+					serialized_name: v.effective_name(),
+					discriminant: v.discriminant,
+				})
+				.collect(),
+		})
 	}
 
 	pub fn into_inner(self) -> Arc<dyn Variant> {
